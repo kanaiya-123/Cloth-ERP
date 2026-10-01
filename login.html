@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — CLOTHERP Clothing Management ERP</title>
+    <meta name="description" content="Sign in to CLOTHERP to manage clothing products, variants, inventory, GST billing, purchases, and LR shipment tracking.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern min-h-screen flex flex-col justify-between">
+
+    <!-- Top Simple Brand Header -->
+    <header class="py-4 px-6 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="./index.html" class="flex items-center space-x-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+                    <i data-lucide="layers" class="w-4 h-4 text-white"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-extrabold tracking-wider text-white font-mono">CLOTH<span class="text-blue-400">ERP</span></span>
+                    <span class="text-[8px] uppercase tracking-widest text-slate-400 -mt-1 font-semibold">Clothing ERP</span>
+                </div>
+            </a>
+
+            <a href="./index.html" class="text-xs font-semibold text-slate-400 hover:text-white flex items-center space-x-1.5 transition">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Authentication Viewport -->
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl shadow-black/80 overflow-hidden">
+            
+            <!-- Left Side: Brand Showcase & Value Pitch (Desktop Only) -->
+            <div class="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950/40 p-8 flex-col justify-between border-r border-slate-800 relative overflow-hidden">
+                <!-- Radial Accent -->
+                <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-blue-600/15 blur-3xl pointer-events-none"></div>
+
+                <div class="space-y-6 relative z-10">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-indicator"></span>
+                        <span>Enterprise Cloud v1.0</span>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight leading-snug">
+                            Everything Your Clothing Business Needs.
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                            Sign in to access real-time apparel stock matrices, GST POS billing, supplier PO tracking, and multi-branch P&L reports.
+                        </p>
+                    </div>
+
+                    <!-- Mini Capability Feature Badges -->
+                    <div class="space-y-2.5 pt-2">
+                        <div class="flex items-center space-x-3 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                                <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">Garment Variant Matrices</div>
+                                <div class="text-[10px] text-slate-400">Sizes, colors, SKU & barcode sync</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">5% Apparel GST Billing</div>
+                                <div class="text-[10px] text-slate-400">Automated CGST/SGST POS & B2B</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                                <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">Freight & LR Number Log</div>
+                                <div class="text-[10px] text-slate-400">Audit trail from supplier to store</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Status -->
+                <div class="pt-6 border-t border-slate-800/80 text-[11px] text-slate-500 flex justify-between items-center font-mono">
+                    <span>Role-Based Access Control</span>
+                    <span class="text-emerald-400">● 99.9% Uptime</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="col-span-1 lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
+                <div class="max-w-md mx-auto w-full space-y-6">
+                    
+                    <!-- Header -->
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Welcome Back</h1>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Sign in to manage your clothing business.</p>
+                    </div>
+
+                    <!-- Notification / Global Error Container -->
+                    <div id="loginFeedback" class="hidden p-3.5 rounded-xl text-xs flex items-start space-x-2.5 border transition-all"></div>
+
+                    <!-- Login Form -->
+                    <form id="loginForm" class="space-y-4" novalidate>
+                        
+                        <!-- Email or Username Field -->
+                        <div class="space-y-1.5">
+                            <label for="identifier" class="block text-xs font-semibold text-slate-300">
+                                Email or Username <span class="text-red-400">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i data-lucide="user" class="w-4 h-4"></i>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    id="identifier" 
+                                    name="identifier" 
+                                    autocomplete="username"
+                                    placeholder="e.g. admin@clotherp.local or admin"
+                                    class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/70 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition"
+                                >
+                            </div>
+                            <div id="identifierError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label for="password" class="block text-xs font-semibold text-slate-300">
+                                    Password <span class="text-red-400">*</span>
+                                </label>
+                                <a href="./forgot-password.html" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition">
+                                    Forgot password?
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i data-lucide="lock" class="w-4 h-4"></i>
+                                </div>
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    autocomplete="current-password"
+                                    placeholder="••••••••••••"
+                                    class="w-full pl-10 pr-10 py-2.5 bg-slate-950/70 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="togglePassword" 
+                                    aria-label="Show or hide password"
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 transition focus:outline-none"
+                                >
+                                    <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div id="passwordError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center justify-between pt-1">
+                            <label class="flex items-center space-x-2.5 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    id="rememberMe" 
+                                    class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                                >
+                                <span class="text-xs text-slate-300">Remember my account</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            id="submitBtn" 
+                            class="btn-primary w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/25 flex items-center justify-center space-x-2 transition-all mt-2"
+                        >
+                            <span id="btnText">Sign In</span>
+                            <i data-lucide="arrow-right" id="btnIcon" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+
+                    <!-- Development Demo Quick Autofill Section -->
+                    <div class="pt-6 border-t border-slate-800">
+                        <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/90 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center">
+                                    <i data-lucide="terminal" class="w-3.5 h-3.5 mr-1.5"></i>
+                                    Development Demo Access
+                                </span>
+                                <span class="text-[10px] text-slate-500">1-Click Login</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400">Select any role to auto-populate credentials for testing:</p>
+                            
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <button type="button" class="demo-login-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="admin@clotherp.local" data-pass="Admin@123">
+                                    <div class="text-xs font-bold text-blue-300">Admin</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">Full Access</div>
+                                </button>
+                                <button type="button" class="demo-login-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="manager@clotherp.local" data-pass="Manager@123">
+                                    <div class="text-xs font-bold text-emerald-300">Manager</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">Operations</div>
+                                </button>
+                                <button type="button" class="demo-login-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="sales@clotherp.local" data-pass="Sales@123">
+                                    <div class="text-xs font-bold text-sky-300">Sales Staff</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">POS & Billing</div>
+                                </button>
+                                <button type="button" class="demo-login-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="purchase@clotherp.local" data-pass="Purchase@123">
+                                    <div class="text-xs font-bold text-amber-300">Purchase Staff</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">Suppliers & LR</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Help -->
+                    <div class="text-center text-xs text-slate-500">
+                        Need assistance? Contact your system administrator or <a href="./index.html" class="text-blue-400 hover:underline">return to home</a>.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800/80 bg-slate-950/40">
+        © 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP
+    </footer>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { authService } from './assets/js/services/authService.js';
+        import { redirectIfAuthenticated } from './assets/js/utils/authGuard.js';
+
+        // Check if already authenticated
+        redirectIfAuthenticated('./dashboard.html');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+
+            const form = document.getElementById('loginForm');
+            const identifierInput = document.getElementById('identifier');
+            const passwordInput = document.getElementById('password');
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const feedbackEl = document.getElementById('loginFeedback');
+            const identifierError = document.getElementById('identifierError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Load remembered email
+            const remembered = authService.getRememberedEmail();
+            if (remembered) {
+                identifierInput.value = remembered;
+                rememberMeCheckbox.checked = true;
+            }
+
+            // Check URL parameters (e.g. ?loggedOut=true or ?resetSuccess=true)
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('loggedOut') === 'true') {
+                showFeedback('You have been successfully signed out.', 'info');
+            } else if (params.get('resetSuccess') === 'true') {
+                showFeedback('Password updated. Please sign in with your new password.', 'success');
+            }
+
+            // Password Visibility Toggle
+            togglePasswordBtn.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+                if (window.lucide) lucide.createIcons();
+            });
+
+            // Demo Autofill Buttons
+            document.querySelectorAll('.demo-login-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const email = btn.getAttribute('data-email');
+                    const pass = btn.getAttribute('data-pass');
+                    identifierInput.value = email;
+                    passwordInput.value = pass;
+                    clearErrors();
+                    hideFeedback();
+                    identifierInput.focus();
+                });
+            });
+
+            // Form Submit Handler
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearErrors();
+                hideFeedback();
+
+                const identifier = identifierInput.value.trim();
+                const password = passwordInput.value;
+                const rememberMe = rememberMeCheckbox.checked;
+
+                // Validation
+                let isValid = true;
+                if (!identifier) {
+                    showFieldError(identifierInput, identifierError, 'Email or username is required.');
+                    isValid = false;
+                }
+                if (!password) {
+                    showFieldError(passwordInput, passwordError, 'Password is required.');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                // Loading State
+                setLoadingState(true);
+
+                try {
+                    const result = await authService.login(identifier, password, rememberMe);
+
+                    if (result.success) {
+                        showFeedback('Login successful. Redirecting...', 'success');
+                        setTimeout(() => {
+                            const returnUrl = params.get('redirect') || './dashboard.html';
+                            window.location.href = returnUrl;
+                        }, 500);
+                    } else {
+                        showFeedback(result.message || 'Invalid username or password.', 'error');
+                        setLoadingState(false);
+                    }
+                } catch (err) {
+                    showFeedback('An unexpected error occurred. Please try again.', 'error');
+                    setLoadingState(false);
+                }
+            });
+
+            function showFieldError(input, errorEl, msg) {
+                input.classList.add('border-red-500', 'focus:ring-red-500/50');
+                input.classList.remove('border-slate-700', 'focus:ring-blue-500/50');
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+            }
+
+            function clearErrors() {
+                [identifierInput, passwordInput].forEach(inp => {
+                    inp.classList.remove('border-red-500', 'focus:ring-red-500/50');
+                    inp.classList.add('border-slate-700', 'focus:ring-blue-500/50');
+                });
+                identifierError.classList.add('hidden');
+                passwordError.classList.add('hidden');
+            }
+
+            function showFeedback(msg, type) {
+                feedbackEl.classList.remove('hidden', 'bg-red-500/10', 'border-red-500/30', 'text-red-300', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300', 'bg-blue-500/10', 'border-blue-500/30', 'text-blue-300');
+                
+                let iconName = 'alert-circle';
+                if (type === 'error') {
+                    feedbackEl.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-300');
+                    iconName = 'alert-octagon';
+                } else if (type === 'success') {
+                    feedbackEl.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300');
+                    iconName = 'check-circle';
+                } else {
+                    feedbackEl.classList.add('bg-blue-500/10', 'border-blue-500/30', 'text-blue-300');
+                    iconName = 'info';
+                }
+
+                feedbackEl.innerHTML = `
+                    <i data-lucide="${iconName}" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                    <span>${msg}</span>
+                `;
+                if (window.lucide) lucide.createIcons();
+            }
+
+            function hideFeedback() {
+                feedbackEl.classList.add('hidden');
+            }
+
+            function setLoadingState(loading) {
+                submitBtn.disabled = loading;
+                if (loading) {
+                    btnText.textContent = 'Signing in...';
+                    btnIcon.setAttribute('data-lucide', 'loader-2');
+                    btnIcon.classList.add('animate-spin');
+                } else {
+                    btnText.textContent = 'Sign In';
+                    btnIcon.setAttribute('data-lucide', 'arrow-right');
+                    btnIcon.classList.remove('animate-spin');
+                }
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

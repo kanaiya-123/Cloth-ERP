@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Workers Master Directory — CLOTHERP</title>
+    <meta name="description" content="Manage external garment job workers, specialized service vendors (embroidery, printing, stitching, washing), and contractor piece rates in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./manufacturing.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Manufacturing</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Job Workers</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="users-2" class="w-6 h-6 text-blue-400"></i>
+                            <span>Job Worker Master Directory</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Outsourced service contractors for embroidery, printing, stitching, washing, and garment embellishments.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./job-orders.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
+                            <span>Job Work Orders</span>
+                        </a>
+
+                        <button id="btnOpenAddWorkerModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Job Worker</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Contractors</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalWorkers">0</div>
+                        <span class="text-[10px] text-slate-500">Service Partners</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Active Partners</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiActiveWorkers">0</div>
+                        <span class="text-[10px] text-slate-500">Approved for Issue</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Embroidery & Print</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono">2 Vendors</div>
+                        <span class="text-[10px] text-slate-500">Specialized Crafting</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Stitching Units</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono">1 Vendor</div>
+                        <span class="text-[10px] text-slate-500">Assembly & Tailoring</span>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="workerSearchInput" 
+                            placeholder="Search contractor name, code, or city..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <select id="workerStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE" selected>Active Only</option>
+                        <option value="INACTIVE">Inactive Only</option>
+                    </select>
+                </div>
+
+                <!-- Job Workers Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="workersContainer">
+                    <!-- Injected dynamically -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Manufacturing Operations</div>
+                <div class="font-mono text-[11px] text-slate-600">Contractor Directory Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT JOB WORKER -->
+    <div id="workerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-xl w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900 my-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2" id="modalTitle">
+                    <i data-lucide="users-2" class="w-4 h-4 text-blue-400"></i>
+                    <span>Add New Job Worker</span>
+                </h3>
+                <button id="btnCloseWorkerModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="workerForm" class="space-y-4" novalidate>
+                <input type="hidden" id="editWorkerId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Contractor / Business Name *</label>
+                        <input type="text" id="workerNameInput" required placeholder="Mehta Embroidery Works" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Worker Code (Unique)</label>
+                        <input type="text" id="workerCodeInput" placeholder="JW-SUR-01" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Person</label>
+                        <input type="text" id="workerContactInput" placeholder="Ketan Mehta" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+                        <input type="text" id="workerPhoneInput" placeholder="+91 261 2899 440" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Address & Industrial Area</label>
+                        <input type="text" id="workerAddressInput" placeholder="Plot 48, GIDC Pandesara, Surat" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">City</label>
+                        <input type="text" id="workerCityInput" placeholder="Surat" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">GSTIN Number</label>
+                        <input type="text" id="workerGstinInput" placeholder="24AABCM9910E1Z4" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Standard Piece Rate (₹)</label>
+                        <input type="number" step="0.5" id="workerRateInput" value="25.00" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelWorker" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Contractor</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { jobWorkService } from './assets/js/services/jobWorkService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.JOBWORK_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'job-workers');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadJobWorkers();
+            attachEvents();
+        });
+
+        async function loadJobWorkers() {
+            const search = document.getElementById('workerSearchInput').value;
+            const status = document.getElementById('workerStatusFilter').value;
+
+            const res = await jobWorkService.getJobWorkers({ search, status });
+
+            document.getElementById('kpiTotalWorkers').textContent = res.summary.totalWorkers;
+            document.getElementById('kpiActiveWorkers').textContent = res.summary.activeCount;
+
+            renderWorkers(res.items);
+        }
+
+        function renderWorkers(workers) {
+            const container = document.getElementById('workersContainer');
+            if (workers.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <i data-lucide="users-2" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                        <p class="text-sm font-bold text-slate-300">No job workers found</p>
+                        <p class="text-xs text-slate-500">Register a new contractor vendor to begin dispatching outsource work orders.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = workers.map(w => `
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="font-mono text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">${w.jobWorkerCode}</span>
+                                    <h3 class="text-sm font-bold text-white mt-1">${w.name}</h3>
+                                    <p class="text-xs text-slate-400">${w.city}, ${w.state}</p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    w.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                                }">${w.status}</span>
+                            </div>
+
+                            <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-1.5 text-xs text-slate-300">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-500">Contact:</span>
+                                    <span class="font-semibold text-slate-200">${w.contactPerson || 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-500">Phone:</span>
+                                    <span class="font-mono text-[10px] text-slate-400">${w.phone}</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-500">Rate:</span>
+                                    <span class="font-mono font-bold text-emerald-400">₹${w.defaultRate.toFixed(2)} / pc</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-1">
+                                ${(w.serviceTypes || []).map(s => `
+                                    <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800 text-[10px] font-medium">${s}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
+                            <a href="./create-job-order.html?workerId=${w.id}" class="btn-primary px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1">
+                                <i data-lucide="scissors" class="w-3 h-3"></i>
+                                <span>Issue Job Work</span>
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openModal() {
+            document.getElementById('workerForm').reset();
+            document.getElementById('workerModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('workerModal').classList.add('hidden');
+        }
+
+        function attachEvents() {
+            document.getElementById('btnOpenAddWorkerModal').addEventListener('click', openModal);
+            document.getElementById('btnCloseWorkerModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelWorker').addEventListener('click', closeModal);
+
+            document.getElementById('workerSearchInput').addEventListener('input', loadJobWorkers);
+            document.getElementById('workerStatusFilter').addEventListener('change', loadJobWorkers);
+
+            document.getElementById('workerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const workerData = {
+                    name: document.getElementById('workerNameInput').value,
+                    jobWorkerCode: document.getElementById('workerCodeInput').value,
+                    contactPerson: document.getElementById('workerContactInput').value,
+                    phone: document.getElementById('workerPhoneInput').value,
+                    address: document.getElementById('workerAddressInput').value,
+                    city: document.getElementById('workerCityInput').value,
+                    gstin: document.getElementById('workerGstinInput').value,
+                    defaultRate: document.getElementById('workerRateInput').value
+                };
+
+                const res = await jobWorkService.createJobWorker(workerData, user.name);
+                if (res.success) {
+                    showToast('Job Worker registered successfully!', 'success');
+                    closeModal();
+                    await loadJobWorkers();
+                } else {
+                    showToast(res.message || 'Failed to save worker', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

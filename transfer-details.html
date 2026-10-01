@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Transfer Details — CLOTHERP</title>
+    <meta name="description" content="View stock transfer details, dispatch freight consignment, and record warehouse receipts in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto" id="transferDetailsMain">
+                
+                <!-- Page Header & Action Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./transfers.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Stock Transfers</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono" id="transferBreadcrumb">TRF-...</span>
+                        </div>
+                        <div class="flex items-center space-x-3 mt-1">
+                            <h1 class="text-2xl font-extrabold text-white" id="transferHeading">Stock Transfer Consignment</h1>
+                            <span id="transferStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border">...</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Route: <span id="transferRouteText" class="text-slate-200 font-medium">Origin → Destination</span></p>
+                    </div>
+
+                    <!-- Dynamic Lifecycle Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-2" id="transferActionButtons">
+                        <!-- Injected dynamically based on transfer status -->
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Origin Depot</span>
+                        <div class="text-sm font-bold text-white truncate" id="cardSourceWh">...</div>
+                        <span class="text-[10px] text-slate-500 font-mono" id="cardSourceBranch">...</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Destination Depot</span>
+                        <div class="text-sm font-bold text-emerald-400 truncate" id="cardDestWh">...</div>
+                        <span class="text-[10px] text-slate-500 font-mono" id="cardDestBranch">...</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Requested Qty</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="cardRequestedQty">0 pcs</div>
+                        <span class="text-[10px] text-slate-500">Order Allocation</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">In-Transit Balance</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="cardInTransitQty">0 pcs</div>
+                        <span class="text-[10px] text-slate-500">En-route on Freight</span>
+                    </div>
+                </div>
+
+                <!-- TABS BAR -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 text-xs font-semibold">
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-blue-500 text-white flex items-center space-x-1.5" data-tab="itemsTab">
+                        <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                        <span>Line Items & Receiving Status</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="logisticsTab">
+                        <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+                        <span>Freight & Transport Tracking</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="activityTab">
+                        <i data-lucide="history" class="w-3.5 h-3.5"></i>
+                        <span>Audit Movement Trail</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: LINE ITEMS -->
+                <div id="itemsTab" class="tab-content space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                    <tr>
+                                        <th class="py-3 px-4">Garment Variant</th>
+                                        <th class="py-3 px-4">SKU</th>
+                                        <th class="py-3 px-4 text-center">Requested</th>
+                                        <th class="py-3 px-4 text-center">Dispatched</th>
+                                        <th class="py-3 px-4 text-center">Received</th>
+                                        <th class="py-3 px-4 text-center">In Transit</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60" id="transferItemsBody">
+                                    <!-- Injected dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: LOGISTICS & TRANSPORT -->
+                <div id="logisticsTab" class="tab-content hidden space-y-4">
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="truck" class="w-4 h-4 text-amber-400"></i>
+                            <span>Freight Dispatch & Transporter Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                                <span class="text-[11px] text-slate-500 font-semibold uppercase block">Transport Logistics</span>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Transporter Name:</span>
+                                    <span class="font-bold text-white" id="dispTransportName">VRL Logistics</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">LR / Docket No:</span>
+                                    <span class="font-mono font-bold text-blue-400" id="dispLrNumber">LR-AHM-9910</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Vehicle Number:</span>
+                                    <span class="font-mono text-slate-300" id="dispVehicleNo">GJ-01-AX-9944</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                                <span class="text-[11px] text-slate-500 font-semibold uppercase block">Transit Timelines</span>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Transfer Initiated:</span>
+                                    <span class="font-mono text-slate-300" id="dispTransferDate">2026-08-22</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Dispatched Date:</span>
+                                    <span class="font-mono text-slate-300" id="dispDispatchDate">N/A</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Completed Date:</span>
+                                    <span class="font-mono text-slate-300" id="dispReceiveDate">N/A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-slate-500 font-semibold uppercase">Notes & Consignment Purpose</span>
+                            <p class="text-xs text-slate-300 leading-normal" id="dispNotes">No special remarks entered.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: ACTIVITY & AUDIT -->
+                <div id="activityTab" class="tab-content hidden space-y-4">
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="history" class="w-4 h-4 text-purple-400"></i>
+                            <span>Stock Transfer Audit Ledger & State Timeline</span>
+                        </div>
+
+                        <div class="space-y-4" id="transferActivityTimeline">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Location ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Stock Transfer Tracking View</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: DISPATCH CONSIGNMENT -->
+    <div id="dispatchModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="truck" class="w-4 h-4 text-blue-400"></i>
+                    <span>Dispatch Consignment & Deduct Stock</span>
+                </h3>
+                <button id="btnCloseDispatchModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300">
+                Dispatching will execute <strong class="text-amber-400 font-mono">TRANSFER_OUT</strong> stock deductions from origin warehouse and move goods into <strong class="text-blue-400">In-Transit</strong> state.
+            </p>
+
+            <form id="dispatchForm" class="space-y-3" novalidate>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Transporter Carrier</label>
+                    <input type="text" id="modalTransportName" placeholder="VRL Logistics / SafeExpress" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">LR / Consignment Number</label>
+                    <input type="text" id="modalLrNumber" placeholder="LR-AHM-9910" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Vehicle Number</label>
+                    <input type="text" id="modalVehicleNo" placeholder="GJ-01-AX-9944" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelDispatch" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Confirm Dispatch</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RECEIVE CONSIGNMENT -->
+    <div id="receiveModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-xl w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="package-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Receive Consignment into Destination Depot</span>
+                </h3>
+                <button id="btnCloseReceiveModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300">
+                Enter received quantity for each garment variant. Stock will increase in destination depot via <strong class="text-emerald-400 font-mono">TRANSFER_IN</strong>.
+            </p>
+
+            <form id="receiveForm" class="space-y-4" novalidate>
+                <div class="space-y-3 max-h-60 overflow-y-auto pr-1" id="receiveItemsInputsContainer">
+                    <!-- Dynamic inputs per variant -->
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelReceive" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check-check" class="w-4 h-4"></i>
+                        <span>Confirm Receipt</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { stockTransferService } from './assets/js/services/stockTransferService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.STOCK_TRANSFERS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const params = new URLSearchParams(window.location.search);
+        const transferId = params.get('id') || 'TRF-000001';
+        let currentTransfer = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'transfers');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadTransferDetails();
+            setupTabs();
+            attachModalEvents();
+        });
+
+        async function loadTransferDetails() {
+            currentTransfer = await stockTransferService.getTransferById(transferId);
+            if (!currentTransfer) {
+                document.getElementById('transferDetailsMain').innerHTML = `
+                    <div class="glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <i data-lucide="alert-octagon" class="w-8 h-8 mx-auto mb-2 text-red-400"></i>
+                        <p class="text-sm font-bold text-slate-200">Stock Transfer Record Not Found</p>
+                        <a href="./transfers.html" class="mt-3 inline-block px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold">Back to Transfers</a>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            document.getElementById('transferBreadcrumb').textContent = currentTransfer.transferNumber;
+            document.getElementById('transferHeading').textContent = `Transfer: ${currentTransfer.transferNumber}`;
+            document.getElementById('transferRouteText').textContent = `${currentTransfer.sourceWarehouseName} (${currentTransfer.sourceBranchName}) → ${currentTransfer.destinationWarehouseName} (${currentTransfer.destinationBranchName})`;
+
+            // Status Badge
+            const badgeEl = document.getElementById('transferStatusBadge');
+            badgeEl.textContent = currentTransfer.status;
+            badgeEl.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+                currentTransfer.status === 'Received' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                currentTransfer.status === 'Dispatched' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                currentTransfer.status === 'Partially Received' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                currentTransfer.status === 'Approved' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
+                currentTransfer.status === 'Submitted' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                currentTransfer.status === 'Cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                'bg-slate-800 text-slate-400 border-slate-700'
+            }`;
+
+            // Cards
+            document.getElementById('cardSourceWh').textContent = currentTransfer.sourceWarehouseName;
+            document.getElementById('cardSourceBranch').textContent = currentTransfer.sourceBranchName;
+            document.getElementById('cardDestWh').textContent = currentTransfer.destinationWarehouseName;
+            document.getElementById('cardDestBranch').textContent = currentTransfer.destinationBranchName;
+            document.getElementById('cardRequestedQty').textContent = `${currentTransfer.totalRequestedQuantity || 0} pcs`;
+            document.getElementById('cardInTransitQty').textContent = `${currentTransfer.inTransitQuantity || 0} pcs`;
+
+            // Logistics Tab
+            document.getElementById('dispTransportName').textContent = currentTransfer.transportName || 'Direct Fleet';
+            document.getElementById('dispLrNumber').textContent = currentTransfer.lrNumber || 'N/A';
+            document.getElementById('dispVehicleNo').textContent = currentTransfer.vehicleNumber || 'N/A';
+            document.getElementById('dispTransferDate').textContent = currentTransfer.transferDate;
+            document.getElementById('dispDispatchDate').textContent = currentTransfer.dispatchDate || 'Pending Dispatch';
+            document.getElementById('dispReceiveDate').textContent = currentTransfer.receiveDate || 'Pending Final Delivery';
+            document.getElementById('dispNotes').textContent = currentTransfer.notes || 'No special remarks entered.';
+
+            renderActionButtons();
+            renderItemsTable();
+            renderActivityTimeline();
+        }
+
+        function renderActionButtons() {
+            const container = document.getElementById('transferActionButtons');
+            let buttonsHtml = '';
+
+            if (currentTransfer.status === 'Draft' || currentTransfer.status === 'Submitted') {
+                buttonsHtml += `
+                    <button id="btnApproveTransfer" class="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span>Approve Transfer</span>
+                    </button>
+                    <button id="btnCancelTransfer" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-red-400 text-xs font-semibold transition">
+                        Cancel
+                    </button>
+                `;
+            }
+
+            if (currentTransfer.status === 'Approved' || currentTransfer.status === 'Submitted') {
+                buttonsHtml += `
+                    <button id="btnOpenDispatchModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+                        <span>Dispatch Consignment</span>
+                    </button>
+                `;
+            }
+
+            if (currentTransfer.status === 'Dispatched' || currentTransfer.status === 'Partially Received') {
+                buttonsHtml += `
+                    <button id="btnOpenReceiveModal" class="btn-primary px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="package-check" class="w-3.5 h-3.5"></i>
+                        <span>Receive Goods (${currentTransfer.inTransitQuantity} in transit)</span>
+                    </button>
+                `;
+            }
+
+            buttonsHtml += `
+                <button onclick="window.print()" class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 hover:text-white transition" title="Print Transfer Delivery Challan">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.innerHTML = buttonsHtml;
+            if (window.lucide) lucide.createIcons();
+            attachLifecycleEvents();
+        }
+
+        function renderItemsTable() {
+            const tbody = document.getElementById('transferItemsBody');
+            tbody.innerHTML = (currentTransfer.items || []).map(i => `
+                <tr class="hover:bg-slate-850/40 transition">
+                    <td class="py-3.5 px-4">
+                        <div class="font-bold text-white">${i.productName}</div>
+                        <div class="text-[11px] text-blue-400 font-mono">${i.variantName}</div>
+                    </td>
+                    <td class="py-3.5 px-4 font-mono text-slate-400">${i.sku}</td>
+                    <td class="py-3.5 px-4 text-center font-mono font-bold text-slate-200">${i.requestedQuantity} pcs</td>
+                    <td class="py-3.5 px-4 text-center font-mono text-slate-300">${i.dispatchedQuantity || 0} pcs</td>
+                    <td class="py-3.5 px-4 text-center font-mono text-emerald-400 font-bold">${i.receivedQuantity || 0} pcs</td>
+                    <td class="py-3.5 px-4 text-center font-mono ${i.inTransitQuantity > 0 ? 'text-blue-400 font-bold' : 'text-slate-500'}">
+                        ${i.inTransitQuantity || 0} pcs
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderActivityTimeline() {
+            const container = document.getElementById('transferActivityTimeline');
+            container.innerHTML = (currentTransfer.activity || []).map(a => `
+                <div class="flex items-start space-x-3 text-xs">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                    </div>
+                    <div class="space-y-0.5">
+                        <p class="text-slate-200 font-medium">${a.action}</p>
+                        <div class="text-[10px] text-slate-500 font-mono">By <strong class="text-slate-400">${a.user}</strong> • ${a.time}</div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachLifecycleEvents() {
+            const btnApprove = document.getElementById('btnApproveTransfer');
+            if (btnApprove) {
+                btnApprove.addEventListener('click', async () => {
+                    const res = await stockTransferService.approveTransfer(currentTransfer.id, user.name);
+                    if (res.success) {
+                        showToast('Stock transfer approved for dispatch!', 'success');
+                        await loadTransferDetails();
+                    } else {
+                        showToast(res.message, 'error');
+                    }
+                });
+            }
+
+            const btnCancel = document.getElementById('btnCancelTransfer');
+            if (btnCancel) {
+                btnCancel.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to cancel this stock transfer?')) {
+                        const res = await stockTransferService.cancelTransfer(currentTransfer.id, 'Cancelled by user', user.name);
+                        if (res.success) {
+                            showToast('Transfer cancelled', 'info');
+                            await loadTransferDetails();
+                        } else {
+                            showToast(res.message, 'error');
+                        }
+                    }
+                });
+            }
+
+            const btnOpenDisp = document.getElementById('btnOpenDispatchModal');
+            if (btnOpenDisp) {
+                btnOpenDisp.addEventListener('click', () => {
+                    document.getElementById('modalTransportName').value = currentTransfer.transportName || '';
+                    document.getElementById('modalLrNumber').value = currentTransfer.lrNumber || '';
+                    document.getElementById('modalVehicleNo').value = currentTransfer.vehicleNumber || '';
+                    document.getElementById('dispatchModal').classList.remove('hidden');
+                });
+            }
+
+            const btnOpenRec = document.getElementById('btnOpenReceiveModal');
+            if (btnOpenRec) {
+                btnOpenRec.addEventListener('click', () => {
+                    renderReceiveInputs();
+                    document.getElementById('receiveModal').classList.remove('hidden');
+                });
+            }
+        }
+
+        function renderReceiveInputs() {
+            const container = document.getElementById('receiveItemsInputsContainer');
+            container.innerHTML = (currentTransfer.items || []).filter(i => (i.inTransitQuantity || 0) > 0).map(i => `
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-white text-xs block">${i.productName} (${i.variantName})</span>
+                        <span class="text-[10px] text-slate-500 font-mono">In-Transit: <strong class="text-blue-400">${i.inTransitQuantity} pcs</strong></span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-[11px] text-slate-400">Receive:</label>
+                        <input 
+                            type="number" 
+                            min="1" 
+                            max="${i.inTransitQuantity}" 
+                            value="${i.inTransitQuantity}" 
+                            data-variant="${i.productVariantId}"
+                            class="input-receive-qty w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono text-center focus:outline-none"
+                        >
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function attachModalEvents() {
+            document.getElementById('btnCloseDispatchModal').addEventListener('click', () => document.getElementById('dispatchModal').classList.add('hidden'));
+            document.getElementById('btnCancelDispatch').addEventListener('click', () => document.getElementById('dispatchModal').classList.add('hidden'));
+
+            document.getElementById('dispatchForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const transportData = {
+                    transportName: document.getElementById('modalTransportName').value,
+                    lrNumber: document.getElementById('modalLrNumber').value,
+                    vehicleNumber: document.getElementById('modalVehicleNo').value
+                };
+
+                const res = await stockTransferService.dispatchTransfer(currentTransfer.id, transportData, user.name);
+                if (res.success) {
+                    showToast('Transfer dispatched! Stock deducted from origin warehouse.', 'success');
+                    document.getElementById('dispatchModal').classList.add('hidden');
+                    await loadTransferDetails();
+                } else {
+                    showToast(res.message || 'Dispatch failed', 'error');
+                }
+            });
+
+            document.getElementById('btnCloseReceiveModal').addEventListener('click', () => document.getElementById('receiveModal').classList.add('hidden'));
+            document.getElementById('btnCancelReceive').addEventListener('click', () => document.getElementById('receiveModal').classList.add('hidden'));
+
+            document.getElementById('receiveForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const itemsMap = {};
+                document.querySelectorAll('.input-receive-qty').forEach(input => {
+                    const varId = input.getAttribute('data-variant');
+                    itemsMap[varId] = parseInt(input.value) || 0;
+                });
+
+                const res = await stockTransferService.receiveTransfer(currentTransfer.id, { items: itemsMap }, user.name);
+                if (res.success) {
+                    showToast('Consignment received! Stock added to destination depot.', 'success');
+                    document.getElementById('receiveModal').classList.add('hidden');
+                    await loadTransferDetails();
+                } else {
+                    showToast(res.message || 'Receipt failed', 'error');
+                }
+            });
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('border-blue-500', 'text-white');
+                        b.classList.add('border-transparent', 'text-slate-400');
+                    });
+                    btn.classList.add('border-blue-500', 'text-white');
+                    btn.classList.remove('border-transparent', 'text-slate-400');
+
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

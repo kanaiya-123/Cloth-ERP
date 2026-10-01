@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Restricted — CLOTHERP</title>
+    <meta name="description" content="Access restricted page for unauthorized roles in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="py-4 px-6 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="./index.html" class="flex items-center space-x-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+                    <i data-lucide="layers" class="w-4 h-4 text-white"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-extrabold tracking-wider text-white font-mono">CLOTH<span class="text-blue-400">ERP</span></span>
+                    <span class="text-[8px] uppercase tracking-widest text-slate-400 -mt-1 font-semibold">Clothing ERP</span>
+                </div>
+            </a>
+
+            <div id="profileMenuMount"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-lg p-8 sm:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl shadow-black/90 text-center space-y-6">
+            
+            <div class="w-16 h-16 rounded-3xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto shadow-xl shadow-red-500/10">
+                <i data-lucide="shield-alert" class="w-8 h-8"></i>
+            </div>
+
+            <div class="space-y-2">
+                <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-mono font-semibold">
+                    HTTP 403 • FORBIDDEN
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Access Restricted</h1>
+                <p class="text-sm text-slate-300 max-w-sm mx-auto">
+                    You do not have the required role permissions to access this specific module or enterprise resource.
+                </p>
+            </div>
+
+            <!-- Current Session Diagnosis Box -->
+            <div id="sessionDiagnosis" class="p-4 bg-slate-950/70 rounded-2xl border border-slate-800 text-left text-xs font-mono space-y-2">
+                <div class="flex justify-between text-slate-400">
+                    <span>Active Account:</span>
+                    <span id="diagUser" class="text-slate-200 font-bold">Checking...</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                    <span>Assigned Role:</span>
+                    <span id="diagRole" class="text-blue-400 font-bold">Checking...</span>
+                </div>
+                <div class="flex justify-between text-slate-400 border-t border-slate-800/80 pt-1.5">
+                    <span>Required Access:</span>
+                    <span id="diagReq" class="text-amber-400">Elevated Permissions</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <button onclick="window.history.back()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>Go Back</span>
+                </button>
+                <a href="./protected-demo.html" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                    <span>Return to Allowed Area</span>
+                </a>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 text-center text-xs text-slate-500">
+                Need role elevation? Contact your Administrator or <a href="./login.html" class="text-blue-400 hover:underline">sign in as different user</a>.
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800/80 bg-slate-950/40">
+        © 2026 CLOTHERP. All rights reserved. • Enterprise Role-Based Access Control
+    </footer>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { authService } from './assets/js/services/authService.js';
+        import { initProfileMenu } from './assets/js/components/profileMenu.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+
+            const user = authService.getCurrentUser();
+            const diagUser = document.getElementById('diagUser');
+            const diagRole = document.getElementById('diagRole');
+            const diagReq = document.getElementById('diagReq');
+
+            if (user) {
+                diagUser.textContent = `${user.name} (${user.email})`;
+                diagRole.textContent = user.role;
+                initProfileMenu('profileMenuMount');
+            } else {
+                diagUser.textContent = 'Unauthenticated Guest';
+                diagRole.textContent = 'None';
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const reqRole = params.get('requiredRole');
+            const reqPerm = params.get('requiredPerm');
+
+            if (reqRole) {
+                diagReq.textContent = `Role [${reqRole}] Required`;
+            } else if (reqPerm) {
+                diagReq.textContent = `Permission [${reqPerm}] Required`;
+            }
+        });
+    </script>
+</body>
+</html>

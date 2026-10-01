@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase & Supplier Reports — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Detailed procurement reports, supplier volume ranking, and PO payables analysis in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Filter Bar -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./reports.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Reports</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-amber-400 font-bold font-mono">Procurement</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="shopping-bag" class="w-6 h-6 text-amber-400"></i>
+                            <span>Purchase & Supplier Reports</span>
+                        </h1>
+                        <p class="text-xs text-slate-400" id="headerFilterSubtext">Showing supplier procurement transactions for selected range.</p>
+                    </div>
+
+                    <!-- Filter Controls & Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="datePresetSelect" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                            <option value="today">Today</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month" selected>This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_quarter">This Quarter</option>
+                            <option value="this_year">This Year</option>
+                        </select>
+
+                        <button id="btnExportCsv" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Export CSV</span>
+                        </button>
+
+                        <button id="btnPrintReport" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Procurement</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiCost">₹0.00</div>
+                        <span class="text-[10px] text-amber-400">Total Billed Cost</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Purchase Orders</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiOrdersCount">0</div>
+                        <span class="text-[10px] text-slate-500">PO Documents</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Total Units</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiUnits">0 pcs</div>
+                        <span class="text-[10px] text-slate-500">Fabric & Apparel Received</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Outstanding Payables</span>
+                        <div class="text-2xl font-extrabold text-rose-300 font-mono" id="kpiBalance">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Pending Mill Balances</span>
+                    </div>
+                </div>
+
+                <!-- 2 TABS: SUPPLIER PROCUREMENT VS DETAILED POs -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 text-xs">
+                    <button class="tab-btn px-4 py-2 rounded-xl font-bold transition text-white bg-slate-850 border border-slate-700" data-tab="tabSuppliers">Supplier Procurement Ranking</button>
+                    <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabPurchases">Purchase Orders Ledger</button>
+                </div>
+
+                <!-- TAB 1: SUPPLIER PROCUREMENT RANKING -->
+                <div id="tabSuppliers" class="tab-pane space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Fabric Mill / Supplier</th>
+                                        <th class="py-3 px-3 text-center">PO Count</th>
+                                        <th class="py-3 px-4 text-right font-bold text-amber-400">Total Procurement</th>
+                                        <th class="py-3 px-4 text-right text-emerald-400">Total Paid</th>
+                                        <th class="py-3 px-4 text-right text-rose-400">Balance Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliersTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Supplier Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: DETAILED PURCHASE ORDERS LEDGER -->
+                <div id="tabPurchases" class="tab-pane hidden space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">PO Number</th>
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-4">Supplier</th>
+                                        <th class="py-3 px-3 text-center">Units</th>
+                                        <th class="py-3 px-4 text-right">Taxable</th>
+                                        <th class="py-3 px-3 text-right">GST</th>
+                                        <th class="py-3 px-4 text-right font-bold text-white">Grand Total</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchasesTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic PO Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Purchase & Supplier Report</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.REPORTS_PURCHASE_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadPurchaseReport();
+            attachEvents();
+        });
+
+        async function loadPurchaseReport() {
+            const preset = document.getElementById('datePresetSelect').value;
+            currentReportData = await reportingService.getPurchaseReport({ preset });
+
+            document.getElementById('headerFilterSubtext').textContent = `Reporting Window: ${currentReportData.filters.displayRange}`;
+
+            // KPIs
+            document.getElementById('kpiCost').textContent = currentReportData.summary.totalCostFormatted;
+            document.getElementById('kpiOrdersCount').textContent = currentReportData.summary.totalOrders;
+            document.getElementById('kpiUnits').textContent = `${currentReportData.summary.totalUnits} pcs`;
+            document.getElementById('kpiBalance').textContent = currentReportData.summary.totalBalanceFormatted;
+
+            // Render Suppliers Table
+            renderSuppliersTable(currentReportData.supplierSummary);
+
+            // Render POs Table
+            renderPurchasesTable(currentReportData.purchases);
+        }
+
+        function renderSuppliersTable(suppliers) {
+            const tbody = document.getElementById('suppliersTableBody');
+            if (suppliers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 font-sans">No supplier procurement data in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = suppliers.map(s => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4 font-bold text-slate-200">${s.supplierName}</td>
+                    <td class="py-3 px-3 text-center font-mono font-bold text-blue-400">${s.count}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-amber-400">₹${(s.totalAmount || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono text-emerald-400">₹${(s.paid || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-rose-400">₹${(s.balance || 0).toLocaleString('en-IN')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPurchasesTable(purchases) {
+            const tbody = document.getElementById('purchasesTableBody');
+            if (purchases.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-sans">No purchase orders found in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = purchases.map(p => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4 font-mono">
+                        <a href="./purchase-details.html?id=${p.id}" class="font-bold text-amber-400 hover:underline">${p.purchaseNumber}</a>
+                    </td>
+                    <td class="py-3 px-3 text-slate-400 font-mono">${(p.orderDate || '').split('T')[0]}</td>
+                    <td class="py-3 px-4 font-bold text-slate-200">${p.supplierName}</td>
+                    <td class="py-3 px-3 text-center font-mono text-slate-300">${p.totalQuantity}</td>
+                    <td class="py-3 px-4 text-right font-mono text-slate-300">₹${(p.finalTaxableAmount || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-right font-mono text-slate-400">₹${((p.cgstTotal || 0) + (p.sgstTotal || 0) + (p.igstTotal || 0)).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-slate-100">₹${(p.grandTotal || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                            p.status === 'Received' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }">${p.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function attachEvents() {
+            document.getElementById('datePresetSelect').addEventListener('change', loadPurchaseReport);
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                        b.classList.add('text-slate-400');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+                    btn.classList.add('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                    btn.classList.remove('text-slate-400');
+
+                    const target = btn.getAttribute('data-tab');
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCsv').addEventListener('click', () => {
+                if (!currentReportData || !currentReportData.supplierSummary) return;
+                const headers = [
+                    { label: 'Supplier Name', key: 'supplierName' },
+                    { label: 'PO Count', key: 'count' },
+                    { label: 'Total Procurement (INR)', key: 'totalAmount' },
+                    { label: 'Total Paid (INR)', key: 'paid' },
+                    { label: 'Balance Due (INR)', key: 'balance' }
+                ];
+                ReportExportService.exportToCsv('CLOTHERP_Supplier_Procurement_Report', headers, currentReportData.supplierSummary);
+            });
+
+            // Print
+            document.getElementById('btnPrintReport').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        }
+    </script>
+</body>
+</html>

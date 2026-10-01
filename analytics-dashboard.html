@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Intelligence & Analytics — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Executive business intelligence dashboard with interactive graphs, sales trends, inventory valuation, and GST liability in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Global Filter Bar -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Executive BI</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Business Intelligence</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="pie-chart" class="w-6 h-6 text-blue-400"></i>
+                            <span>Executive Analytics Dashboard</span>
+                        </h1>
+                        <p class="text-xs text-slate-400" id="headerDateSubtext">Real-time revenue, gross margin, inventory valuation, and GST liability.</p>
+                    </div>
+
+                    <!-- Global Filter Controls -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="datePresetSelect" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">This Week</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month" selected>This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_quarter">This Quarter</option>
+                            <option value="this_year">This Year</option>
+                            <option value="custom">Custom Date Range</option>
+                        </select>
+
+                        <div id="customDateRangeBox" class="hidden flex items-center space-x-1.5">
+                            <input type="date" id="customStartDate" class="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono">
+                            <span class="text-slate-500 text-xs">to</span>
+                            <input type="date" id="customEndDate" class="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono">
+                            <button type="button" id="btnApplyCustomDate" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">Apply</button>
+                        </div>
+
+                        <button id="btnPrintDashboard" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+
+                        <a href="./reports.html" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+                            <span>Detailed Reports</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 8 KEY EXECUTIVE KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Total Sales -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Total Sales Revenue</span>
+                            <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        </div>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiSalesRevenue">₹0</div>
+                        <span class="text-[10px] text-emerald-400" id="kpiSalesSub">Invoiced Sales Value</span>
+                    </div>
+
+                    <!-- Gross Margin -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Estimated Gross Profit</span>
+                            <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-blue-400"></i>
+                        </div>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiGrossProfit">₹0</div>
+                        <span class="text-[10px] text-slate-400" id="kpiGrossMargin">Margin: 0.0%</span>
+                    </div>
+
+                    <!-- Total Purchases -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Fabric Purchases</span>
+                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-amber-400"></i>
+                        </div>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiPurchasesCost">₹0</div>
+                        <span class="text-[10px] text-slate-500">Mill Procurement</span>
+                    </div>
+
+                    <!-- Inventory Valuation -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Inventory Valuation</span>
+                            <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-400"></i>
+                        </div>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiInventoryValuation">₹0</div>
+                        <span class="text-[10px] text-slate-400" id="kpiInventoryUnits">0 units in warehouse</span>
+                    </div>
+
+                    <!-- Outstanding Receivables -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Receivables Due</span>
+                            <i data-lucide="arrow-down-right" class="w-3.5 h-3.5 text-amber-400"></i>
+                        </div>
+                        <div class="text-xl font-extrabold text-amber-300 font-mono" id="kpiReceivables">₹0</div>
+                        <span class="text-[10px] text-slate-500">From wholesale/retail clients</span>
+                    </div>
+
+                    <!-- Outstanding Payables -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Payables to Mills</span>
+                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-rose-400"></i>
+                        </div>
+                        <div class="text-xl font-extrabold text-rose-300 font-mono" id="kpiPayables">₹0</div>
+                        <span class="text-[10px] text-slate-500">Pending vendor disbursements</span>
+                    </div>
+
+                    <!-- Customer Returns -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Returns & Credit Notes</span>
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-indigo-400"></i>
+                        </div>
+                        <div class="text-xl font-extrabold text-indigo-300 font-mono" id="kpiReturnsValue">₹0</div>
+                        <span class="text-[10px] text-slate-500">Settled return adjustments</span>
+                    </div>
+
+                    <!-- Net GST Position -->
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <span>Net GST Position</span>
+                            <i data-lucide="receipt" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        </div>
+                        <div class="text-xl font-extrabold text-emerald-300 font-mono" id="kpiNetGst">₹0</div>
+                        <span class="text-[10px] text-slate-500">Output tax minus Input credits</span>
+                    </div>
+                </div>
+
+                <!-- MAIN CHART: SALES VS PURCHASES TREND -->
+                <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Revenue & Procurement Trajectory</h3>
+                            <p class="text-xs text-slate-400">Daily sales invoiced vs fabric purchases disbursed.</p>
+                        </div>
+                        <div class="flex items-center space-x-4 text-xs font-mono">
+                            <span class="flex items-center space-x-1.5 text-blue-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                                <span>Sales (₹)</span>
+                            </span>
+                            <span class="flex items-center space-x-1.5 text-amber-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                                <span>Purchases (₹)</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="relative h-72 w-full">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 2-COLUMN SECTION: VARIANT PERFORMANCE & DONUT CHARTS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Color & Size Distribution -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <h3 class="text-sm font-bold text-white">Garment Variant Color & Size Distribution</h3>
+                        <p class="text-xs text-slate-400">Sales volume grouped by clothing colorway and standard sizing matrix.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="space-y-2 text-center">
+                                <span class="text-[11px] font-mono text-slate-400 uppercase">Sales by Colorway</span>
+                                <div class="relative h-48 w-full">
+                                    <canvas id="colorDonutChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-center">
+                                <span class="text-[11px] font-mono text-slate-400 uppercase">Sales by Size Matrix</span>
+                                <div class="relative h-48 w-full">
+                                    <canvas id="sizeBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Status & Payment Breakdown -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <h3 class="text-sm font-bold text-white">Fulfillment Status & Payment Methods</h3>
+                        <p class="text-xs text-slate-400">Live breakdown of order pipeline stages and settlement channels.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="space-y-2 text-center">
+                                <span class="text-[11px] font-mono text-slate-400 uppercase">Order Pipeline</span>
+                                <div class="relative h-48 w-full">
+                                    <canvas id="statusDonutChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-center">
+                                <span class="text-[11px] font-mono text-slate-400 uppercase">Payment Modes</span>
+                                <div class="relative h-48 w-full">
+                                    <canvas id="paymentDonutChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Executive BI Analytics</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.DASHBOARD_ANALYTICS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let chartInstances = {};
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'analytics');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadDashboardData();
+            attachFilterEvents();
+
+            document.getElementById('btnPrintDashboard').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        });
+
+        async function loadDashboardData() {
+            const preset = document.getElementById('datePresetSelect').value;
+            const customStart = document.getElementById('customStartDate').value;
+            const customEnd = document.getElementById('customEndDate').value;
+
+            const res = await reportingService.getExecutiveDashboardMetrics({
+                preset,
+                customStart,
+                customEnd
+            });
+
+            // Bind Subtext Range
+            document.getElementById('headerDateSubtext').textContent = `Reporting Period: ${res.filters.displayRange}`;
+
+            // Bind KPIs
+            document.getElementById('kpiSalesRevenue').textContent = res.kpis.totalSalesFormatted;
+            document.getElementById('kpiGrossProfit').textContent = res.kpis.grossProfitFormatted;
+            document.getElementById('kpiGrossMargin').textContent = `Gross Margin: ${res.kpis.grossMarginPercent}`;
+            document.getElementById('kpiPurchasesCost').textContent = res.kpis.totalPurchasesFormatted;
+            document.getElementById('kpiInventoryValuation').textContent = res.kpis.inventoryValuationFormatted;
+            document.getElementById('kpiInventoryUnits').textContent = `${res.kpis.totalStockUnits} units in warehouse`;
+            document.getElementById('kpiReceivables').textContent = res.kpis.outstandingReceivablesFormatted;
+            document.getElementById('kpiPayables').textContent = res.kpis.outstandingPayablesFormatted;
+            document.getElementById('kpiReturnsValue').textContent = res.kpis.totalReturnsFormatted;
+            document.getElementById('kpiNetGst').textContent = res.kpis.netGstLiabilityFormatted;
+
+            // Render Charts
+            renderTrendChart(res.charts.trend);
+            renderColorDonut(res.charts.colorDistribution);
+            renderSizeBar(res.charts.sizeDistribution);
+            renderStatusDonut(res.charts.orderStatus);
+            renderPaymentDonut(res.charts.paymentMethods);
+        }
+
+        function renderTrendChart(trend) {
+            const ctx = document.getElementById('salesTrendChart').getContext('2d');
+            if (chartInstances.trend) chartInstances.trend.destroy();
+
+            chartInstances.trend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trend.labels,
+                    datasets: [
+                        {
+                            label: 'Sales Revenue (₹)',
+                            data: trend.sales,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Purchases (₹)',
+                            data: trend.purchases,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function renderColorDonut(colors) {
+            const ctx = document.getElementById('colorDonutChart').getContext('2d');
+            if (chartInstances.colors) chartInstances.colors.destroy();
+
+            chartInstances.colors = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: colors.labels.length > 0 ? colors.labels : ['No Data'],
+                    datasets: [{
+                        data: colors.data.length > 0 ? colors.data : [1],
+                        backgroundColor: ['#1e3a8a', '#0284c7', '#059669', '#d97706', '#9333ea', '#e11d48']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 9 } } } }
+                }
+            });
+        }
+
+        function renderSizeBar(sizes) {
+            const ctx = document.getElementById('sizeBarChart').getContext('2d');
+            if (chartInstances.sizes) chartInstances.sizes.destroy();
+
+            chartInstances.sizes = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sizes.labels.length > 0 ? sizes.labels : ['M'],
+                    datasets: [{
+                        label: 'Units',
+                        data: sizes.data.length > 0 ? sizes.data : [0],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function renderStatusDonut(statuses) {
+            const ctx = document.getElementById('statusDonutChart').getContext('2d');
+            if (chartInstances.statuses) chartInstances.statuses.destroy();
+
+            chartInstances.statuses = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: statuses.labels.length > 0 ? statuses.labels : ['Delivered'],
+                    datasets: [{
+                        data: statuses.data.length > 0 ? statuses.data : [1],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 9 } } } }
+                }
+            });
+        }
+
+        function renderPaymentDonut(payments) {
+            const ctx = document.getElementById('paymentDonutChart').getContext('2d');
+            if (chartInstances.payments) chartInstances.payments.destroy();
+
+            chartInstances.payments = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: payments.labels.length > 0 ? payments.labels : ['UPI'],
+                    datasets: [{
+                        data: payments.data.length > 0 ? payments.data : [1],
+                        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 9 } } } }
+                }
+            });
+        }
+
+        function attachFilterEvents() {
+            const presetSelect = document.getElementById('datePresetSelect');
+            const customBox = document.getElementById('customDateRangeBox');
+
+            presetSelect.addEventListener('change', async (e) => {
+                if (e.target.value === 'custom') {
+                    customBox.classList.remove('hidden');
+                } else {
+                    customBox.classList.add('hidden');
+                    await loadDashboardData();
+                }
+            });
+
+            document.getElementById('btnApplyCustomDate').addEventListener('click', async () => {
+                await loadDashboardData();
+            });
+        }
+    </script>
+</body>
+</html>

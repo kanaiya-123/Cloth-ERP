@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Receivables & CRM Reports — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Customer revenue ranking, outstanding receivables ledger, and credit limits report in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./reports.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Reports</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-cyan-400 font-bold font-mono">Receivables Ledger</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="users" class="w-6 h-6 text-cyan-400"></i>
+                            <span>Customer Receivables & CRM Report</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Track client revenue volume, credit term exposures, and outstanding invoice balances.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-2">
+                        <button id="btnExportCsv" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Export CSV</span>
+                        </button>
+
+                        <button id="btnPrintReport" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-cyan-400 font-medium">Total Active Clients</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiClientCount">0</div>
+                        <span class="text-[10px] text-slate-500">B2B Wholesalers & Retail</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Outstanding Receivables</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiTotalReceivables">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Uncollected Billed Invoices</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Collection Health</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono">Good (30 Days)</div>
+                        <span class="text-[10px] text-slate-500">Standard Net Credit Terms</span>
+                    </div>
+                </div>
+
+                <!-- Customer Ledger Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                    <th class="py-3 px-4">Customer Name & Code</th>
+                                    <th class="py-3 px-3">Type</th>
+                                    <th class="py-3 px-3 font-mono">Contact / GSTIN</th>
+                                    <th class="py-3 px-3 text-center">Orders</th>
+                                    <th class="py-3 px-4 text-right">Invoiced (₹)</th>
+                                    <th class="py-3 px-4 text-right text-emerald-400">Paid (₹)</th>
+                                    <th class="py-3 px-4 text-right font-bold text-amber-400">Balance Due (₹)</th>
+                                    <th class="py-3 px-3 text-center">Credit Days</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                <!-- Dynamic Customer Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Customer Receivables Report</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.REPORTS_CUSTOMER_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadCustomerReport();
+            attachEvents();
+        });
+
+        async function loadCustomerReport() {
+            currentReportData = await reportingService.getCustomerReport();
+
+            document.getElementById('kpiClientCount').textContent = currentReportData.customers.length;
+            document.getElementById('kpiTotalReceivables').textContent = `₹${currentReportData.totalReceivables.toLocaleString('en-IN')}`;
+
+            renderCustomerTable(currentReportData.customers);
+        }
+
+        function renderCustomerTable(customers) {
+            const tbody = document.getElementById('customersTableBody');
+            if (customers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-sans">No customer records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = customers.map(c => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4">
+                        <a href="./customer-details.html?id=${c.id}" class="font-bold text-cyan-400 hover:underline">${c.name}</a>
+                        <div class="text-[10px] text-slate-500 font-mono">${c.customerCode}</div>
+                    </td>
+                    <td class="py-3 px-3 text-slate-300">${c.customerType}</td>
+                    <td class="py-3 px-3 font-mono text-[11px] text-slate-400">
+                        <div>${c.mobile}</div>
+                        <div class="text-[10px] text-slate-500">${c.gstin}</div>
+                    </td>
+                    <td class="py-3 px-3 text-center font-mono font-bold text-blue-400">${c.ordersCount}</td>
+                    <td class="py-3 px-4 text-right font-mono text-slate-300">₹${c.totalInvoiced.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono text-emerald-400">₹${c.totalPaid.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-amber-400">₹${c.balanceDue.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-center font-mono text-slate-400">${c.creditDays} days</td>
+                </tr>
+            `).join('');
+        }
+
+        function attachEvents() {
+            // Export CSV
+            document.getElementById('btnExportCsv').addEventListener('click', () => {
+                if (!currentReportData || !currentReportData.customers) return;
+                const headers = [
+                    { label: 'Customer Code', key: 'customerCode' },
+                    { label: 'Customer Name', key: 'name' },
+                    { label: 'Type', key: 'customerType' },
+                    { label: 'Mobile', key: 'mobile' },
+                    { label: 'Total Invoiced (INR)', key: 'totalInvoiced' },
+                    { label: 'Total Paid (INR)', key: 'totalPaid' },
+                    { label: 'Balance Due (INR)', key: 'balanceDue' },
+                    { label: 'Credit Days', key: 'creditDays' }
+                ];
+                ReportExportService.exportToCsv('CLOTHERP_Customer_Receivables_Report', headers, currentReportData.customers);
+            });
+
+            // Print
+            document.getElementById('btnPrintReport').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        }
+    </script>
+</body>
+</html>

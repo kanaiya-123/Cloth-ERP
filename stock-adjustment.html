@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Adjustment — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Adjust variant inventory counts and record audit reasons in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-2xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./inventory.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Inventory</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-indigo-400 font-bold font-mono">Reconciliation</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2">
+                            <i data-lucide="sliders-horizontal" class="w-6 h-6 text-indigo-400"></i>
+                            <span>Stock Adjustment</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Reconcile physical stock counts with traceable inventory adjustments.</p>
+                    </div>
+
+                    <a href="./inventory.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+
+                <!-- Stock Adjustment Form Card -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+                    
+                    <form id="adjustmentForm" class="space-y-4" novalidate>
+                        
+                        <!-- Product Selection -->
+                        <div class="space-y-1">
+                            <label for="selectProduct" class="block text-xs font-semibold text-slate-300">Select Product Style <span class="text-red-400">*</span></label>
+                            <select id="selectProduct" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <option value="">-- Choose Product --</option>
+                            </select>
+                            <div id="productError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                        </div>
+
+                        <!-- Variant Selection -->
+                        <div class="space-y-1">
+                            <label for="selectVariant" class="block text-xs font-semibold text-slate-300">Select Variant (Color × Size) <span class="text-red-400">*</span></label>
+                            <select id="selectVariant" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40" disabled>
+                                <option value="">-- Select Product First --</option>
+                            </select>
+                            <div id="variantError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                        </div>
+
+                        <!-- Live Stock Info Pill -->
+                        <div id="variantInfoBanner" class="hidden p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+                            <div>
+                                <span class="text-slate-500 block text-[10px]">SKU CODE</span>
+                                <span class="font-bold text-blue-300" id="infoSku">—</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[10px]">CURRENT STOCK</span>
+                                <span class="font-bold text-white" id="infoStock">0 Units</span>
+                            </div>
+                        </div>
+
+                        <!-- Adjustment Type & Quantity Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="selectAdjType" class="block text-xs font-semibold text-slate-300">Adjustment Type <span class="text-red-400">*</span></label>
+                                <select id="selectAdjType" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="Increase">Increase Stock (+)</option>
+                                    <option value="Decrease">Decrease Stock (-)</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputQuantity" class="block text-xs font-semibold text-slate-300">Adjustment Quantity <span class="text-red-400">*</span></label>
+                                <input type="number" id="inputQuantity" min="1" placeholder="e.g. 3" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <div id="quantityError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="space-y-1">
+                            <label for="selectReason" class="block text-xs font-semibold text-slate-300">Audit Reason <span class="text-red-400">*</span></label>
+                            <select id="selectReason" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <option value="Physical Count Difference">Physical Count Difference</option>
+                                <option value="Damaged Items">Damaged Items (Unsellable)</option>
+                                <option value="Lost Items">Lost / Inventory Shrinkage</option>
+                                <option value="Data Correction">Data Entry Correction</option>
+                                <option value="Opening Correction">Opening Balance Correction</option>
+                                <option value="Other">Other Reason</option>
+                            </select>
+                            <div id="reasonError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="space-y-1">
+                            <label for="inputNotes" class="block text-xs font-semibold text-slate-300">Notes & Auditor Remarks</label>
+                            <textarea id="inputNotes" rows="2" placeholder="Audit memo, store manager authorization..." class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"></textarea>
+                        </div>
+
+                        <!-- Review & Submit Button -->
+                        <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+                            <a href="./inventory.html" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                            <button type="submit" id="btnPreviewAdjust" class="btn-primary px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-500/20 transition flex items-center space-x-2">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                <span>Review & Confirm Adjustment</span>
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved.</div>
+                <div class="font-mono text-[11px] text-slate-600">Stock Adjustment Form</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- ADJUSTMENT CONFIRMATION MODAL -->
+    <div id="adjustModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="relative w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="adjustModalCard">
+            
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white">Confirm Stock Adjustment</h3>
+                </div>
+                <button id="btnCloseModal" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Product Style</span>
+                        <span class="font-bold text-white" id="modalProdName">—</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Variant (SKU)</span>
+                        <span class="font-mono text-blue-300 font-bold" id="modalSku">—</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800/80 pt-2">
+                        <span class="text-slate-500">Current Stock</span>
+                        <span class="font-mono text-slate-300" id="modalCurrentStock">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Adjustment</span>
+                        <span class="font-mono font-bold" id="modalAdjChange">—</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800/80 pt-2 font-bold text-sm">
+                        <span class="text-slate-300">New Resulting Stock</span>
+                        <span class="font-mono text-emerald-300" id="modalNewStock">0</span>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-slate-400">
+                    <strong>Reason:</strong> <span id="modalReason">—</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+                <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                <button type="button" id="btnConfirmAdjust" class="btn-primary px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition">Confirm & Save</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { inventoryService } from './assets/js/services/inventoryService.js';
+        import { stockMovementService } from './assets/js/services/stockMovementService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.INVENTORY_ADJUST });
+        if (!user) throw new Error('Auth required');
+
+        let allProducts = [];
+        let allInventory = [];
+        let selectedVariantStock = 0;
+        let pendingAdjustmentData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'inventory');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadData();
+            attachCascadingEvents();
+        });
+
+        async function loadData() {
+            const [prodRes, invRes] = await Promise.all([
+                productService.getProducts({ pageSize: 100 }),
+                inventoryService.getInventory({ pageSize: 100 })
+            ]);
+
+            allProducts = prodRes.items || [];
+            allInventory = invRes.items || [];
+
+            const prodSelect = document.getElementById('selectProduct');
+            prodSelect.innerHTML = '<option value="">-- Choose Product Style --</option>' +
+                allProducts.map(p => `<option value="${p.id}">${p.name} (${p.code})</option>`).join('');
+
+            // Pre-select if passed in query param
+            const urlParams = new URLSearchParams(window.location.search);
+            const passedVarId = urlParams.get('variantId');
+            if (passedVarId) {
+                const invItem = allInventory.find(i => i.productVariantId === passedVarId);
+                if (invItem) {
+                    prodSelect.value = invItem.productId;
+                    populateVariants(invItem.productId, passedVarId);
+                }
+            }
+        }
+
+        function populateVariants(productId, selectedVariantId = '') {
+            const varSelect = document.getElementById('selectVariant');
+            const product = allProducts.find(p => p.id === productId);
+
+            if (!product || !product.variants || product.variants.length === 0) {
+                varSelect.innerHTML = '<option value="">-- No variants found for product --</option>';
+                varSelect.disabled = true;
+                return;
+            }
+
+            varSelect.innerHTML = '<option value="">-- Select Variant --</option>' +
+                product.variants.map(v => `<option value="${v.id}" data-sku="${v.sku}">${v.color} / ${v.size} (${v.sku})</option>`).join('');
+
+            varSelect.disabled = false;
+            if (selectedVariantId) {
+                varSelect.value = selectedVariantId;
+                updateVariantInfoBanner(selectedVariantId);
+            }
+        }
+
+        function updateVariantInfoBanner(variantId) {
+            const banner = document.getElementById('variantInfoBanner');
+            if (!variantId) {
+                banner.classList.add('hidden');
+                selectedVariantStock = 0;
+                return;
+            }
+
+            const invItem = allInventory.find(i => i.productVariantId === variantId);
+            if (invItem) {
+                selectedVariantStock = invItem.currentStock;
+                document.getElementById('infoSku').textContent = invItem.sku;
+                document.getElementById('infoStock').textContent = `${invItem.currentStock} Units`;
+                banner.classList.remove('hidden');
+            }
+        }
+
+        function attachCascadingEvents() {
+            document.getElementById('selectProduct').addEventListener('change', (e) => {
+                populateVariants(e.target.value);
+                updateVariantInfoBanner('');
+            });
+
+            document.getElementById('selectVariant').addEventListener('change', (e) => {
+                updateVariantInfoBanner(e.target.value);
+            });
+
+            document.getElementById('adjustmentForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const productVal = document.getElementById('selectProduct').value;
+                const variantVal = document.getElementById('selectVariant').value;
+                const typeVal = document.getElementById('selectAdjType').value;
+                const quantityVal = document.getElementById('inputQuantity').value;
+                const reasonVal = document.getElementById('selectReason').value;
+                const notesVal = document.getElementById('inputNotes').value.trim();
+
+                const prodErr = document.getElementById('productError');
+                const varErr = document.getElementById('variantError');
+                const qtyErr = document.getElementById('quantityError');
+
+                prodErr.classList.add('hidden');
+                varErr.classList.add('hidden');
+                qtyErr.classList.add('hidden');
+
+                let isValid = true;
+                if (!productVal) {
+                    prodErr.textContent = 'Please select a product style.';
+                    prodErr.classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!variantVal) {
+                    varErr.textContent = 'Please select a product variant.';
+                    varErr.classList.remove('hidden');
+                    isValid = false;
+                }
+                const qty = parseInt(quantityVal);
+                if (isNaN(qty) || qty <= 0) {
+                    qtyErr.textContent = 'Adjustment quantity must be greater than zero.';
+                    qtyErr.classList.remove('hidden');
+                    isValid = false;
+                }
+
+                // Check negative stock on decrease
+                if (isValid && typeVal === 'Decrease' && qty > selectedVariantStock) {
+                    qtyErr.textContent = `Cannot decrease by ${qty} units. Maximum available stock reduction is ${selectedVariantStock} units.`;
+                    qtyErr.classList.remove('hidden');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                const invItem = allInventory.find(i => i.productVariantId === variantVal);
+                const newStock = typeVal === 'Increase' ? selectedVariantStock + qty : selectedVariantStock - qty;
+
+                pendingAdjustmentData = {
+                    productVariantId: variantVal,
+                    adjustmentType: typeVal,
+                    quantity: qty,
+                    reason: reasonVal,
+                    notes: notesVal,
+                    user: user.name
+                };
+
+                // Open Confirmation Modal
+                openModal({
+                    productName: invItem ? invItem.productName : 'Product',
+                    sku: invItem ? `${invItem.sku} (${invItem.color} / ${invItem.size})` : 'SKU',
+                    currentStock: selectedVariantStock,
+                    adjType: typeVal,
+                    quantity: qty,
+                    newStock: newStock,
+                    reason: reasonVal
+                });
+            });
+
+            document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+            document.getElementById('btnConfirmAdjust').addEventListener('click', async () => {
+                if (!pendingAdjustmentData) return;
+
+                const res = await stockMovementService.adjustStock(pendingAdjustmentData);
+                closeModal();
+
+                if (res.success) {
+                    showToast(`Stock adjusted successfully! New stock: ${res.newStock} units.`, 'success');
+                    setTimeout(() => {
+                        window.location.href = `./inventory-details.html?variantId=${pendingAdjustmentData.productVariantId}`;
+                    }, 500);
+                } else {
+                    showToast(res.message || 'Error saving adjustment.', 'error');
+                }
+            });
+        }
+
+        function openModal(data) {
+            document.getElementById('modalProdName').textContent = data.productName;
+            document.getElementById('modalSku').textContent = data.sku;
+            document.getElementById('modalCurrentStock').textContent = `${data.currentStock} Units`;
+            
+            const adjEl = document.getElementById('modalAdjChange');
+            if (data.adjType === 'Increase') {
+                adjEl.textContent = `Increase (+${data.quantity} Units)`;
+                adjEl.className = 'font-mono font-bold text-emerald-400';
+            } else {
+                adjEl.textContent = `Decrease (-${data.quantity} Units)`;
+                adjEl.className = 'font-mono font-bold text-red-400';
+            }
+
+            document.getElementById('modalNewStock').textContent = `${data.newStock} Units`;
+            document.getElementById('modalReason').textContent = data.reason;
+
+            const modal = document.getElementById('adjustModal');
+            const card = document.getElementById('adjustModalCard');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('adjustModal');
+            const card = document.getElementById('adjustModalCard');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

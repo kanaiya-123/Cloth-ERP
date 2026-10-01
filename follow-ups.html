@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Follow-ups & Reminders — CLOTHERP</title>
+    <meta name="description" content="Manage scheduled calls, WhatsApp follow-ups, client visits, and outcome tracking in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./crm.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">CRM</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Follow-ups</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="phone-call" class="w-6 h-6 text-blue-400"></i>
+                            <span>Follow-ups & Call Scheduler</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Track client call reminders, record negotiation outcomes, and schedule next follow-up touchpoints.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <button id="btnOpenScheduleModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Schedule Follow-up</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Scheduled Follow-ups</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiScheduled">0</div>
+                        <span class="text-[10px] text-slate-500">Upcoming Client Calls</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Due Today</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiDueToday">0</div>
+                        <span class="text-[10px] text-slate-500">Today's Call Schedule</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Overdue Follow-ups</span>
+                        <div class="text-2xl font-extrabold text-rose-300 font-mono" id="kpiOverdue">0</div>
+                        <span class="text-[10px] text-slate-500">Pending Reminders</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Completed Follow-ups</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiCompleted">0</div>
+                        <span class="text-[10px] text-slate-500">Recorded Outcomes</span>
+                    </div>
+                </div>
+
+                <!-- Follow-ups Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Scheduled Date</th>
+                                    <th class="py-3 px-4">Prospect / Client</th>
+                                    <th class="py-3 px-4">Channel</th>
+                                    <th class="py-3 px-4">Agenda / Notes</th>
+                                    <th class="py-3 px-4">Assigned To</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="followupsTableBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Sales Automation</div>
+                <div class="font-mono text-[11px] text-slate-600">Follow-up Reminder Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: SCHEDULE FOLLOW-UP -->
+    <div id="scheduleModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="phone-call" class="w-4 h-4 text-blue-400"></i>
+                    <span>Schedule Client Follow-up</span>
+                </h3>
+                <button id="btnCloseScheduleModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="scheduleForm" class="space-y-3" novalidate>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Prospect / Client Name *</label>
+                    <input type="text" id="flwNameInput" required placeholder="e.g. Surat Silk Plaza" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Channel / Type</label>
+                        <select id="flwTypeSelect" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="PHONE_CALL">Phone Call</option>
+                            <option value="WHATSAPP">WhatsApp Message</option>
+                            <option value="MEETING">Showroom Visit / Meeting</option>
+                            <option value="EMAIL">Email</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Scheduled Date *</label>
+                        <input type="date" id="flwDateInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Agenda / Discussion Notes</label>
+                    <input type="text" id="flwNotesInput" placeholder="Confirm quotation pricing and payment terms" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelSchedule" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Schedule</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: COMPLETE FOLLOW-UP -->
+    <div id="completeModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Record Follow-up Outcome</span>
+                </h3>
+                <button id="btnCloseCompleteModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="completeForm" class="space-y-3" novalidate>
+                <input type="hidden" id="completeFlwId">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Call / Interaction Outcome *</label>
+                    <select id="completeOutcomeSelect" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                        <option value="INTERESTED">Interested (Send Proposal)</option>
+                        <option value="ORDER_CONFIRMED">Order Confirmed (Won Deal!)</option>
+                        <option value="CALL_BACK">Call Back Later</option>
+                        <option value="NOT_INTERESTED">Not Interested</option>
+                        <option value="NO_RESPONSE">No Response / Line Busy</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Next Follow-up Date (Optional)</label>
+                    <input type="date" id="completeNextDateInput" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Outcome Notes</label>
+                    <input type="text" id="completeNotesInput" placeholder="Client requested sample color swatches" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelComplete" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Mark as Completed</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.FOLLOWUPS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'follow-ups');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            document.getElementById('flwDateInput').value = new Date().toISOString().split('T')[0];
+
+            await loadFollowUps();
+            attachEvents();
+        });
+
+        async function loadFollowUps() {
+            const res = await crmService.getFollowUps();
+
+            document.getElementById('kpiScheduled').textContent = res.summary.totalScheduled;
+            document.getElementById('kpiDueToday').textContent = res.summary.dueTodayCount;
+            document.getElementById('kpiOverdue').textContent = res.summary.overdueCount;
+            document.getElementById('kpiCompleted').textContent = res.summary.completedCount;
+
+            renderTable(res.items);
+        }
+
+        function renderTable(items) {
+            const tbody = document.getElementById('followupsTableBody');
+            tbody.innerHTML = items.map(f => {
+                const isOverdue = f.status === 'SCHEDULED' && f.scheduledDate < new Date().toISOString().split('T')[0];
+                return `
+                    <tr class="hover:bg-slate-850/60 transition">
+                        <td class="py-3 px-4 font-mono font-bold ${isOverdue ? 'text-rose-400' : 'text-blue-400'}">${f.scheduledDate}</td>
+                        <td class="py-3 px-4 font-bold text-white">${f.relatedName}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">${f.type}</span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-300 max-w-xs truncate">${f.notes}</td>
+                        <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${f.assignedTo}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                f.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                isOverdue ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
+                                'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                            }">${isOverdue ? 'OVERDUE' : f.status}</span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            ${f.status === 'SCHEDULED' ? `
+                                <button class="btn-complete px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] shadow transition" data-id="${f.id}">Mark Done</button>
+                            ` : '<span class="text-[11px] font-bold text-emerald-400 font-mono">Done ✓</span>'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+            attachRowEvents();
+        }
+
+        function attachRowEvents() {
+            document.querySelectorAll('.btn-complete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('completeFlwId').value = btn.dataset.id;
+                    document.getElementById('completeForm').reset();
+                    document.getElementById('completeModal').classList.remove('hidden');
+                });
+            });
+        }
+
+        function attachEvents() {
+            document.getElementById('btnOpenScheduleModal').addEventListener('click', () => {
+                document.getElementById('scheduleForm').reset();
+                document.getElementById('flwDateInput').value = new Date().toISOString().split('T')[0];
+                document.getElementById('scheduleModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseScheduleModal').addEventListener('click', () => {
+                document.getElementById('scheduleModal').classList.add('hidden');
+            });
+            document.getElementById('btnCancelSchedule').addEventListener('click', () => {
+                document.getElementById('scheduleModal').classList.add('hidden');
+            });
+
+            document.getElementById('btnCloseCompleteModal').addEventListener('click', () => {
+                document.getElementById('completeModal').classList.add('hidden');
+            });
+            document.getElementById('btnCancelComplete').addEventListener('click', () => {
+                document.getElementById('completeModal').classList.add('hidden');
+            });
+
+            document.getElementById('scheduleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const flwData = {
+                    relatedName: document.getElementById('flwNameInput').value,
+                    type: document.getElementById('flwTypeSelect').value,
+                    scheduledDate: document.getElementById('flwDateInput').value,
+                    notes: document.getElementById('flwNotesInput').value
+                };
+
+                const res = await crmService.scheduleFollowUp(flwData, user.name);
+                if (res.success) {
+                    showToast('Follow-up scheduled successfully!', 'success');
+                    document.getElementById('scheduleModal').classList.add('hidden');
+                    await loadFollowUps();
+                }
+            });
+
+            document.getElementById('completeForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('completeFlwId').value;
+                const outcome = document.getElementById('completeOutcomeSelect').value;
+                const nextDate = document.getElementById('completeNextDateInput').value;
+                const notes = document.getElementById('completeNotesInput').value;
+
+                const res = await crmService.completeFollowUp(id, outcome, nextDate, notes, user.name);
+                if (res.success) {
+                    showToast('Follow-up outcome recorded!', 'success');
+                    document.getElementById('completeModal').classList.add('hidden');
+                    await loadFollowUps();
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

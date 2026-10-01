@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Workspace — CLOTHERP</title>
+    <meta name="description" content="CLOTHERP Protected Workspace with Role-Based Access Control Verification.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern min-h-screen flex flex-col justify-between">
+
+    <!-- Top Protected Navbar -->
+    <header class="sticky top-0 z-40 py-3.5 px-4 sm:px-8 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- Left Brand -->
+            <div class="flex items-center space-x-4">
+                <a href="./index.html" class="flex items-center space-x-3 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <i data-lucide="layers" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-lg font-extrabold tracking-wider text-white font-mono">CLOTH<span class="text-blue-400">ERP</span></span>
+                        <span class="text-[8px] uppercase tracking-widest text-slate-400 -mt-1 font-semibold">Workspace</span>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-2 pl-4 border-l border-slate-800">
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-medium flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 pulse-indicator"></span>
+                        SESSION ACTIVE
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right Profile Menu Mount -->
+            <div class="flex items-center space-x-4">
+                <div id="profileMenuMount"></div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Main Protected Workspace Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+        
+        <!-- Welcome Banner -->
+        <div class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+                <div>
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-300 mb-3">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span>Phase 2 RBAC & Authentication Verified</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
+                        Welcome, <span id="welcomeUserName" class="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">User</span> 👋
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                        You have successfully authenticated into the CLOTHERP enterprise ecosystem.
+                    </p>
+                </div>
+
+                <!-- Session Metadata Card -->
+                <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800/90 text-xs font-mono space-y-1.5 min-w-[280px]">
+                    <div class="flex justify-between text-slate-400">
+                        <span>User Role:</span>
+                        <span id="metaRole" class="text-blue-400 font-bold">...</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Assigned Branch:</span>
+                        <span id="metaBranch" class="text-slate-200">...</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Login Timestamp:</span>
+                        <span id="metaTime" class="text-slate-300">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1-Click Role Switcher (For Evaluation & Testing) -->
+        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i data-lucide="repeat" class="w-4 h-4 text-blue-400"></i>
+                        <span>Test Role-Based Access Control (1-Click Switcher)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Switch user roles instantly to observe how permissions update dynamically in real time:</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button type="button" class="switch-role-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="admin@clotherp.local" data-pass="Admin@123">
+                    <div class="text-xs font-bold text-blue-300">👑 Administrator</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">Full System Access</div>
+                </button>
+
+                <button type="button" class="switch-role-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="manager@clotherp.local" data-pass="Manager@123">
+                    <div class="text-xs font-bold text-emerald-300">👔 Store Manager</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">Operations Oversight</div>
+                </button>
+
+                <button type="button" class="switch-role-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="sales@clotherp.local" data-pass="Sales@123">
+                    <div class="text-xs font-bold text-sky-300">💳 Sales Staff</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">POS & Invoicing</div>
+                </button>
+
+                <button type="button" class="switch-role-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700 text-left transition" data-email="purchase@clotherp.local" data-pass="Purchase@123">
+                    <div class="text-xs font-bold text-amber-300">🚚 Purchase Staff</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">Suppliers & Shipments</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Permission Matrix for Active User -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left 8 Cols: Module Access Status -->
+            <div class="lg:col-span-8 glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Authorized Module Access</h3>
+                        <p class="text-xs text-slate-400">Permissions granted to your active role:</p>
+                    </div>
+                    <span id="roleBadgeEl" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold">...</span>
+                </div>
+
+                <div id="modulePermissionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+                    <!-- Loaded dynamically via permissions check -->
+                </div>
+            </div>
+
+            <!-- Right 4 Cols: Security Testing Tools -->
+            <div class="lg:col-span-4 glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div class="pb-3 border-b border-slate-800">
+                    <h3 class="text-base font-bold text-white">Route Guard Test Suite</h3>
+                    <p class="text-xs text-slate-400">Simulate unauthorized route attempts:</p>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Test 1: Admin Only Action -->
+                    <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+                        <div class="font-bold text-slate-200 text-xs">Financial Audit & Tax Filing</div>
+                        <p class="text-[11px] text-slate-400">Requires [Admin] role.</p>
+                        <button id="btnTestAdminRoute" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold transition">
+                            Simulate Admin Action
+                        </button>
+                    </div>
+
+                    <!-- Test 2: Purchase Only Action -->
+                    <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+                        <div class="font-bold text-slate-200 text-xs">Freight LR Dispatch Entry</div>
+                        <p class="text-[11px] text-slate-400">Requires [PurchaseStaff or Admin] role.</p>
+                        <button id="btnTestPurchaseRoute" class="w-full py-2 px-3 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-xs font-semibold transition">
+                            Simulate Logistics Action
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800/80 bg-slate-950/40">
+        © 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP
+    </footer>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { authService } from './assets/js/services/authService.js';
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { initProfileMenu } from './assets/js/components/profileMenu.js';
+        import { PERMISSIONS, ROLES, getRoleDetails } from './assets/js/config/permissions.js';
+
+        // 1. Guard current page: must be logged in
+        const user = requireAuth();
+        if (!user) {
+            // requireAuth handles redirection
+            throw new Error('Authentication required');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+
+            // 2. Initialize Profile Dropdown & Logout Modal
+            initProfileMenu('profileMenuMount');
+
+            // 3. Render User Details
+            document.getElementById('welcomeUserName').textContent = user.name;
+            document.getElementById('metaRole').textContent = user.role;
+            document.getElementById('metaBranch').textContent = user.branch || 'Central Hub';
+            document.getElementById('metaTime').textContent = new Date(user.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const roleInfo = getRoleDetails(user.role);
+            const roleBadgeEl = document.getElementById('roleBadgeEl');
+            roleBadgeEl.textContent = roleInfo.name;
+            roleBadgeEl.className = `px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${roleInfo.badgeClass}`;
+
+            // 4. Render Module Permissions Grid
+            renderPermissionsMatrix(user);
+
+            // 5. Setup 1-Click Role Switchers
+            document.querySelectorAll('.switch-role-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const email = btn.getAttribute('data-email');
+                    const pass = btn.getAttribute('data-pass');
+                    await authService.login(email, pass, false);
+                    window.location.reload();
+                });
+            });
+
+            // 6. Setup Route Guard Simulation Tests
+            document.getElementById('btnTestAdminRoute').addEventListener('click', () => {
+                if (user.role === ROLES.ADMIN) {
+                    alert('✓ Access Granted: You have Administrator permissions for Financial Audit.');
+                } else {
+                    window.location.href = './access-denied.html?requiredRole=Admin';
+                }
+            });
+
+            document.getElementById('btnTestPurchaseRoute').addEventListener('click', () => {
+                if (user.role === ROLES.PURCHASE_STAFF || user.role === ROLES.ADMIN || user.role === ROLES.MANAGER) {
+                    alert('✓ Access Granted: You have Logistics permissions for Freight LR Dispatch.');
+                } else {
+                    window.location.href = './access-denied.html?requiredRole=PurchaseStaff';
+                }
+            });
+        });
+
+        function renderPermissionsMatrix(user) {
+            const grid = document.getElementById('modulePermissionsGrid');
+            if (!grid) return;
+
+            const modules = [
+                { title: 'Products & Variants', perm: PERMISSIONS.PRODUCTS_MANAGE, icon: 'tag' },
+                { title: 'Inventory Health Monitor', perm: PERMISSIONS.INVENTORY_MANAGE, icon: 'boxes' },
+                { title: 'Sales POS & GST Billing', perm: PERMISSIONS.INVOICES_CREATE, icon: 'receipt' },
+                { title: 'Supplier PO & GRN', perm: PERMISSIONS.GRN_CREATE, icon: 'shopping-bag' },
+                { title: 'Freight LR Tracking', perm: PERMISSIONS.SHIPMENTS_TRACK, icon: 'truck' },
+                { title: 'P&L Financial Reports', perm: PERMISSIONS.FINANCIALS_VIEW, icon: 'bar-chart-3' },
+            ];
+
+            grid.innerHTML = '';
+
+            modules.forEach(m => {
+                const allowed = authService.hasPermission(m.perm);
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-xl border flex items-center justify-between ${
+                    allowed ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-950/40 border-slate-900 opacity-60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center ${
+                            allowed ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-500'
+                        }">
+                            <i data-lucide="${m.icon}" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-200">${m.title}</div>
+                            <div class="text-[10px] text-slate-500 font-mono">${m.perm}</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                        allowed ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                    }">
+                        ${allowed ? 'GRANTED' : 'DENIED'}
+                    </span>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

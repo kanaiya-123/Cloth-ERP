@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile & Account Settings — CLOTHERP</title>
+    <meta name="description" content="Manage your personal profile, security credentials, terminal preferences, and active session audit logs in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto">
+                
+                <!-- Page Header & User Hero Card -->
+                <div class="p-6 rounded-3xl bg-gradient-to-r from-blue-950/40 via-slate-900 to-indigo-950/40 border border-slate-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="flex items-center space-x-4">
+                        <div id="pageUserAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-xl shadow-blue-500/25 border-2 border-white/10">
+                            PS
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2.5">
+                                <h1 id="pageUserName" class="text-2xl font-black text-white">Priya Sharma</h1>
+                                <span id="pageUserRoleBadge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">SalesStaff</span>
+                            </div>
+                            <p id="pageUserEmail" class="text-xs text-slate-400 font-mono mt-0.5">sales@clotherp.local</p>
+                            <div class="flex items-center space-x-3 mt-2 text-[11px] text-slate-400">
+                                <span id="pageUserBranch" class="flex items-center space-x-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-400"></i><span>Retail Counter #01</span></span>
+                                <span>•</span>
+                                <span id="pageUserDept" class="flex items-center space-x-1"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-indigo-400"></i><span>Retail Counter Sales & Billing</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <div class="flex items-center bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 text-xs self-start md:self-auto shadow-inner">
+                        <button type="button" class="page-tab-btn px-4 py-2 rounded-xl font-semibold transition bg-blue-600 text-white shadow" data-tab="profile">
+                            <span class="flex items-center space-x-2"><i data-lucide="user" class="w-4 h-4"></i><span>My Profile</span></span>
+                        </button>
+                        <button type="button" class="page-tab-btn px-4 py-2 rounded-xl font-semibold transition text-slate-400 hover:text-white" data-tab="settings">
+                            <span class="flex items-center space-x-2"><i data-lucide="settings" class="w-4 h-4"></i><span>Account Settings</span></span>
+                        </button>
+                        <button type="button" class="page-tab-btn px-4 py-2 rounded-xl font-semibold transition text-slate-400 hover:text-white" data-tab="sessions">
+                            <span class="flex items-center space-x-2"><i data-lucide="activity" class="w-4 h-4"></i><span>Session Log</span></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 1: MY PROFILE -->
+                <div id="pageTabProfile" class="page-tab-pane space-y-6">
+                    <form id="pageProfileForm" class="space-y-6">
+                        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                                    <i data-lucide="user-check" class="w-4 h-4 text-blue-400"></i>
+                                    <span>Personal & Employment Information</span>
+                                </h3>
+                                <span class="text-[11px] text-slate-400">Instant ERP Sync Active</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Full Name</label>
+                                    <input type="text" id="pInputName" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition" required>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Official Email</label>
+                                    <input type="email" id="pInputEmail" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition" required>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Mobile Number</label>
+                                    <input type="text" id="pInputPhone" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Branch / Hub</label>
+                                    <input type="text" id="pInputBranch" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Department</label>
+                                    <input type="text" id="pInputDept" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Employee Code</label>
+                                    <input type="text" id="pInputEmpId" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-mono cursor-not-allowed" readonly>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Emergency Contact Details</label>
+                                    <input type="text" id="pInputEmergency" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Address</label>
+                                    <textarea id="pInputAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition"></textarea>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-slate-300 font-semibold mb-1.5">Bio / Remarks</label>
+                                    <textarea id="pInputBio" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-3">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition flex items-center space-x-2">
+                                    <i data-lucide="save" class="w-4 h-4"></i>
+                                    <span>Save Profile Information</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TAB 2: ACCOUNT SETTINGS -->
+                <div id="pageTabSettings" class="page-tab-pane hidden space-y-6">
+                    <!-- Password Update Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+                        <div class="border-b border-slate-800/80 pb-3">
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                                <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Security Credentials & Password</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">Keep your terminal login safe with regular credential updates.</p>
+                        </div>
+
+                        <form id="pagePasswordForm" class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+                            <div>
+                                <label class="block text-slate-300 font-semibold mb-1.5">Current Password</label>
+                                <input type="password" id="pPassCurrent" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition" placeholder="••••••••" required>
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-semibold mb-1.5">New Password</label>
+                                <input type="password" id="pPassNew" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition" placeholder="Min. 6 chars" required>
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 font-semibold mb-1.5">Confirm Password</label>
+                                <input type="password" id="pPassConfirm" class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white focus:outline-none focus:border-blue-500 transition" placeholder="Repeat new" required>
+                            </div>
+                            <div class="md:col-span-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                                <div class="text-[11px] text-slate-500">Preset demo passwords: <span class="font-mono text-slate-400">Admin@123, Sales@123, Manager@123</span></div>
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center space-x-2 self-start sm:self-auto">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                    <span>Update Password</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Terminal & ERP Preferences -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+                        <div class="border-b border-slate-800/80 pb-3">
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                                <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+                                <span>Terminal System & Notification Preferences</span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div>
+                                    <div class="font-bold text-white">Two-Factor Authentication</div>
+                                    <div class="text-[11px] text-slate-400">Mandate OTP for every login</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="pSetting2FA" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div>
+                                    <div class="font-bold text-white">Inactivity Auto-Lock</div>
+                                    <div class="text-[11px] text-slate-400">Lock retail register screen</div>
+                                </div>
+                                <select id="pSettingAutoLock" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-white font-mono text-xs">
+                                    <option value="5">5 Minutes</option>
+                                    <option value="15" selected>15 Minutes</option>
+                                    <option value="30">30 Minutes</option>
+                                    <option value="60">60 Minutes</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div>
+                                    <div class="font-bold text-white">Email PO & Sales Alerts</div>
+                                    <div class="text-[11px] text-slate-400">Real-time order notifications</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="pSettingEmail" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div>
+                                    <div class="font-bold text-white">Scanner Sound Feedback</div>
+                                    <div class="text-[11px] text-slate-400">Audible beep on item addition</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="pSettingSound" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-3">
+                            <button type="button" id="pBtnSaveSettings" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                <span>Save System Preferences</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SESSION LOG -->
+                <div id="pageTabSessions" class="page-tab-pane hidden space-y-6">
+                    <!-- Current Active Terminal -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-r from-blue-950/50 to-slate-900 border border-blue-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold">
+                                <i data-lucide="monitor" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2.5">
+                                    <span class="text-sm font-bold text-white">Current Active Session</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active Terminal</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Desktop Chrome (Windows 11) • IP: 127.0.0.1 (Local POS Host) • Surat Retail Counter #01</p>
+                            </div>
+                        </div>
+                        <button type="button" id="pBtnTerminateOthers" class="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs font-semibold transition flex items-center space-x-2 self-start md:self-auto">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                            <span>Terminate All Other Sessions</span>
+                        </button>
+                    </div>
+
+                    <!-- Logs Table Card -->
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+                            <div class="font-bold text-xs text-white uppercase tracking-wider flex items-center space-x-2">
+                                <i data-lucide="history" class="w-4 h-4 text-blue-400"></i>
+                                <span>Login & Security Session Audit Log</span>
+                            </div>
+                            <span class="text-xs text-slate-400 font-mono" id="pSessionCount">Showing audit records</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3.5 px-5">Device & Platform</th>
+                                        <th class="py-3.5 px-5">IP Address</th>
+                                        <th class="py-3.5 px-5">Location</th>
+                                        <th class="py-3.5 px-5">Session Timestamp</th>
+                                        <th class="py-3.5 px-5">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pSessionLogsTbody" class="divide-y divide-slate-800/60 font-mono text-xs text-slate-300">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Script Modules -->
+    <script type="module">
+        import { sidebarComponent } from './assets/js/components/sidebar.js';
+        import { topbarComponent } from './assets/js/components/topbar.js';
+        import { initProfileMenu } from './assets/js/components/profileMenu.js';
+        import { userProfileService } from './assets/js/services/userProfileService.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render Shell
+            document.getElementById('sidebarMount').innerHTML = sidebarComponent.render();
+            document.getElementById('topbarMount').innerHTML = topbarComponent.render();
+            sidebarComponent.init();
+            topbarComponent.init();
+            initProfileMenu();
+
+            loadProfile();
+            loadSettings();
+            loadSessions();
+            attachTabs();
+            attachForms();
+
+            if (window.lucide) lucide.createIcons();
+        });
+
+        function attachTabs() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialTab = urlParams.get('tab') || 'profile';
+
+            document.querySelectorAll('.page-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+
+            switchTab(initialTab);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.page-tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.className = 'page-tab-btn px-4 py-2 rounded-xl font-semibold transition bg-blue-600 text-white shadow';
+                } else {
+                    btn.className = 'page-tab-btn px-4 py-2 rounded-xl font-semibold transition text-slate-400 hover:text-white';
+                }
+            });
+
+            document.getElementById('pageTabProfile').classList.toggle('hidden', tab !== 'profile');
+            document.getElementById('pageTabSettings').classList.toggle('hidden', tab !== 'settings');
+            document.getElementById('pageTabSessions').classList.toggle('hidden', tab !== 'sessions');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function loadProfile() {
+            const prof = userProfileService.getProfile();
+            document.getElementById('pageUserName').textContent = prof.name;
+            document.getElementById('pageUserRoleBadge').textContent = prof.role;
+            document.getElementById('pageUserEmail').textContent = prof.email;
+            document.getElementById('pageUserAvatar').textContent = prof.avatar;
+            document.getElementById('pageUserBranch').innerHTML = `<i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-400"></i><span>${prof.branch || 'Central'}</span>`;
+            document.getElementById('pageUserDept').innerHTML = `<i data-lucide="briefcase" class="w-3.5 h-3.5 text-indigo-400"></i><span>${prof.department || 'Store'}</span>`;
+
+            document.getElementById('pInputName').value = prof.name || '';
+            document.getElementById('pInputEmail').value = prof.email || '';
+            document.getElementById('pInputPhone').value = prof.phone || '';
+            document.getElementById('pInputBranch').value = prof.branch || '';
+            document.getElementById('pInputDept').value = prof.department || '';
+            document.getElementById('pInputEmpId').value = prof.employeeId || 'EMP-2024-001';
+            document.getElementById('pInputEmergency').value = prof.emergencyContact || '';
+            document.getElementById('pInputAddress').value = prof.address || '';
+            document.getElementById('pInputBio').value = prof.bio || '';
+        }
+
+        function loadSettings() {
+            const s = userProfileService.getSettings();
+            document.getElementById('pSetting2FA').checked = !!s.twoFactorAuth;
+            document.getElementById('pSettingAutoLock').value = s.autoLockMinutes || 15;
+            document.getElementById('pSettingEmail').checked = s.emailNotifications !== false;
+            document.getElementById('pSettingSound').checked = s.soundAlerts !== false;
+        }
+
+        function loadSessions() {
+            const logs = userProfileService.getSessionLogs();
+            document.getElementById('pSessionCount').textContent = `${logs.length} Total Sessions Tracked`;
+            const tbody = document.getElementById('pSessionLogsTbody');
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No session history records.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = logs.map(l => {
+                let badge = 'bg-slate-800 text-slate-400 border-slate-700';
+                if (l.status === 'Active' || l.isCurrent) badge = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+                else if (l.status.includes('Terminated')) badge = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+                const d = new Date(l.loginTime);
+                const timeStr = d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return `
+                    <tr class="hover:bg-slate-900/40 transition">
+                        <td class="py-3.5 px-5 text-white font-sans font-medium flex items-center space-x-2.5">
+                            <i data-lucide="${l.device.includes('Tablet') ? 'tablet' : 'laptop'}" class="w-4 h-4 text-slate-400"></i>
+                            <span>${l.device}</span>
+                            ${l.isCurrent ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold">Current Terminal</span>' : ''}
+                        </td>
+                        <td class="py-3.5 px-5">${l.ipAddress}</td>
+                        <td class="py-3.5 px-5 font-sans text-slate-300">${l.location}</td>
+                        <td class="py-3.5 px-5 text-slate-400">${timeStr}</td>
+                        <td class="py-3.5 px-5">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${badge}">
+                                ${l.status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachForms() {
+            document.getElementById('pageProfileForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const updated = {
+                    name: document.getElementById('pInputName').value.trim(),
+                    email: document.getElementById('pInputEmail').value.trim(),
+                    phone: document.getElementById('pInputPhone').value.trim(),
+                    branch: document.getElementById('pInputBranch').value.trim(),
+                    department: document.getElementById('pInputDept').value.trim(),
+                    emergencyContact: document.getElementById('pInputEmergency').value.trim(),
+                    address: document.getElementById('pInputAddress').value.trim(),
+                    bio: document.getElementById('pInputBio').value.trim()
+                };
+                userProfileService.updateProfile(updated);
+                showToast('Profile information successfully saved!');
+                loadProfile();
+            });
+
+            document.getElementById('pagePasswordForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const curr = document.getElementById('pPassCurrent').value;
+                const newP = document.getElementById('pPassNew').value;
+                const conf = document.getElementById('pPassConfirm').value;
+
+                const res = userProfileService.changePassword(curr, newP, conf);
+                if (res.success) {
+                    showToast(res.message);
+                    document.getElementById('pagePasswordForm').reset();
+                } else {
+                    alert(res.message);
+                }
+            });
+
+            document.getElementById('pBtnSaveSettings').addEventListener('click', () => {
+                const s = {
+                    twoFactorAuth: document.getElementById('pSetting2FA').checked,
+                    autoLockMinutes: Number(document.getElementById('pSettingAutoLock').value),
+                    emailNotifications: document.getElementById('pSettingEmail').checked,
+                    soundAlerts: document.getElementById('pSettingSound').checked
+                };
+                userProfileService.updateSettings(s);
+                showToast('Terminal and notification preferences saved!');
+            });
+
+            document.getElementById('pBtnTerminateOthers').addEventListener('click', () => {
+                userProfileService.terminateOtherSessions();
+                showToast('All other terminal sessions have been terminated.');
+                loadSessions();
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl bg-emerald-950 border border-emerald-500/50 text-emerald-200 text-xs font-bold shadow-2xl flex items-center space-x-2 animate-in fade-in slide-in-from-bottom-5';
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>${msg}</span>`;
+            document.body.appendChild(toast);
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

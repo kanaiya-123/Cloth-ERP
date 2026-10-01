@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Product Exchange — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Structured product variant exchange builder with stock validation, price difference calculation, and payment adjustment.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./exchanges.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Exchanges</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-indigo-400 font-bold font-mono">New Exchange</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Initiate Product Exchange</h1>
+                        <p class="text-xs text-slate-400">Exchange sold garment variants for a replacement style/size, compute value differences, and adjust inventory.</p>
+                    </div>
+
+                    <a href="./exchanges.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+
+                <form id="createExchangeForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: ORIGINAL SALE SELECTION -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono text-[11px]">1</span>
+                            <span>Original Sale Order & Customer Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="space-y-1 sm:col-span-2">
+                                <label for="selectSale" class="block text-xs font-semibold text-slate-300">Select Sale Order <span class="text-red-400">*</span></label>
+                                <select id="selectSale" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                                    <option value="">-- Choose Original Sale Order --</option>
+                                </select>
+                                <div id="saleError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputExchangeDate" class="block text-xs font-semibold text-slate-300">Exchange Date <span class="text-red-400">*</span></label>
+                                <input type="date" id="inputExchangeDate" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                            </div>
+
+                            <!-- Customer Meta Banner -->
+                            <div class="sm:col-span-3 p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs hidden" id="customerMetaBanner">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">CUSTOMER</span>
+                                        <span class="font-bold text-white" id="infoCustName">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">CONTACT</span>
+                                        <span class="text-slate-300 font-mono" id="infoCustContact">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">ORIGINAL INVOICE</span>
+                                        <span class="text-blue-300 font-mono font-bold" id="infoCustInvoice">—</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2 & 3: RETURNED ITEM VS REPLACEMENT ITEM -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- SECTION 2: RETURNED ITEM -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono text-[11px]">2</span>
+                                <span>Returned Item (from Sale)</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <div class="space-y-1">
+                                    <label for="selectReturnedItem" class="block text-xs font-semibold text-slate-300">Select Item Being Returned <span class="text-red-400">*</span></label>
+                                    <select id="selectReturnedItem" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="">-- Select Sold Variant --</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label for="inputReturnQty" class="block text-xs font-semibold text-slate-300">Return Quantity</label>
+                                        <input type="number" id="inputReturnQty" min="1" value="1" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label for="selectReturnedCondition" class="block text-xs font-semibold text-slate-300">Physical Condition</label>
+                                        <select id="selectReturnedCondition" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                            <option value="Resalable">Resalable (Restock)</option>
+                                            <option value="Damaged">Damaged (Quarantine)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between font-mono">
+                                    <span class="text-slate-400">Credit Value for Return:</span>
+                                    <span class="font-bold text-amber-400" id="infoReturnValue">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: REPLACEMENT ITEM -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono text-[11px]">3</span>
+                                <span>Replacement Garment Variant</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <div class="space-y-1">
+                                    <label for="selectReplacementVariant" class="block text-xs font-semibold text-slate-300">Select Replacement Variant <span class="text-red-400">*</span></label>
+                                    <select id="selectReplacementVariant" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="">-- Choose In-Stock Variant --</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label for="inputReplacementQty" class="block text-xs font-semibold text-slate-300">Replacement Quantity</label>
+                                        <input type="number" id="inputReplacementQty" min="1" value="1" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-300">Available Stock</label>
+                                        <div class="px-3 py-2 bg-slate-950/80 rounded-xl border border-slate-800 font-mono text-emerald-400 font-bold" id="infoReplacementStock">0 pcs</div>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between font-mono">
+                                    <span class="text-slate-400">Replacement Value:</span>
+                                    <span class="font-bold text-emerald-400" id="infoReplacementValue">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- SECTION 4: PRICE DIFFERENCE & PAYMENT ADJUSTMENT -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono text-[11px]">4</span>
+                            <span>Price Difference Calculation & Settlement Adjustment</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            
+                            <!-- Financial Calculation Box -->
+                            <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs font-mono">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Replacement Garment Total:</span>
+                                    <span class="text-white font-bold" id="calcReplacement">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Returned Garment Credit:</span>
+                                    <span class="text-amber-400 font-bold" id="calcReturn">-₹0.00</span>
+                                </div>
+                                <div class="flex justify-between border-t border-slate-800 pt-2 font-bold text-sm">
+                                    <span id="diffLabel" class="text-slate-300">Net Difference:</span>
+                                    <span class="text-indigo-300" id="calcDifference">₹0.00</span>
+                                </div>
+                                <div class="text-[11px] text-slate-400 pt-1 font-sans" id="diffMessage">
+                                    Select returned and replacement items to calculate difference.
+                                </div>
+                            </div>
+
+                            <!-- Payment Method / Adjustment -->
+                            <div class="space-y-3 text-xs">
+                                <div class="space-y-1">
+                                    <label for="selectPaymentMethod" class="block text-xs font-semibold text-slate-300">Difference Settlement Method</label>
+                                    <select id="selectPaymentMethod" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="UPI">UPI (GooglePay / PhonePe)</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Credit Note">Credit Note</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="inputPaymentRef" class="block text-xs font-semibold text-slate-300">Transaction / UTR Reference</label>
+                                    <input type="text" id="inputPaymentRef" placeholder="e.g. UPI-EXC-992" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="inputExchangeNotes" class="block text-xs font-semibold text-slate-300">Exchange Reason / Memo</label>
+                                    <input type="text" id="inputExchangeNotes" placeholder="Reason for exchange..." class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./exchanges.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        <button type="submit" id="btnSubmitExchange" class="btn-primary px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-500/20 transition flex items-center space-x-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Execute Exchange & Adjust Stock</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Product Exchange Form</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { salesService } from './assets/js/services/salesService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { inventoryStore, INVENTORY_STORAGE_KEYS } from './assets/js/services/inventoryStore.js';
+        import { exchangeService } from './assets/js/services/exchangeService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.EXCHANGES_CREATE });
+        if (!user) throw new Error('Auth required');
+
+        let allSales = [];
+        let allVariantsFlat = [];
+        let selectedSale = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'exchanges');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            document.getElementById('inputExchangeDate').value = new Date().toISOString().split('T')[0];
+
+            await loadPrerequisites();
+            attachFormEvents();
+        });
+
+        async function loadPrerequisites() {
+            const [salesRes, prodRes] = await Promise.all([
+                salesService.getSales({ pageSize: 100 }),
+                productService.getProducts({ pageSize: 100 })
+            ]);
+
+            allSales = (salesRes.items || []).filter(s => s.status !== 'Draft' && s.status !== 'Cancelled');
+            const inventory = inventoryStore.get(INVENTORY_STORAGE_KEYS.INVENTORY);
+
+            allVariantsFlat = [];
+            (prodRes.items || []).forEach(p => {
+                (p.variants || []).forEach(v => {
+                    const invRec = inventory.find(i => i.productVariantId === v.id);
+                    const stock = invRec ? (invRec.currentStock || 0) : 0;
+
+                    allVariantsFlat.push({
+                        productId: p.id,
+                        productName: p.name,
+                        gstRate: p.gstRate ? parseInt(p.gstRate) : 5,
+                        productVariantId: v.id,
+                        color: v.color,
+                        size: v.size,
+                        sku: v.sku,
+                        sellingPrice: v.sellingPrice || p.baseSellingPrice || 1499,
+                        availableStock: stock
+                    });
+                });
+            });
+
+            // Populate Sales
+            const saleSelect = document.getElementById('selectSale');
+            saleSelect.innerHTML = '<option value="">-- Choose Original Sale Order --</option>' +
+                allSales.map(s => `<option value="${s.id}">${s.saleNumber} — ${s.customerName} (${s.items.length} items)</option>`).join('');
+
+            // Populate Replacement Variants
+            const varSelect = document.getElementById('selectReplacementVariant');
+            varSelect.innerHTML = '<option value="">-- Choose In-Stock Variant --</option>' +
+                allVariantsFlat.map(v => `<option value="${v.productVariantId}" data-stock="${v.availableStock}" data-price="${v.sellingPrice}">${v.productName} (${v.color} / ${v.size} • ${v.availableStock} in stock • ₹${v.sellingPrice})</option>`).join('');
+        }
+
+        function handleSaleChange(saleId) {
+            selectedSale = allSales.find(s => s.id === saleId);
+            const banner = document.getElementById('customerMetaBanner');
+            const returnedSelect = document.getElementById('selectReturnedItem');
+
+            if (!selectedSale) {
+                banner.classList.add('hidden');
+                returnedSelect.innerHTML = '<option value="">-- Select Sold Variant --</option>';
+                recalculate();
+                return;
+            }
+
+            document.getElementById('infoCustName').textContent = selectedSale.customerName;
+            document.getElementById('infoCustContact').textContent = `${selectedSale.customerMobile} (${selectedSale.customerType})`;
+            document.getElementById('infoCustInvoice').textContent = selectedSale.invoiceNumber || selectedSale.saleNumber;
+            banner.classList.remove('hidden');
+
+            returnedSelect.innerHTML = '<option value="">-- Select Sold Variant --</option>' +
+                (selectedSale.items || []).map(i => `<option value="${i.productVariantId}" data-rate="${i.sellingRate}" data-disc="${i.discountVal || 0}" data-qty="${i.quantity}">${i.productName} (${i.variantName} • Qty: ${i.quantity} • ₹${i.sellingRate})</option>`).join('');
+
+            recalculate();
+        }
+
+        function recalculate() {
+            const returnedSelect = document.getElementById('selectReturnedItem');
+            const replacementSelect = document.getElementById('selectReplacementVariant');
+            const returnQty = parseInt(document.getElementById('inputReturnQty').value) || 1;
+            const replacementQty = parseInt(document.getElementById('inputReplacementQty').value) || 1;
+
+            let returnUnitVal = 0;
+            if (returnedSelect.selectedIndex > 0) {
+                const opt = returnedSelect.options[returnedSelect.selectedIndex];
+                const rate = parseFloat(opt.getAttribute('data-rate')) || 0;
+                returnUnitVal = rate * returnQty;
+            }
+
+            let replacementUnitVal = 0;
+            let replacementStock = 0;
+            if (replacementSelect.selectedIndex > 0) {
+                const opt = replacementSelect.options[replacementSelect.selectedIndex];
+                const price = parseFloat(opt.getAttribute('data-price')) || 0;
+                replacementStock = parseInt(opt.getAttribute('data-stock')) || 0;
+                replacementUnitVal = price * replacementQty;
+            }
+
+            document.getElementById('infoReturnValue').textContent = `₹${returnUnitVal.toFixed(2)}`;
+            document.getElementById('infoReplacementValue').textContent = `₹${replacementUnitVal.toFixed(2)}`;
+            document.getElementById('infoReplacementStock').textContent = `${replacementStock} pcs`;
+
+            document.getElementById('calcReplacement').textContent = `₹${replacementUnitVal.toFixed(2)}`;
+            document.getElementById('calcReturn').textContent = `-₹${returnUnitVal.toFixed(2)}`;
+
+            const diff = replacementUnitVal - returnUnitVal;
+            const absDiff = Math.abs(diff);
+
+            const calcDiffEl = document.getElementById('calcDifference');
+            const diffMsg = document.getElementById('diffMessage');
+            const diffLabel = document.getElementById('diffLabel');
+
+            if (diff > 0) {
+                diffLabel.textContent = 'Customer Pays Difference:';
+                calcDiffEl.textContent = `+₹${absDiff.toFixed(2)}`;
+                calcDiffEl.className = 'text-amber-400 font-bold';
+                diffMsg.textContent = `Replacement value is higher by ₹${absDiff.toFixed(2)}. Collect additional payment from customer.`;
+            } else if (diff < 0) {
+                diffLabel.textContent = 'Customer Refund / Credit:';
+                calcDiffEl.textContent = `-₹${absDiff.toFixed(2)}`;
+                calcDiffEl.className = 'text-emerald-400 font-bold';
+                diffMsg.textContent = `Replacement value is lower by ₹${absDiff.toFixed(2)}. Issue a refund or Credit Note to customer.`;
+            } else {
+                diffLabel.textContent = 'Even Exchange:';
+                calcDiffEl.textContent = `₹0.00`;
+                calcDiffEl.className = 'text-slate-300 font-bold';
+                diffMsg.textContent = 'Replacement value is equal to returned item value. No payment adjustment required.';
+            }
+        }
+
+        function attachFormEvents() {
+            document.getElementById('selectSale').addEventListener('change', (e) => handleSaleChange(e.target.value));
+            document.getElementById('selectReturnedItem').addEventListener('change', recalculate);
+            document.getElementById('selectReplacementVariant').addEventListener('change', recalculate);
+            document.getElementById('inputReturnQty').addEventListener('input', recalculate);
+            document.getElementById('inputReplacementQty').addEventListener('input', recalculate);
+
+            document.getElementById('createExchangeForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitExchange();
+            });
+        }
+
+        async function submitExchange() {
+            const saleId = document.getElementById('selectSale').value;
+            const returnedVarId = document.getElementById('selectReturnedItem').value;
+            const replacementVarId = document.getElementById('selectReplacementVariant').value;
+
+            if (!saleId || !returnedVarId || !replacementVarId) {
+                showToast('Please select sale, returned item, and replacement variant.', 'error');
+                return;
+            }
+
+            const saleItem = selectedSale.items.find(i => i.productVariantId === returnedVarId);
+            const replacementVar = allVariantsFlat.find(v => v.productVariantId === replacementVarId);
+
+            const returnQty = parseInt(document.getElementById('inputReturnQty').value) || 1;
+            const replacementQty = parseInt(document.getElementById('inputReplacementQty').value) || 1;
+
+            if (replacementVar.availableStock < replacementQty) {
+                showToast(`Insufficient stock: Only ${replacementVar.availableStock} available for replacement.`, 'error');
+                return;
+            }
+
+            const returnVal = saleItem.sellingRate * returnQty;
+            const replacementVal = replacementVar.sellingPrice * replacementQty;
+
+            const payload = {
+                saleId,
+                exchangeDate: document.getElementById('inputExchangeDate').value,
+                completeNow: true,
+                returnedItem: {
+                    productId: saleItem.productId,
+                    productName: saleItem.productName,
+                    productVariantId: saleItem.productVariantId,
+                    variantName: saleItem.variantName,
+                    color: saleItem.color,
+                    size: saleItem.size,
+                    sku: saleItem.sku,
+                    quantity: returnQty,
+                    originalRate: saleItem.sellingRate,
+                    unitValue: returnVal,
+                    condition: document.getElementById('selectReturnedCondition').value
+                },
+                replacementItem: {
+                    productId: replacementVar.productId,
+                    productName: replacementVar.productName,
+                    productVariantId: replacementVar.productVariantId,
+                    variantName: `${replacementVar.color} / ${replacementVar.size}`,
+                    color: replacementVar.color,
+                    size: replacementVar.size,
+                    sku: replacementVar.sku,
+                    quantity: replacementQty,
+                    sellingRate: replacementVar.sellingPrice,
+                    unitValue: replacementVal
+                },
+                returnValue: returnVal,
+                replacementValue: replacementVal,
+                paymentMethod: document.getElementById('selectPaymentMethod').value,
+                paymentReference: document.getElementById('inputPaymentRef').value.trim(),
+                reason: document.getElementById('inputExchangeNotes').value.trim() || 'Product Size / Color Exchange'
+            };
+
+            const res = await exchangeService.createExchange(payload, user.name);
+
+            if (res.success) {
+                showToast(`Exchange ${res.exchange.exchangeNumber} executed successfully!`, 'success');
+                setTimeout(() => {
+                    window.location.href = `./exchange-details.html?id=${res.exchange.id}`;
+                }, 500);
+            } else {
+                showToast(res.message || 'Error executing exchange.', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

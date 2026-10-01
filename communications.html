@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Communications Hub — CLOTHERP</title>
+    <meta name="description" content="Multi-channel WhatsApp, SMS, and Email customer communication logs and dispatch in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./crm.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">CRM</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Communications</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="message-square" class="w-6 h-6 text-blue-400"></i>
+                            <span>Multi-Channel Communication Center</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Unified WhatsApp, SMS, and Email logs with dynamic template dispatch and delivery tracking.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./communication-templates.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                            <span>Message Templates</span>
+                        </a>
+
+                        <button id="btnOpenSendModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Send Message</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Messages</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalComms">0</div>
+                        <span class="text-[10px] text-slate-500">All Outbound Dispatches</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">WhatsApp Messages</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono">100% Delivered</div>
+                        <span class="text-[10px] text-slate-500">Business Cloud API</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Email Proposals</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono">Quotes & Invoices</div>
+                        <span class="text-[10px] text-slate-500">Transactional Relays</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Variable Automation</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono">Active</div>
+                        <span class="text-[10px] text-slate-500">Dynamic Client Merges</span>
+                    </div>
+                </div>
+
+                <!-- Communications Log Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Timestamp</th>
+                                    <th class="py-3 px-4">Channel</th>
+                                    <th class="py-3 px-4">Recipient</th>
+                                    <th class="py-3 px-4">Message / Payload</th>
+                                    <th class="py-3 px-4">Dispatched By</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="commsTableBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Customer Communication</div>
+                <div class="font-mono text-[11px] text-slate-600">Multi-Channel Gateway</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: SEND MESSAGE -->
+    <div id="sendModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="send" class="w-4 h-4 text-blue-400"></i>
+                    <span>Send Customer Communication</span>
+                </h3>
+                <button id="btnCloseSendModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="sendForm" class="space-y-3" novalidate>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Communication Channel *</label>
+                        <select id="sendChannelSelect" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="WHATSAPP">WhatsApp Message</option>
+                            <option value="SMS">SMS Notification</option>
+                            <option value="EMAIL">Email Message</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Load Reusable Template</label>
+                        <select id="sendTemplateSelect" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="">Custom Message (No Template)</option>
+                            <!-- Injected dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Recipient Name *</label>
+                        <input type="text" id="sendRecipientName" required placeholder="e.g. Sanjay Deshmukh" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Phone / Email *</label>
+                        <input type="text" id="sendRecipientContact" required placeholder="+91 98201 44552" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Message Body *</label>
+                    <textarea id="sendMessageBody" rows="4" required placeholder="Type your message or select a template above..." class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelSend" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Dispatch Message</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.COMMUNICATIONS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let templatesList = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'communications');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadTemplates();
+            await loadCommunications();
+            attachEvents();
+        });
+
+        async function loadTemplates() {
+            templatesList = await crmService.getTemplates();
+            const select = document.getElementById('sendTemplateSelect');
+            templatesList.forEach(t => {
+                select.add(new Option(`${t.name} (${t.channel})`, t.id));
+            });
+        }
+
+        async function loadCommunications() {
+            const items = await crmService.getCommunications();
+            document.getElementById('kpiTotalComms').textContent = items.length;
+
+            const tbody = document.getElementById('commsTableBody');
+            tbody.innerHTML = items.map(c => `
+                <tr class="hover:bg-slate-850/60 transition">
+                    <td class="py-3 px-4 font-mono text-slate-400">${c.sentAt}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                            c.channel === 'WHATSAPP' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                        }">${c.channel}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-white">${c.recipientName}</div>
+                        <div class="text-[11px] font-mono text-slate-400">${c.recipientPhone}</div>
+                    </td>
+                    <td class="py-3 px-4 text-slate-300 max-w-sm truncate">${c.messageSummary}</td>
+                    <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${c.sentBy}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">${c.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachEvents() {
+            document.getElementById('btnOpenSendModal').addEventListener('click', () => {
+                document.getElementById('sendForm').reset();
+                document.getElementById('sendModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseSendModal').addEventListener('click', () => {
+                document.getElementById('sendModal').classList.add('hidden');
+            });
+            document.getElementById('btnCancelSend').addEventListener('click', () => {
+                document.getElementById('sendModal').classList.add('hidden');
+            });
+
+            document.getElementById('sendTemplateSelect').addEventListener('change', (e) => {
+                const tpl = templatesList.find(t => t.id === e.target.value);
+                if (tpl) {
+                    let msg = tpl.body;
+                    msg = msg.replace('{{customerName}}', document.getElementById('sendRecipientName').value || 'Customer');
+                    msg = msg.replace('{{companyName}}', 'CLOTHERP Fashion Hub');
+                    msg = msg.replace('{{invoiceAmount}}', '52,500');
+                    msg = msg.replace('{{invoiceNumber}}', 'INV-2026-00001');
+                    msg = msg.replace('{{dueDate}}', '2026-08-30');
+                    document.getElementById('sendMessageBody').value = msg;
+                    document.getElementById('sendChannelSelect').value = tpl.channel;
+                }
+            });
+
+            document.getElementById('sendForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const commData = {
+                    channel: document.getElementById('sendChannelSelect').value,
+                    recipientName: document.getElementById('sendRecipientName').value,
+                    recipientPhone: document.getElementById('sendRecipientContact').value,
+                    messageBody: document.getElementById('sendMessageBody').value
+                };
+
+                const res = await crmService.sendCommunication(commData, user.name);
+                if (res.success) {
+                    showToast('Message dispatched successfully!', 'success');
+                    document.getElementById('sendModal').classList.add('hidden');
+                    await loadCommunications();
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

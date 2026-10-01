@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM & Sales Automation — CLOTHERP</title>
+    <meta name="description" content="Customer Relationship Management, lead conversion, visual sales pipeline, follow-ups, and customer communications in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Quick Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">CRM</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Overview</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="layout-dashboard" class="w-6 h-6 text-blue-400"></i>
+                            <span>CRM & Sales Automation Hub</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Manage prospective leads, track visual sales pipeline, automate follow-ups, and dispatch multi-channel customer communications.</p>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="./leads.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>New Lead</span>
+                        </a>
+
+                        <a href="./communications.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                            <span>Send Message</span>
+                        </a>
+
+                        <a href="./pipeline.html" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="kanban" class="w-4 h-4"></i>
+                            <span>Open Sales Pipeline</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Active Leads</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalLeads">0</div>
+                        <span class="text-[10px] text-slate-500">Prospective Garment Buyers</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Pipeline Value (Est.)</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiPipelineValue">₹0</div>
+                        <span class="text-[10px] text-slate-500">Unclosed Deal Pipeline</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Weighted Forecast</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiWeightedValue">₹0</div>
+                        <span class="text-[10px] text-slate-500">Probable Revenue Conversion</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Follow-ups Scheduled</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiDueFollowups">0</div>
+                        <span class="text-[10px] text-slate-500">Calls & WhatsApp Dues</span>
+                    </div>
+                </div>
+
+                <!-- 4 CORE MODULE SHORTCUT CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    
+                    <!-- Leads Directory Card -->
+                    <a href="./leads.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="contact" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Lead Management</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Capture incoming inquiries, detect duplicates, qualify prospects, and convert to active customers.</p>
+                        </div>
+                        <span class="text-xs text-blue-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Manage Leads</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Sales Pipeline Card -->
+                    <a href="./pipeline.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+                            <i data-lucide="kanban" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Visual Sales Pipeline</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Interactive deal stages: New, Qualified, Quotation, Negotiation, Won with weighted value calculations.</p>
+                        </div>
+                        <span class="text-xs text-purple-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Open Pipeline</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Follow-ups Card -->
+                    <a href="./follow-ups.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                            <i data-lucide="phone-call" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Follow-ups & Reminders</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Automated call and message reminders, outcome logging, and next follow-up auto-prompts.</p>
+                        </div>
+                        <span class="text-xs text-amber-400 font-semibold inline-flex items-center space-x-1">
+                            <span>View Follow-ups</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Communications Card -->
+                    <a href="./communications.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="message-square" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Multi-Channel Comms</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">WhatsApp and Email dispatching with dynamic variable templates and customer message history.</p>
+                        </div>
+                        <span class="text-xs text-emerald-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Communication Center</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- RECENT ACTIVE LEADS & PIPELINE SUMMARY -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden space-y-4 p-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Top Priority Prospects</h3>
+                        </div>
+                        <a href="./leads.html" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">View All Leads →</a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-2.5 px-3">Lead #</th>
+                                    <th class="py-2.5 px-3">Company / Contact</th>
+                                    <th class="py-2.5 px-3">Source</th>
+                                    <th class="py-2.5 px-3">Interest</th>
+                                    <th class="py-2.5 px-3 text-right">Est. Value (₹)</th>
+                                    <th class="py-2.5 px-3">Priority</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="topLeadsBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Sales Automation & CRM</div>
+                <div class="font-mono text-[11px] text-slate-600">Enterprise CRM Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.CRM_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'crm');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            const [leadsRes, opps, followupsRes] = await Promise.all([
+                crmService.getLeads(),
+                crmService.getOpportunities(),
+                crmService.getFollowUps()
+            ]);
+
+            const totalEst = opps.reduce((acc, o) => acc + (o.estimatedValue || 0), 0);
+            const totalWeighted = opps.reduce((acc, o) => acc + (o.weightedValue || 0), 0);
+
+            document.getElementById('kpiTotalLeads').textContent = leadsRes.summary.totalLeads;
+            document.getElementById('kpiPipelineValue').textContent = `₹${totalEst.toLocaleString('en-IN')}`;
+            document.getElementById('kpiWeightedValue').textContent = `₹${totalWeighted.toLocaleString('en-IN')}`;
+            document.getElementById('kpiDueFollowups').textContent = followupsRes.summary.totalScheduled;
+
+            const tbody = document.getElementById('topLeadsBody');
+            tbody.innerHTML = (leadsRes.items || []).slice(0, 5).map(l => `
+                <tr class="hover:bg-slate-850/40 transition">
+                    <td class="py-3 px-3 font-mono font-bold text-blue-400">${l.leadNumber}</td>
+                    <td class="py-3 px-3">
+                        <div class="font-bold text-white">${l.companyName}</div>
+                        <div class="text-[11px] text-slate-400 font-mono">${l.contactPerson} • ${l.phone}</div>
+                    </td>
+                    <td class="py-3 px-3 text-slate-300">${l.leadSource}</td>
+                    <td class="py-3 px-3 text-slate-300">${l.productInterest}</td>
+                    <td class="py-3 px-3 text-right font-mono font-bold text-emerald-400">₹${l.estimatedValue.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                            l.priority === 'URGENT' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
+                            l.priority === 'HIGH' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                            'bg-slate-800 text-slate-300'
+                        }">${l.priority}</span>
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            l.status === 'QUALIFIED' || l.status === 'WON' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            l.status === 'PROPOSAL_SENT' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            'bg-slate-800 text-slate-300'
+                        }">${l.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

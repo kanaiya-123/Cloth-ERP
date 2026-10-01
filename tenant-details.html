@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Details & Usage Limits — CLOTHERP</title>
+    <meta name="description" content="Detailed tenant management console, subscription tiers, usage limits, and platform security in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./tenants.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Tenants</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono" id="tenantCodeBreadcrumb">TEN-00001</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="building" class="w-6 h-6 text-blue-400"></i>
+                            <span id="tenantCompanyName">Loading Organization...</span>
+                        </h1>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <a href="./tenants.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                            <span>Back to Tenants</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3 CAPACITY LIMIT GAUGES -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400">User Seats Utilization</span>
+                            <span class="font-mono font-bold text-blue-400" id="userSeatRatio">7 / 100</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" id="userSeatBar" style="width: 7%"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400">Branch Nodes Quota</span>
+                            <span class="font-mono font-bold text-emerald-400" id="branchRatio">2 / 25</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full" id="branchBar" style="width: 8%"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400">Storage & File System</span>
+                            <span class="font-mono font-bold text-purple-400">1.2 GB / 50 GB</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500 rounded-full" style="width: 2.4%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TENANT PROFILE & PLAN SPECS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    
+                    <!-- Organization Profile -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">Organization Profile</h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Tenant Code:</span>
+                                <span class="font-mono font-bold text-blue-400" id="tCode">CLT-00001</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Primary Contact:</span>
+                                <span id="tContact">Sumit Sharma</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Admin Email:</span>
+                                <span class="font-mono text-slate-300" id="tEmail">admin@clotherp.local</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Phone:</span>
+                                <span class="font-mono text-slate-300" id="tPhone">+91 98765 43210</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Headquarters:</span>
+                                <span id="tLocation">Ahmedabad, Gujarat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Details -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">Active Subscription Tier</h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Plan Name:</span>
+                                <span class="font-bold text-purple-400" id="tPlan">Enterprise Plan</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Subscription Status:</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" id="tSubStatus">ACTIVE</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Annual Renewal Date:</span>
+                                <span class="font-mono text-slate-300" id="tRenewal">2027-08-01</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span class="text-slate-500">Multi-Tenant Isolation:</span>
+                                <span class="text-emerald-400 font-bold">Enabled (Backend Schema)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Tenant Platform</div>
+                <div class="font-mono text-[11px] text-slate-600">Tenant Control Center</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { saasService } from './assets/js/services/saasService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PLATFORM_TENANTS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'tenants');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            const params = new URLSearchParams(window.location.search);
+            const tenantId = params.get('id') || 'TEN-00001';
+
+            await loadTenantDetails(tenantId);
+        });
+
+        async function loadTenantDetails(id) {
+            const tenant = await saasService.getTenantById(id);
+            if (!tenant) return;
+
+            document.getElementById('tenantCodeBreadcrumb').textContent = tenant.tenantCode;
+            document.getElementById('tenantCompanyName').textContent = tenant.companyName;
+            document.getElementById('tCode').textContent = tenant.tenantCode;
+            document.getElementById('tContact').textContent = tenant.primaryContact;
+            document.getElementById('tEmail').textContent = tenant.email;
+            document.getElementById('tPhone').textContent = tenant.phone;
+            document.getElementById('tLocation').textContent = `${tenant.city}, ${tenant.state}`;
+            document.getElementById('tPlan').textContent = tenant.planName;
+            document.getElementById('tSubStatus').textContent = tenant.subscriptionStatus;
+            document.getElementById('tRenewal').textContent = tenant.renewalDate;
+
+            document.getElementById('userSeatRatio').textContent = `${tenant.activeUsersCount} / 100`;
+            document.getElementById('branchRatio').textContent = `${tenant.activeBranchesCount} / 25`;
+        }
+    </script>
+</body>
+</html>

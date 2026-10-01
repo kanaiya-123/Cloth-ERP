@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Order Tracking — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Track clothing order status, invoice fulfillment, and delivery checkpoints in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Fulfillment & Logistics</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Order Tracking</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-purple-400"></i>
+                            <span>Customer Order Status Tracking</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Search customer orders by Order No, Invoice No, or Mobile to track live fulfillment progression.</p>
+                    </div>
+
+                    <a href="./sales.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                        <span>All Sales</span>
+                    </a>
+                </div>
+
+                <!-- Tracking Search Box Card -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <form id="trackingSearchForm" class="flex flex-col sm:flex-row items-center gap-3">
+                        <div class="relative flex-1 w-full">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="trackingInput" 
+                                placeholder="Enter Order No (e.g. SAL-000001), Invoice No (INV-000001), or Mobile..." 
+                                class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 font-mono"
+                            >
+                        </div>
+                        <button type="submit" class="btn-primary w-full sm:w-auto px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/20 transition flex items-center justify-center space-x-2">
+                            <i data-lucide="locate-fixed" class="w-4 h-4"></i>
+                            <span>Track Order</span>
+                        </button>
+                    </form>
+
+                    <!-- Quick Suggestions -->
+                    <div class="flex items-center space-x-2 text-[11px] text-slate-500 pt-1">
+                        <span>Quick Demo Tracks:</span>
+                        <button type="button" class="btn-quick-track text-blue-400 hover:underline font-mono" data-val="SAL-000001">SAL-000001</button>
+                        <span>•</span>
+                        <button type="button" class="btn-quick-track text-blue-400 hover:underline font-mono" data-val="SAL-000002">SAL-000002</button>
+                        <span>•</span>
+                        <button type="button" class="btn-quick-track text-blue-400 hover:underline font-mono" data-val="9820011223">9820011223</button>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="noSearchState" class="p-12 text-center text-slate-500 glass-card rounded-2xl border border-slate-800">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                        <i data-lucide="package-search" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-sm font-bold text-slate-300 mb-1">Enter an Order Number to Track</p>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto">Track dispatch status, carrier details, and fulfillment timeline for any customer sale order.</p>
+                </div>
+
+                <!-- Tracking Results Area -->
+                <div id="trackingResultsContainer" class="hidden space-y-6">
+                    
+                    <!-- Order Header Summary -->
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
+                        <div>
+                            <span class="text-slate-500 text-[10px] uppercase font-mono block">SALE / INVOICE NUMBER</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-mono font-bold text-blue-300 text-base" id="resSaleNo">SAL-000001</span>
+                                <span class="text-slate-500 font-mono" id="resInvoiceNo">(INV-000001)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-slate-500 text-[10px] uppercase font-mono block">CUSTOMER</span>
+                            <div class="font-bold text-white text-sm" id="resCustomerName">Royal Fashion Boutique</div>
+                            <span class="text-[10px] text-slate-400 font-mono" id="resCustomerMobile">+91 98200 11223</span>
+                        </div>
+
+                        <div>
+                            <span class="text-slate-500 text-[10px] uppercase font-mono block">LIFECYCLE STATUS</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border inline-block mt-0.5" id="resStatusBadge">Delivered</span>
+                        </div>
+
+                        <div>
+                            <span class="text-slate-500 text-[10px] uppercase font-mono block">PAYMENT SETTLEMENT</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border inline-block mt-0.5" id="resPaymentBadge">Paid</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Milestone Progression Steps -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider">Fulfillment Lifecycle Progression</div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs" id="progressStepsGrid">
+                            <!-- Step 1: Draft -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Draft">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">1</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Draft</div>
+                            </div>
+                            <!-- Step 2: Confirmed -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Confirmed">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">2</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Confirmed</div>
+                            </div>
+                            <!-- Step 3: Processing -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Processing">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">3</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Processing</div>
+                            </div>
+                            <!-- Step 4: Ready for Dispatch -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Ready-for-Dispatch">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">4</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Ready</div>
+                            </div>
+                            <!-- Step 5: Dispatched / In Transit -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Dispatched">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">5</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">In Transit</div>
+                            </div>
+                            <!-- Step 6: Delivered -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Delivered">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">6</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Delivered</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meta Delivery Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">DELIVERY METHOD & REF</span>
+                            <div class="font-bold text-white text-sm" id="resDeliveryMethod">Local Delivery</div>
+                            <div class="font-mono text-purple-300 font-bold" id="resTrackingRef">—</div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">RECIPIENT & CONTACT</span>
+                            <div class="font-bold text-white text-sm" id="resRecipient">—</div>
+                            <div class="text-slate-300 font-mono" id="resRecMobile">—</div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">TIMELINE ESTIMATE</span>
+                            <div class="font-mono text-white text-sm" id="resExpectedDelivery">—</div>
+                            <div class="text-slate-400 text-[11px]" id="resOrderDate">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Chronological Checkpoint Timeline -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="clock" class="w-4 h-4 text-purple-400"></i>
+                            <span>Audit & Fulfillment Milestone Timeline</span>
+                        </div>
+
+                        <div class="space-y-4 relative pl-4 border-l border-slate-800" id="trackingCheckpointsContainer">
+                            <!-- Dynamic Milestones -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Customer Order Tracking</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { salesService } from './assets/js/services/salesService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.SALES_TRACKING_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'customer-tracking');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            attachEvents();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNo = urlParams.get('orderNo');
+            if (orderNo) {
+                document.getElementById('trackingInput').value = orderNo;
+                await performTrackingSearch(orderNo);
+            }
+        });
+
+        function attachEvents() {
+            document.getElementById('trackingSearchForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const q = document.getElementById('trackingInput').value.trim();
+                if (q) await performTrackingSearch(q);
+            });
+
+            document.querySelectorAll('.btn-quick-track').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const val = btn.getAttribute('data-val');
+                    document.getElementById('trackingInput').value = val;
+                    await performTrackingSearch(val);
+                });
+            });
+        }
+
+        async function performTrackingSearch(query) {
+            const res = await salesService.getSales({ search: query, pageSize: 1 });
+            const sale = (res.items && res.items.length > 0) ? res.items[0] : null;
+
+            const emptyState = document.getElementById('noSearchState');
+            const resultContainer = document.getElementById('trackingResultsContainer');
+
+            if (!sale) {
+                emptyState.innerHTML = `
+                    <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-3 text-red-400">
+                        <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-sm font-bold text-red-300 mb-1">No order found matching "${query}"</p>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto">Please check your Order Number, Invoice Number, or customer mobile and try again.</p>
+                `;
+                emptyState.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            // Bind Header
+            document.getElementById('resSaleNo').textContent = sale.saleNumber;
+            document.getElementById('resInvoiceNo').textContent = sale.invoiceNumber ? `(${sale.invoiceNumber})` : '';
+            document.getElementById('resCustomerName').textContent = sale.customerName;
+            document.getElementById('resCustomerMobile').textContent = `${sale.customerMobile} • ${sale.customerType}`;
+
+            const badge = document.getElementById('resStatusBadge');
+            badge.textContent = sale.status;
+            badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                sale.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                sale.status === 'Confirmed' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                sale.status === 'Dispatched' || sale.status === 'In Transit' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                sale.status === 'Processing' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                sale.status === 'Cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                'bg-slate-800 text-slate-300 border-slate-700'
+            }`;
+
+            const pBadge = document.getElementById('resPaymentBadge');
+            pBadge.textContent = sale.paymentStatus;
+            pBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                sale.paymentStatus === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                sale.paymentStatus === 'Partial' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                'bg-red-500/10 text-red-400 border-red-500/20'
+            }`;
+
+            // Delivery Meta Cards
+            const del = sale.delivery || {};
+            document.getElementById('resDeliveryMethod').textContent = del.method || 'Local Delivery';
+            document.getElementById('resTrackingRef').textContent = del.trackingReference ? `Docket: ${del.trackingReference}` : 'Direct Handover';
+            document.getElementById('resRecipient').textContent = del.contactPerson || sale.customerName;
+            document.getElementById('resRecMobile').textContent = del.contactMobile || sale.customerMobile;
+            document.getElementById('resExpectedDelivery').textContent = sale.expectedDeliveryDate || 'Standard Window';
+            document.getElementById('resOrderDate').textContent = `Booked On: ${sale.saleDate}`;
+
+            // Milestone Progress Highlight
+            highlightSteps(sale.status);
+
+            // Render Timeline
+            renderTimeline(sale.trackingTimeline || []);
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function highlightSteps(status) {
+            const stepsOrder = ['Draft', 'Confirmed', 'Processing', 'Ready-for-Dispatch', 'Dispatched', 'Delivered'];
+            let activeIdx = 0;
+
+            if (status === 'Confirmed') activeIdx = 1;
+            else if (status === 'Processing') activeIdx = 2;
+            else if (status === 'Ready for Dispatch') activeIdx = 3;
+            else if (status === 'Dispatched' || status === 'In Transit' || status === 'Out for Delivery') activeIdx = 4;
+            else if (status === 'Delivered') activeIdx = 5;
+
+            stepsOrder.forEach((step, idx) => {
+                const el = document.getElementById(`step-${step}`);
+                if (!el) return;
+                const circle = el.querySelector('div:first-child');
+                const title = el.querySelector('div:last-child');
+
+                if (idx <= activeIdx) {
+                    el.className = 'p-3 rounded-xl border space-y-1 bg-purple-500/10 border-purple-500/30';
+                    circle.className = 'w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-purple-600 text-white';
+                    title.className = 'font-bold text-purple-300 text-[11px]';
+                } else {
+                    el.className = 'p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800';
+                    circle.className = 'w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400';
+                    title.className = 'font-semibold text-slate-500 text-[11px]';
+                }
+            });
+        }
+
+        function renderTimeline(timeline) {
+            const container = document.getElementById('trackingCheckpointsContainer');
+            if (timeline.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-xs py-4">No checkpoint records logged.</div>`;
+                return;
+            }
+
+            container.innerHTML = timeline.map((t, idx) => `
+                <div class="relative pl-6 pb-2">
+                    <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full ${idx === timeline.length - 1 ? 'bg-purple-500 ring-4 ring-purple-500/20' : 'bg-slate-700'}"></div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-200">${t.title || t.status}</span>
+                        <span class="text-[10px] text-slate-500 font-mono">${t.date} ${t.time || ''}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 mt-0.5">${t.notes || ''}</p>
+                    <span class="text-[10px] text-slate-500 block font-mono">Logged by: ${t.user}</span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

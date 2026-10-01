@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLOTHERP — Premium Clothing Business & Inventory Management ERP</title>
+    <meta name="description" content="Manage your clothing retail and wholesale business smarter. Complete ERP for garment variants, real-time inventory, sales, GST billing, purchases, and LR shipment tracking.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <!-- 1. NAVBAR -->
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <!-- Brand Logo / Wordmark -->
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <i data-lucide="layers" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-extrabold tracking-wider text-white font-mono">CLOTH<span class="text-blue-400">ERP</span></span>
+                        <span class="text-[9px] uppercase tracking-widest text-slate-400 -mt-1 font-semibold">Clothing ERP</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                    <a href="#features" class="hover:text-blue-400 transition-colors py-1">Features</a>
+                    <a href="#solutions" class="hover:text-blue-400 transition-colors py-1">Solutions</a>
+                    <a href="#how-it-works" class="hover:text-blue-400 transition-colors py-1">How It Works</a>
+                    <a href="#analytics" class="hover:text-blue-400 transition-colors py-1">Analytics</a>
+                </nav>
+
+                <!-- Desktop CTA Actions -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="./login.html" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-colors border border-transparent hover:border-slate-700">
+                        Login
+                    </a>
+                    <a href="./login.html" class="btn-primary px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-lg shadow-md shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center space-x-1.5">
+                        <span>Get Started</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <div class="flex md:hidden">
+                    <button id="mobileMenuBtn" aria-label="Toggle navigation menu" class="p-2 rounded-lg bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden flex-col bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 px-6 py-5 space-y-4 shadow-2xl">
+            <a href="#features" class="mobile-nav-link text-slate-200 hover:text-blue-400 font-medium text-base py-2">Features</a>
+            <a href="#solutions" class="mobile-nav-link text-slate-200 hover:text-blue-400 font-medium text-base py-2">Solutions</a>
+            <a href="#how-it-works" class="mobile-nav-link text-slate-200 hover:text-blue-400 font-medium text-base py-2">How It Works</a>
+            <a href="#analytics" class="mobile-nav-link text-slate-200 hover:text-blue-400 font-medium text-base py-2">Analytics</a>
+            <div class="pt-4 border-t border-slate-800 flex flex-col space-y-3">
+                <a href="./login.html" class="w-full py-2.5 text-center text-sm font-medium text-slate-300 bg-slate-800/80 rounded-lg border border-slate-700">
+                    Login
+                </a>
+                <a href="./login.html" class="mobile-nav-link w-full py-2.5 text-center text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-lg shadow-blue-500/20">
+                    Get Started →
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+        <!-- Top Gradient Glow -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] radial-glow-top pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Hero Content -->
+            <div class="text-center max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="800">
+                <!-- Trust / Capability Pill -->
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs text-blue-300 mb-6 shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-indicator"></span>
+                    <span class="font-medium tracking-wide">Built for modern clothing retail & wholesale businesses</span>
+                </div>
+
+                <!-- Hero Headline -->
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight sm:leading-none">
+                    Manage Your Clothing Business <br class="hidden sm:inline">
+                    <span class="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                        Smarter & Faster.
+                    </span>
+                </h1>
+
+                <!-- Hero Description -->
+                <p class="mt-6 text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
+                    From products and inventory to sales, GST, payments, purchases and shipment tracking — <strong class="text-white font-semibold">CLOTHERP</strong> brings your entire clothing business together in one powerful platform.
+                </p>
+
+                <!-- Hero CTA Buttons -->
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="./login.html" class="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-base shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center space-x-2">
+                        <span>Sign In / Enter ERP</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                    <a href="./invoice-print.html?id=sal_301&type=invoice" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 font-semibold text-base border border-blue-500/40 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="printer" class="w-4 h-4 text-blue-400"></i>
+                        <span>EasyPrint PDF Module</span>
+                    </a>
+                    <a href="./estimates.html" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-base border border-slate-700 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i>
+                        <span>Estimates & Quotations</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. ERP DASHBOARD PREVIEW -->
+            <div class="mt-16 sm:mt-20" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+                <div class="relative mx-auto rounded-2xl p-2 sm:p-3 bg-gradient-to-b from-slate-700/50 to-slate-900/80 border border-slate-700/80 shadow-2xl shadow-black/80">
+                    
+                    <!-- App Window Top Bar -->
+                    <div class="flex items-center justify-between px-4 py-2.5 bg-slate-900 rounded-t-xl border-b border-slate-800">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+                            <span class="ml-2 text-xs font-mono text-slate-400 hidden sm:inline">CLOTHERP Core Cloud ERP v1.0</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs text-slate-400">
+                            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">LIVE PRODUCT PREVIEW</span>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Layout Mockup -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 bg-slate-950 rounded-b-xl overflow-hidden min-h-[540px]">
+                        
+                        <!-- Sidebar Mockup -->
+                        <div class="hidden lg:flex lg:col-span-3 xl:col-span-2 bg-slate-900/90 border-r border-slate-800/80 p-4 flex-col justify-between">
+                            <div class="space-y-6">
+                                <div class="flex items-center space-x-2.5 px-2 py-1.5">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                                        <i data-lucide="shirt" class="w-4 h-4"></i>
+                                    </div>
+                                    <span class="font-bold text-sm tracking-wide text-white">Store Hub #01</span>
+                                </div>
+
+                                <nav class="space-y-1 text-xs font-medium">
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-blue-600/15 text-blue-400 border border-blue-500/30">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="tag" class="w-4 h-4"></i>
+                                        <span>Products</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="boxes" class="w-4 h-4"></i>
+                                        <span>Inventory</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                                        <span>Sales & GST</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="truck" class="w-4 h-4"></i>
+                                        <span>Purchases</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="navigation" class="w-4 h-4"></i>
+                                        <span>Shipments & LR</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="users" class="w-4 h-4"></i>
+                                        <span>Customers</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="building-2" class="w-4 h-4"></i>
+                                        <span>Suppliers</span>
+                                    </a>
+                                    <a href="javascript:void(0)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+                                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                                        <span>Reports</span>
+                                    </a>
+                                </nav>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-800 flex items-center space-x-3 px-2">
+                                <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">
+                                    AD
+                                </div>
+                                <div class="flex flex-col text-[11px]">
+                                    <span class="text-slate-200 font-semibold">Admin Owner</span>
+                                    <span class="text-slate-500 font-mono">Central Branch</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Dashboard Area Mockup -->
+                        <div class="col-span-1 lg:col-span-9 xl:col-span-10 p-4 sm:p-6 space-y-6">
+                            
+                            <!-- Header & Greeting -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800/60">
+                                <div>
+                                    <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                        <span>Good morning, Admin 👋</span>
+                                    </h2>
+                                    <p class="text-xs text-slate-400 mt-0.5">Here is today's overview across retail counter, warehouse & dispatch.</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-xs font-mono text-slate-300">
+                                        Today: 29 Aug 2026
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 4 Key Stat Cards -->
+                            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                                <!-- Today's Sales -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+                                    <div class="flex items-center justify-between text-slate-400 text-xs">
+                                        <span>Today's Sales</span>
+                                        <div class="p-1 rounded bg-blue-500/10 text-blue-400">
+                                            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 text-lg sm:text-xl font-extrabold text-white font-mono">₹84,200</div>
+                                    <div class="mt-1 flex items-center text-[10px] text-emerald-400">
+                                        <i data-lucide="arrow-up-right" class="w-3 h-3 mr-0.5"></i>
+                                        <span>+14.2% vs yesterday</span>
+                                    </div>
+                                </div>
+
+                                <!-- Today's Purchase -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+                                    <div class="flex items-center justify-between text-slate-400 text-xs">
+                                        <span>Today's Purchase</span>
+                                        <div class="p-1 rounded bg-indigo-500/10 text-indigo-400">
+                                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 text-lg sm:text-xl font-extrabold text-white font-mono">₹52,000</div>
+                                    <div class="mt-1 text-[10px] text-slate-400">
+                                        <span>3 Consignments received</span>
+                                    </div>
+                                </div>
+
+                                <!-- Total Stock -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+                                    <div class="flex items-center justify-between text-slate-400 text-xs">
+                                        <span>Total Stock</span>
+                                        <div class="p-1 rounded bg-emerald-500/10 text-emerald-400">
+                                            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 text-lg sm:text-xl font-extrabold text-white font-mono">14,820 <span class="text-xs font-normal text-slate-400">pcs</span></div>
+                                    <div class="mt-1 text-[10px] text-slate-400">
+                                        <span>94.2% variants active</span>
+                                    </div>
+                                </div>
+
+                                <!-- Today's Profit -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+                                    <div class="flex items-center justify-between text-slate-400 text-xs">
+                                        <span>Today's Profit</span>
+                                        <div class="p-1 rounded bg-amber-500/10 text-amber-400">
+                                            <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 text-lg sm:text-xl font-extrabold text-amber-300 font-mono">₹21,450</div>
+                                    <div class="mt-1 text-[10px] text-slate-400">
+                                        <span>25.4% estimated gross</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Dashboard Content Grid -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                
+                                <!-- Mini Sales Trend Chart -->
+                                <div class="lg:col-span-2 p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-semibold text-slate-200">Intraday Hourly Sales Trend</span>
+                                            <span class="px-1.5 py-0.5 text-[9px] bg-blue-500/20 text-blue-300 rounded font-mono">LIVE POS SYNC</span>
+                                        </div>
+                                        <span class="text-xs font-mono text-slate-400">Peak: 8 PM</span>
+                                    </div>
+                                    <div class="h-44 w-full">
+                                        <canvas id="heroMiniChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Low Stock & Shipment Status Widget -->
+                                <div class="space-y-4">
+                                    <!-- Low Stock Alert -->
+                                    <div class="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2.5">
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span class="font-semibold text-slate-200 flex items-center">
+                                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400 mr-1.5"></i>
+                                                Variant Alerts
+                                            </span>
+                                            <span class="text-[10px] text-amber-400 font-medium">3 low stock</span>
+                                        </div>
+                                        <div class="space-y-1.5 text-xs">
+                                            <div class="flex justify-between items-center p-1.5 bg-slate-950/60 rounded border border-slate-800/80">
+                                                <div>
+                                                    <div class="font-medium text-slate-200">Cotton Shirt (Black/XL)</div>
+                                                    <div class="text-[10px] text-slate-500 font-mono">SKU: SH-BLK-XL</div>
+                                                </div>
+                                                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-mono text-[11px] font-bold">3 left</span>
+                                            </div>
+                                            <div class="flex justify-between items-center p-1.5 bg-slate-950/60 rounded border border-slate-800/80">
+                                                <div>
+                                                    <div class="font-medium text-slate-200">Slim Pant (Blue/32)</div>
+                                                    <div class="text-[10px] text-slate-500 font-mono">SKU: PT-BLU-32</div>
+                                                </div>
+                                                <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-mono text-[11px] font-bold">1 left</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Live Shipment Status -->
+                                    <div class="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800">
+                                        <div class="flex items-center justify-between text-xs mb-2">
+                                            <span class="font-semibold text-slate-200 flex items-center">
+                                                <i data-lucide="truck" class="w-3.5 h-3.5 text-blue-400 mr-1.5"></i>
+                                                Active Dispatch
+                                            </span>
+                                            <span class="text-[10px] font-mono text-slate-400">LR #123456</span>
+                                        </div>
+                                        <div class="p-2 bg-slate-950/60 rounded border border-slate-800/80 text-xs space-y-1">
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-400">Transporter:</span>
+                                                <span class="text-slate-200 font-medium">Shree Transport</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-400">Status:</span>
+                                                <span class="text-blue-400 font-semibold flex items-center">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1 animate-pulse"></span>
+                                                    In Transit
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 4. BUSINESS STATS SECTION -->
+    <section class="py-12 bg-slate-900/60 border-y border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-semibold font-mono">
+                    One platform. Complete business visibility.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 lg:gap-6 text-center">
+                <!-- Stat 1 -->
+                <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition" data-aos="fade-up" data-aos-delay="50">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto mb-2.5">
+                        <i data-lucide="tag" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-sm text-slate-200">Product & Variants</div>
+                    <div class="text-xs text-slate-400 mt-1">Size, color & SKU matrices</div>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-2.5">
+                        <i data-lucide="boxes" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-sm text-slate-200">Real-time Inventory</div>
+                    <div class="text-xs text-slate-400 mt-1">Variant-level auto-deduct</div>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition" data-aos="fade-up" data-aos-delay="150">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto mb-2.5">
+                        <i data-lucide="receipt" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-sm text-slate-200">GST-ready Billing</div>
+                    <div class="text-xs text-slate-400 mt-1">Automated CGST/SGST POS</div>
+                </div>
+
+                <!-- Stat 4 -->
+                <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-2.5">
+                        <i data-lucide="truck" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-sm text-slate-200">Shipment Tracking</div>
+                    <div class="text-xs text-slate-400 mt-1">LR & Transporter logs</div>
+                </div>
+
+                <!-- Stat 5 (Span 2 on mobile) -->
+                <div class="col-span-2 md:col-span-1 p-4 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition" data-aos="fade-up" data-aos-delay="250">
+                    <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center mx-auto mb-2.5">
+                        <i data-lucide="line-chart" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-sm text-slate-200">Business Analytics</div>
+                    <div class="text-xs text-slate-400 mt-1">Margins, profits & dead stock</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. CORE FEATURES SECTION -->
+    <section id="features" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-blue-400 font-mono">Enterprise Capabilities</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    Everything Your Clothing Business Needs.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Manage everyday operations with one connected ERP platform designed specifically for garment retailers, wholesalers, and manufacturers.
+                </p>
+            </div>
+
+            <!-- 6 Feature Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                
+                <!-- Feature 1 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="50">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="tag" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Product & Variant Management</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Manage clothing products with sizes, colors, SKU and barcode-based identification across retail racks and warehouse bins.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-blue-400">
+                        <span>Matrix SKU Generator</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="boxes" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Smart Inventory</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Track stock at the clothing variant level and monitor low-stock and out-of-stock products with proactive reorder thresholds.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-emerald-400">
+                        <span>Variant-Level Sync</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="150">
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="receipt" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Sales & GST</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Create sales with multiple products, quantities, discounts, GST calculation (CGST/SGST/IGST) and multi-mode payment tracking.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-sky-400">
+                        <span>Automated Tax Slips</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Purchase Management</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Manage suppliers, purchase orders, advance payments, Goods Received Notes (GRN) and incoming garment consignments.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-indigo-400">
+                        <span>GRN & Stock Reconciliation</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="250">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Shipment Tracking</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Track transport details, Lorry Receipt (LR) information, shipment status, vehicle numbers and step-by-step delivery activity.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-amber-400">
+                        <span>LR Number Log & Audit</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="glass-card hover-lift p-7 rounded-2xl relative overflow-hidden group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2.5">Reports & Analytics</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Understand sales performance, purchase volumes, inventory aging, customer payment aging and real-time gross profit margins.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-purple-400">
+                        <span>Real-time Financials</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. HOW CLOTHERP WORKS SECTION -->
+    <section id="how-it-works" class="py-24 bg-slate-900/40 border-t border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 font-mono">End-To-End Architecture</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    One Connected Business Workflow.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Every transaction seamlessly flows through the garment lifecycle — from raw supplier stock to final customer dispatch and P&L analytics.
+                </p>
+            </div>
+
+            <!-- 7-Step Visual Connected Workflow -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 lg:gap-3">
+                
+                <!-- Step 1: Product -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="50">
+                    <div class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">1</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-blue-400 flex items-center justify-center mb-2">
+                        <i data-lucide="tag" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Product</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Define styles, fabrics, size & color matrix</p>
+                </div>
+
+                <!-- Step 2: Inventory -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">2</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-emerald-400 flex items-center justify-center mb-2">
+                        <i data-lucide="boxes" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Inventory</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Auto-track stock at exact SKU variant level</p>
+                </div>
+
+                <!-- Step 3: Purchase / Sales -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="150">
+                    <div class="w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">3</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-indigo-400 flex items-center justify-center mb-2">
+                        <i data-lucide="repeat" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Purchase & Sale</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Supplier POs and quick POS/B2B invoicing</p>
+                </div>
+
+                <!-- Step 4: Payment -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">4</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-amber-400 flex items-center justify-center mb-2">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Payment</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Record Cash, UPI, Card & Ledger Credit</p>
+                </div>
+
+                <!-- Step 5: Shipment -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="250">
+                    <div class="w-7 h-7 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">5</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-sky-400 flex items-center justify-center mb-2">
+                        <i data-lucide="truck" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Shipment</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Assign transport, vehicle & LR numbers</p>
+                </div>
+
+                <!-- Step 6: Tracking -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-7 h-7 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">6</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-teal-400 flex items-center justify-center mb-2">
+                        <i data-lucide="navigation" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Tracking</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">Dispatch timeline & milestone updates</p>
+                </div>
+
+                <!-- Step 7: Reports -->
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center relative step-connector-last" data-aos="fade-up" data-aos-delay="350">
+                    <div class="w-7 h-7 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/40 font-mono text-xs font-bold flex items-center justify-center mb-3">7</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 text-purple-400 flex items-center justify-center mb-2">
+                        <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-100">Reports</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-normal">P&L, GST filing & stock valuation reports</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. PRODUCT & INVENTORY SECTION (SPLIT LAYOUT) -->
+    <section id="solutions" class="py-24 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left: Variant Matrix Explanation & Demo Table -->
+                <div class="lg:col-span-6 space-y-6" data-aos="fade-right">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        <span>Variant-Centric Architecture</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                        Know Exactly What You Have.
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Clothing products aren't simple single SKUs — they exist across multiple sizes, colors, and fabric cuts. <strong class="text-white">CLOTHERP</strong> is designed from the ground up around variant-level inventory management.
+                    </p>
+
+                    <!-- Variant Matrix Display Card -->
+                    <div class="glass-card rounded-xl p-4 border border-slate-800 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider font-mono">Sample Product</span>
+                                <h4 class="text-base font-bold text-white">Men's Oxford Cotton Shirt</h4>
+                            </div>
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300 border border-slate-700">
+                                5 Active Variants
+                            </span>
+                        </div>
+
+                        <!-- Variant Rows Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-800 font-mono">
+                                        <th class="pb-2">Variant</th>
+                                        <th class="pb-2">SKU Code</th>
+                                        <th class="pb-2 text-center">Stock</th>
+                                        <th class="pb-2 text-right">Price</th>
+                                        <th class="pb-2 text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 font-mono">
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 font-sans font-medium text-slate-200">Black / M</td>
+                                        <td class="py-2.5 text-slate-400">SH-BLK-M</td>
+                                        <td class="py-2.5 text-center font-bold text-slate-200">20 pcs</td>
+                                        <td class="py-2.5 text-right text-slate-300">₹900</td>
+                                        <td class="py-2.5 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-sans text-[10px] font-semibold">In Stock</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 font-sans font-medium text-slate-200">Black / L</td>
+                                        <td class="py-2.5 text-slate-400">SH-BLK-L</td>
+                                        <td class="py-2.5 text-center font-bold text-slate-200">15 pcs</td>
+                                        <td class="py-2.5 text-right text-slate-300">₹900</td>
+                                        <td class="py-2.5 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-sans text-[10px] font-semibold">In Stock</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 font-sans font-medium text-slate-200">Black / XL</td>
+                                        <td class="py-2.5 text-slate-400">SH-BLK-XL</td>
+                                        <td class="py-2.5 text-center font-bold text-amber-400">3 pcs</td>
+                                        <td class="py-2.5 text-right text-slate-300">₹950</td>
+                                        <td class="py-2.5 text-right"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-sans text-[10px] font-semibold">Low Stock</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 font-sans font-medium text-slate-200">White / M</td>
+                                        <td class="py-2.5 text-slate-400">SH-WHT-M</td>
+                                        <td class="py-2.5 text-center font-bold text-slate-200">24 pcs</td>
+                                        <td class="py-2.5 text-right text-slate-300">₹850</td>
+                                        <td class="py-2.5 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-sans text-[10px] font-semibold">In Stock</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 font-sans font-medium text-slate-200">White / L</td>
+                                        <td class="py-2.5 text-slate-400">SH-WHT-L</td>
+                                        <td class="py-2.5 text-center font-bold text-red-400">0 pcs</td>
+                                        <td class="py-2.5 text-right text-slate-300">₹850</td>
+                                        <td class="py-2.5 text-right"><span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-sans text-[10px] font-semibold">Out of Stock</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: ERP Inventory Dashboard Mockup -->
+                <div class="lg:col-span-6" data-aos="fade-left">
+                    <div class="glass-card rounded-2xl p-6 border border-slate-800 shadow-2xl relative">
+                        <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                                    <i data-lucide="boxes" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>Inventory Health Monitor</span>
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Central Warehouse + 2 Retail Outlets</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-medium">98.2% Accuracy</span>
+                        </div>
+
+                        <!-- 4 Inventory Metrics -->
+                        <div class="grid grid-cols-2 gap-3 mb-5">
+                            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                                <span class="text-xs text-slate-400">Total Stock</span>
+                                <div class="text-xl font-extrabold text-white font-mono mt-1">14,820 <span class="text-xs font-normal text-slate-400">pcs</span></div>
+                                <span class="text-[10px] text-emerald-400">₹42.8 Lakhs Valuation</span>
+                            </div>
+                            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                                <span class="text-xs text-slate-400">Low Stock Variants</span>
+                                <div class="text-xl font-extrabold text-amber-400 font-mono mt-1">18 <span class="text-xs font-normal text-slate-400">items</span></div>
+                                <span class="text-[10px] text-amber-400">Reorder triggered</span>
+                            </div>
+                            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                                <span class="text-xs text-slate-400">Out of Stock</span>
+                                <div class="text-xl font-extrabold text-red-400 font-mono mt-1">4 <span class="text-xs font-normal text-slate-400">variants</span></div>
+                                <span class="text-[10px] text-red-400">Supplier PO Pending</span>
+                            </div>
+                            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                                <span class="text-xs text-slate-400">Today's Movement</span>
+                                <div class="text-xl font-extrabold text-sky-400 font-mono mt-1">+340 <span class="text-xs font-normal text-slate-400">pcs</span></div>
+                                <span class="text-[10px] text-slate-400">220 Sold / 560 Received</span>
+                            </div>
+                        </div>
+
+                        <!-- Stock Movement Timeline Concept -->
+                        <div class="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+                            <span class="text-xs font-semibold text-slate-300">Recent Movement Log</span>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex items-center justify-between text-slate-300">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                        <span>Cotton Oxford Shirt (Black/M)</span>
+                                    </div>
+                                    <span class="font-mono text-emerald-400 font-semibold">+60 pcs GRN</span>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-300">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                        <span>Slim Fit Pant (Navy/32)</span>
+                                    </div>
+                                    <span class="font-mono text-blue-400 font-semibold">-2 pcs POS Sale</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. SALES + GST SECTION (SPLIT LAYOUT) -->
+    <section class="py-24 bg-slate-900/40 border-t border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left: Sales Pitch & Explanation -->
+                <div class="lg:col-span-5 space-y-6" data-aos="fade-right">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+                        <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                        <span>Retail POS & Wholesale B2B</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                        Sell Faster. Bill Smarter.
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Whether at a bustling retail cash counter or managing bulk B2B wholesale consignments, <strong class="text-white">CLOTHERP</strong> automatically calculates taxable amounts, split CGST/SGST, and tracks multi-mode payments in seconds.
+                    </p>
+
+                    <!-- Payment Methods Selector Preview -->
+                    <div class="space-y-3 pt-2">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">Supported Payment Modes</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <button class="payment-method-btn px-3 py-2 rounded-lg bg-blue-600 text-white border border-blue-500 shadow-md text-xs font-medium flex items-center justify-center space-x-1.5 transition">
+                                <i data-lucide="banknote" class="w-3.5 h-3.5"></i>
+                                <span>Cash</span>
+                            </button>
+                            <button class="payment-method-btn px-3 py-2 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-600 text-xs font-medium flex items-center justify-center space-x-1.5 transition">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                                <span>UPI</span>
+                            </button>
+                            <button class="payment-method-btn px-3 py-2 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-600 text-xs font-medium flex items-center justify-center space-x-1.5 transition">
+                                <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                                <span>Card</span>
+                            </button>
+                            <button class="payment-method-btn px-3 py-2 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-600 text-xs font-medium flex items-center justify-center space-x-1.5 transition">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                <span>Credit</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Sales Invoice Billing UI -->
+                <div class="lg:col-span-7" data-aos="fade-left">
+                    <div class="glass-card rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-2xl space-y-5">
+                        
+                        <!-- Invoice Header -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-4 border-b border-slate-800">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="text-base font-bold text-white">Sales Invoice #INV-2026-894</h3>
+                                    <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-mono font-semibold">GST COMPLIANT</span>
+                                </div>
+                                <div class="text-xs text-slate-400 mt-1">
+                                    Customer: <strong class="text-slate-200">Rahul Sharma</strong> | Mobile: <span class="font-mono">+91 98765 43210</span>
+                                </div>
+                            </div>
+                            <button id="btnAddProduct" class="btn-primary px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-1 transition shadow">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>+ Add Product</span>
+                            </button>
+                        </div>
+
+                        <!-- Invoice Line Items Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-slate-400 text-xs border-b border-slate-800 uppercase font-mono">
+                                        <th class="py-2 px-3">Product</th>
+                                        <th class="py-2 px-2">Variant</th>
+                                        <th class="py-2 px-2 text-center">Qty</th>
+                                        <th class="py-2 px-2 text-right">Rate</th>
+                                        <th class="py-2 px-3 text-right">Amount</th>
+                                        <th class="py-2 px-2 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceItemsList" class="divide-y divide-slate-800/60">
+                                    <!-- Dynamic rows loaded by main.js -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Calculation Breakdown & GST Summary -->
+                        <div class="pt-4 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                            <div class="text-xs text-slate-400 space-y-1">
+                                <div class="flex items-center space-x-1.5 text-slate-300 font-medium">
+                                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>5% Apparel GST Slab (2.5% CGST + 2.5% SGST)</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500">Interactive live demo. Adjust quantities or add products above.</p>
+                            </div>
+
+                            <div class="space-y-1.5 text-xs font-mono bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Subtotal:</span>
+                                    <span id="invSubtotal" class="text-slate-200">₹2,800</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Discount:</span>
+                                    <span id="invDiscount" class="text-emerald-400">-₹200</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400 border-t border-slate-800/60 pt-1">
+                                    <span>Taxable Amount:</span>
+                                    <span id="invTaxable" class="text-slate-200 font-semibold">₹2,600</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>CGST (2.5%):</span>
+                                    <span id="invCgst" class="text-slate-300">₹65</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>SGST (2.5%):</span>
+                                    <span id="invSgst" class="text-slate-300">₹65</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-white border-t border-slate-700/80 pt-1.5">
+                                    <span>Grand Total:</span>
+                                    <span id="invGrandTotal" class="text-emerald-400 font-mono text-base">₹2,730</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. PURCHASE + SHIPMENT SECTION -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-amber-400 font-mono">Supply Chain & Freight</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    From Supplier to Stock — Track Every Step.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Manage incoming garment consignments, transporter LR details, and step-by-step personnel audit logs across the supply line.
+                </p>
+            </div>
+
+            <!-- Purchase Workflow Steps -->
+            <div class="mb-14 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-center" data-aos="fade-up">
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 1</span>
+                    <span class="font-semibold text-slate-200">Supplier</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 2</span>
+                    <span class="font-semibold text-slate-200">Purchase</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 3</span>
+                    <span class="font-semibold text-slate-200">Packed</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 4</span>
+                    <span class="font-semibold text-slate-200">Dispatched</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 5</span>
+                    <span class="font-semibold text-slate-200">In Transit</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-blue-400 font-mono font-bold block mb-1">Step 6</span>
+                    <span class="font-semibold text-slate-200">Delivered</span>
+                </div>
+                <div class="col-span-2 sm:col-span-1 p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/80 text-xs">
+                    <span class="text-emerald-400 font-mono font-bold block mb-1">Step 7</span>
+                    <span class="font-semibold text-emerald-300">Stock Received</span>
+                </div>
+            </div>
+
+            <!-- Shipment Card + Timeline Audit Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Shipment Card Mockup -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4" data-aos="fade-right">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                                <i data-lucide="truck" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Consignment #PO-9941</h3>
+                                <span class="text-xs text-slate-400">Supplier: Arvind Mills Fabric Ltd.</span>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-semibold flex items-center space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                            <span>In Transit</span>
+                        </span>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-2 gap-4 text-xs font-mono pt-2">
+                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800/80">
+                            <span class="text-slate-400 font-sans block mb-1">Transporter Name:</span>
+                            <span class="text-slate-100 font-bold font-sans text-sm">Shree Transport</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800/80">
+                            <span class="text-slate-400 font-sans block mb-1">LR Number:</span>
+                            <span class="text-blue-400 font-bold text-sm">LR123456</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800/80">
+                            <span class="text-slate-400 font-sans block mb-1">Vehicle Number:</span>
+                            <span class="text-slate-200 font-semibold">GJ01AB1234</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800/80">
+                            <span class="text-slate-400 font-sans block mb-1">Dispatch / Delivery:</span>
+                            <span class="text-slate-200 font-semibold">28 Aug → 30 Aug</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Audit Timeline Mockup -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4" data-aos="fade-left">
+                    <div class="pb-2 border-b border-slate-800 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
+                            <span>Personnel Activity & Movement Timeline</span>
+                        </h3>
+                        <span class="text-[10px] font-mono text-slate-500">AUDIT TRAIL</span>
+                    </div>
+
+                    <!-- Timeline Items -->
+                    <div class="space-y-4 text-xs pl-2">
+                        <!-- Event 1 -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20"></div>
+                            <div class="flex-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+                                <div class="flex justify-between">
+                                    <span class="font-bold text-slate-200">Purchase Created</span>
+                                    <span class="font-mono text-slate-400 text-[11px]">09:15 AM</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400">By Amit (Procurement Lead)</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 2 -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20"></div>
+                            <div class="flex-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+                                <div class="flex justify-between">
+                                    <span class="font-bold text-slate-200">Packed & Inspected</span>
+                                    <span class="font-mono text-slate-400 text-[11px]">11:30 AM</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400">By Rakesh (Warehouse Exec)</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 3 -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20"></div>
+                            <div class="flex-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+                                <div class="flex justify-between">
+                                    <span class="font-bold text-slate-200">Dispatched via Shree Transport</span>
+                                    <span class="font-mono text-slate-400 text-[11px]">02:10 PM</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400">By Suresh (Logistics)</span>
+                            </div>
+                        </div>
+
+                        <!-- Event 4 -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-amber-400 ring-4 ring-amber-400/20 animate-pulse"></div>
+                            <div class="flex-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+                                <div class="flex justify-between">
+                                    <span class="font-bold text-amber-300">Shipment Updated (In Transit)</span>
+                                    <span class="font-mono text-slate-400 text-[11px]">06:45 PM</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400">By Suresh (Logistics)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. CUSTOMER TRACKING SECTION -->
+    <section class="py-24 bg-slate-900/40 border-t border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-sky-400 font-mono">Customer Self-Service</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    Keep Customers Informed.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Provide real-time order transparency with dedicated customer-facing tracking portals showing live fulfillment stages and transporter details.
+                </p>
+            </div>
+
+            <!-- Customer Tracking Portal Mockup -->
+            <div class="max-w-4xl mx-auto glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-6" data-aos="fade-up" data-aos-delay="100">
+                
+                <!-- Order Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-lg font-bold text-white font-mono">Order #ORD-00125</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                                ₹2,730 Paid
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Recipient: <strong class="text-slate-200">Rahul</strong> | Placed on 28 Aug 2026</p>
+                    </div>
+                    <button data-route="/track-order" class="btn-primary px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                        <span>Track Order</span>
+                    </button>
+                </div>
+
+                <!-- Products Summary -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-slate-200">Oxford Cotton Shirt</div>
+                            <div class="text-[11px] text-slate-400 font-mono">Black / M</div>
+                        </div>
+                        <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono font-semibold">Qty: 2</span>
+                    </div>
+                    <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-slate-200">Slim Fit Denim Pant</div>
+                            <div class="text-[11px] text-slate-400 font-mono">Blue / 32</div>
+                        </div>
+                        <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono font-semibold">Qty: 1</span>
+                    </div>
+                </div>
+
+                <!-- 6-Stage Visual Shipment Progress Bar -->
+                <div class="pt-4 space-y-4">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">Shipment Progress</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        <!-- Stage 1 -->
+                        <div class="p-2.5 bg-emerald-950/30 border border-emerald-800/60 rounded-lg text-center">
+                            <span class="text-emerald-400 text-xs font-bold block">✓ Confirmed</span>
+                            <span class="text-[10px] text-slate-400 font-mono">28 Aug, 09:30</span>
+                        </div>
+                        <!-- Stage 2 -->
+                        <div class="p-2.5 bg-emerald-950/30 border border-emerald-800/60 rounded-lg text-center">
+                            <span class="text-emerald-400 text-xs font-bold block">✓ Packed</span>
+                            <span class="text-[10px] text-slate-400 font-mono">28 Aug, 11:45</span>
+                        </div>
+                        <!-- Stage 3 -->
+                        <div class="p-2.5 bg-emerald-950/30 border border-emerald-800/60 rounded-lg text-center">
+                            <span class="text-emerald-400 text-xs font-bold block">✓ Dispatched</span>
+                            <span class="text-[10px] text-slate-400 font-mono">28 Aug, 14:15</span>
+                        </div>
+                        <!-- Stage 4 -->
+                        <div class="p-2.5 bg-blue-950/40 border border-blue-600/80 rounded-lg text-center shadow-lg shadow-blue-500/10">
+                            <span class="text-blue-300 text-xs font-bold flex items-center justify-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1 animate-pulse"></span>
+                                In Transit
+                            </span>
+                            <span class="text-[10px] text-slate-300 font-mono">Hub Checkpoint</span>
+                        </div>
+                        <!-- Stage 5 -->
+                        <div class="p-2.5 bg-slate-900/50 border border-slate-800 rounded-lg text-center opacity-60">
+                            <span class="text-slate-400 text-xs block">○ Out for Delivery</span>
+                            <span class="text-[10px] text-slate-500 font-mono">30 Aug</span>
+                        </div>
+                        <!-- Stage 6 -->
+                        <div class="p-2.5 bg-slate-900/50 border border-slate-800 rounded-lg text-center opacity-60">
+                            <span class="text-slate-400 text-xs block">○ Delivered</span>
+                            <span class="text-[10px] text-slate-500 font-mono">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transporter Footer Info -->
+                <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between text-xs text-slate-400 font-mono gap-2">
+                    <div>Transport: <span class="text-slate-200 font-semibold font-sans">Shree Transport</span> (LR #LR123456)</div>
+                    <div>Expected Delivery: <span class="text-emerald-400 font-semibold font-sans">30 Aug 2026</span></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. REPORTS & ANALYTICS SECTION -->
+    <section id="analytics" class="py-24 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-purple-400 font-mono">Data-Driven Growth</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    Turn Business Data Into Better Decisions.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Real-time financial visibility into sales revenue, procurement expenses, net gross profit, and high-velocity clothing categories.
+                </p>
+            </div>
+
+            <!-- Top 4 Analytics KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" data-aos="fade-up">
+                <div class="glass-card p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 font-medium">Total Sales (FY 2026)</span>
+                    <div class="text-2xl font-extrabold text-white font-mono mt-1">₹12.5L</div>
+                    <div class="text-[11px] text-emerald-400 mt-1 flex items-center">
+                        <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
+                        <span>+18.4% YoY Growth</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 font-medium">Total Purchase (Fabrics)</span>
+                    <div class="text-2xl font-extrabold text-slate-200 font-mono mt-1">₹8.4L</div>
+                    <div class="text-[11px] text-slate-400 mt-1">94 Supplier consignments</div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 font-medium">Net Gross Profit</span>
+                    <div class="text-2xl font-extrabold text-emerald-400 font-mono mt-1">₹2.4L</div>
+                    <div class="text-[11px] text-emerald-400 mt-1">24.2% Average Margin</div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 font-medium">Fulfilled Orders</span>
+                    <div class="text-2xl font-extrabold text-sky-400 font-mono mt-1">1,250</div>
+                    <div class="text-[11px] text-sky-400 mt-1">99.1% On-time dispatch</div>
+                </div>
+            </div>
+
+            <!-- Visual Charts Grid (Chart.js) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" data-aos="fade-up" data-aos-delay="100">
+                
+                <!-- Chart 1: Monthly Sales Trend (8 Cols) -->
+                <div class="lg:col-span-8 glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-base font-bold text-white">Monthly Sales & Margin Trend</h3>
+                            <p class="text-xs text-slate-400">Monthly gross sales vs net margins over the financial cycle</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs font-mono">12-Month View</span>
+                    </div>
+                    <div class="h-64 sm:h-72 w-full">
+                        <canvas id="monthlySalesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Category Sales Distribution (4 Cols) -->
+                <div class="lg:col-span-4 glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Category Sales Share</h3>
+                        <p class="text-xs text-slate-400">Revenue split across garment lines</p>
+                    </div>
+                    <div class="h-64 sm:h-72 w-full flex items-center justify-center">
+                        <canvas id="categoryDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Purchase vs Sales Quarterly (6 Cols) -->
+                <div class="lg:col-span-6 glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Purchase vs Sales Volume (Quarterly)</h3>
+                        <p class="text-xs text-slate-400">Procurement spend against outgoing invoiced turnover</p>
+                    </div>
+                    <div class="h-56 sm:h-64 w-full">
+                        <canvas id="purchaseVsSalesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Selling Products List (6 Cols) -->
+                <div class="lg:col-span-6 glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-base font-bold text-white">Top Selling Products</h3>
+                            <p class="text-xs text-slate-400">Ranked by unit velocity & gross contribution</p>
+                        </div>
+                        <span class="text-xs font-mono text-emerald-400 font-semibold">High Margin</span>
+                    </div>
+                    <div class="space-y-3 pt-1">
+                        <!-- Item 1 -->
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-mono text-slate-400 font-bold">#1</span>
+                                <div>
+                                    <div class="font-bold text-slate-200">Men's Cotton Oxford Shirt</div>
+                                    <span class="text-[10px] text-slate-400 font-mono">480 pcs sold (₹4.32L)</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-mono font-semibold">+28% YoY</span>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-mono text-slate-400 font-bold">#2</span>
+                                <div>
+                                    <div class="font-bold text-slate-200">Slim Fit Stretch Denim</div>
+                                    <span class="text-[10px] text-slate-400 font-mono">340 pcs sold (₹3.40L)</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-mono font-semibold">+19% YoY</span>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-mono text-slate-400 font-bold">#3</span>
+                                <div>
+                                    <div class="font-bold text-slate-200">Printed Pure Silk Kurta</div>
+                                    <span class="text-[10px] text-slate-400 font-mono">210 pcs sold (₹3.04L)</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-mono font-semibold">+35% YoY</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. ROLE & PERMISSION SECTION -->
+    <section class="py-24 bg-slate-900/40 border-t border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-400 font-mono">Granular Security</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+                    The Right Access for Every Role.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg">
+                    Role-based access helps businesses control what each user can view and manage — ensuring cashier staff only see retail billing while sensitive financials stay private to owners.
+                </p>
+            </div>
+
+            <!-- 4 Role Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Role 1: Admin -->
+                <div class="glass-card hover-lift p-6 rounded-2xl border border-blue-500/30 relative" data-aos="fade-up" data-aos-delay="50">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+                        <i data-lucide="shield" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white">Admin</h3>
+                        <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-mono font-bold">FULL ACCESS</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Complete authority over configurations, financials, user permissions, audit trails, and multi-branch management.
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 mr-2"></i> All System Modules</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 mr-2"></i> Profit & Tax Statements</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 mr-2"></i> User & Role Creation</li>
+                    </ul>
+                </div>
+
+                <!-- Role 2: Manager -->
+                <div class="glass-card hover-lift p-6 rounded-2xl border border-slate-800 relative" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white">Manager</h3>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">OPERATIONS</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Oversees daily operational workflows across Sales, Purchases, Stock adjustments, and performance reports.
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 mr-2"></i> Sales, Purchase & Inventory</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 mr-2"></i> Operations Reports</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 mr-2"></i> Stock Adjustment Approvals</li>
+                    </ul>
+                </div>
+
+                <!-- Role 3: Sales Staff -->
+                <div class="glass-card hover-lift p-6 rounded-2xl border border-slate-800 relative" data-aos="fade-up" data-aos-delay="150">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center mb-4">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white">Sales Staff</h3>
+                        <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-mono font-bold">POS / BILLING</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Dedicated counter billing interface for barcode scanning, invoice generation, customer lookups, and returns.
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-sky-400 mr-2"></i> Retail & B2B Sales POS</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-sky-400 mr-2"></i> Customer Directory</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-sky-400 mr-2"></i> GST Invoice Printing</li>
+                    </ul>
+                </div>
+
+                <!-- Role 4: Purchase Staff -->
+                <div class="glass-card hover-lift p-6 rounded-2xl border border-slate-800 relative" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
+                        <i data-lucide="truck" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-white">Purchase Staff</h3>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold">LOGISTICS</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Handles fabric and garment supplier interactions, Goods Receipt Notes (GRN), and LR shipment dispatches.
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-400 mr-2"></i> Supplier Purchase Orders</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-400 mr-2"></i> GRN & Stock Intake</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 text-amber-400 mr-2"></i> Transporter LR Tracking</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 13. FINAL HIGH-IMPACT CTA SECTION -->
+    <section class="py-24 relative overflow-hidden">
+        <!-- Radial Glow -->
+        <div class="absolute inset-0 radial-glow-center pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-4xl mx-auto text-center glass-card p-10 sm:p-14 rounded-3xl border border-slate-700/80 shadow-2xl" data-aos="zoom-in">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/25">
+                    <i data-lucide="layers" class="w-7 h-7 text-white"></i>
+                </div>
+
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                    Your Clothing Business. <br>
+                    <span class="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                        One Connected System.
+                    </span>
+                </h2>
+
+                <p class="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                    Bring products, inventory, sales, purchases, payments and shipments together with <strong class="text-white">CLOTHERP</strong>.
+                </p>
+
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#features" class="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-base shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center space-x-2">
+                        <span>Get Started</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#how-it-works" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-base border border-slate-700 transition-all flex items-center justify-center space-x-2">
+                        <span>Explore Features</span>
+                        <i data-lucide="compass" class="w-4 h-4 text-slate-400"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 14. FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 pt-16 pb-12 text-slate-400 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pb-12 border-b border-slate-800/80">
+                <!-- Brand & Tagline -->
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xl font-extrabold text-white font-mono tracking-wider">CLOTH<span class="text-blue-400">ERP</span></span>
+                    </div>
+                    <p class="text-xs text-slate-400 max-w-sm">
+                        Clothing business management, simplified. Tailored ERP for retail, wholesale and apparel manufacturing.
+                    </p>
+                </div>
+
+                <!-- Footer Navigation Links -->
+                <div class="flex flex-wrap gap-x-8 gap-y-3 font-medium text-xs sm:text-sm text-slate-300">
+                    <a href="#features" class="hover:text-blue-400 transition">Features</a>
+                    <a href="#solutions" class="hover:text-blue-400 transition">Solutions</a>
+                    <a href="#how-it-works" class="hover:text-blue-400 transition">How It Works</a>
+                    <a href="#analytics" class="hover:text-blue-400 transition">Analytics</a>
+                    <a href="./login.html" class="hover:text-blue-400 transition text-left">Login</a>
+                </div>
+            </div>
+
+            <!-- Copyright Note -->
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
+                <div>
+                    © 2026 CLOTHERP. All rights reserved.
+                </div>
+                <div class="font-mono text-[11px] text-slate-600">
+                    Enterprise Garment ERP Architecture
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="./assets/js/dashboard-charts.js"></script>
+    <script src="./assets/js/main.js"></script>
+</body>
+</html>

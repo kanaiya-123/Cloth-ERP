@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Job Work Order — CLOTHERP</title>
+    <meta name="description" content="Dispatch cut garment panels or fabric to outsourced embroidery, printing, and stitching job workers in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./job-orders.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Job Work</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Issue JWO</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="scissors" class="w-6 h-6 text-blue-400"></i>
+                            <span>Issue Job Work Order</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Dispatch garment components to external embroidery, printing, or stitching contractors.</p>
+                    </div>
+
+                    <a href="./job-orders.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Back</span>
+                    </a>
+                </div>
+
+                <form id="jobOrderForm" class="space-y-6" novalidate>
+                    
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="users-2" class="w-4 h-4 text-blue-400"></i>
+                            <span>Contractor & Service Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Select Job Worker / Contractor *</label>
+                                <select id="jwoWorkerSelect" required class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                    <!-- Injected dynamically -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Service Type *</label>
+                                <select id="jwoServiceSelect" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                    <option value="Embroidery" selected>Embroidery / Zari Work</option>
+                                    <option value="Screen Printing">Screen / Discharge Printing</option>
+                                    <option value="Stitching">Collar / Sleeve Stitching</option>
+                                    <option value="Washing">Enzyme / Stone Wash</option>
+                                    <option value="Finishing">Pleating & Hand Embellishment</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Description / Garment Item Details *</label>
+                                <input type="text" id="jwoTitleInput" required placeholder="e.g. Chanderi Kurti Neckline Zari Embroidery" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Linked Production Order (Optional)</label>
+                                <select id="jwoProdSelect" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                    <!-- Injected dynamically -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Source Warehouse (Dispatch Point) *</label>
+                                <select id="jwoWarehouseSelect" required class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                    <!-- Injected dynamically -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Issued Quantity (Pcs / Panels) *</label>
+                                <input type="number" id="jwoIssuedQtyInput" min="1" value="100" required class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Piece Rate Charge (₹ / pc) *</label>
+                                <input type="number" step="0.5" id="jwoRateInput" value="25.00" required class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Issue / Dispatch Date</label>
+                                <input type="date" id="jwoIssueDateInput" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Expected Return Date</label>
+                                <input type="date" id="jwoReturnDateInput" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Transport / Delivery Vehicle</label>
+                                <input type="text" id="jwoTransportInput" placeholder="Local Delivery Van" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Challan / LR Number</label>
+                                <input type="text" id="jwoLrInput" placeholder="JW-CHALLAN-1095" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 font-mono focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Charges Footprint -->
+                        <div class="p-4 bg-slate-950/70 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs pt-3">
+                            <span class="text-slate-400">Total Estimated Job Work Charges:</span>
+                            <span class="font-mono text-base font-bold text-emerald-400" id="totalJobChargesDisplay">₹2,500.00</span>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./job-orders.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        
+                        <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-2">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Issue Job Work Order</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Manufacturing Operations</div>
+                <div class="font-mono text-[11px] text-slate-600">Job Work Order Dispatcher</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { jobWorkService } from './assets/js/services/jobWorkService.js';
+        import { warehouseService } from './assets/js/services/warehouseService.js';
+        import { productionService } from './assets/js/services/productionService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.JOBWORK_MANAGE });
+        if (!user) throw new Error('Auth required');
+
+        const params = new URLSearchParams(window.location.search);
+        const preselectedWorkerId = params.get('workerId');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'job-orders');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            const today = new Date().toISOString().split('T')[0];
+            const returnDate = new Date(Date.now() + 4 * 86400000).toISOString().split('T')[0];
+            document.getElementById('jwoIssueDateInput').value = today;
+            document.getElementById('jwoReturnDateInput').value = returnDate;
+
+            await loadDropdowns();
+            attachEvents();
+        });
+
+        async function loadDropdowns() {
+            const [workers, warehouses, prods] = await Promise.all([
+                jobWorkService.getActiveJobWorkers(),
+                warehouseService.getActiveWarehouses(),
+                productionService.getProductionOrders({ pageSize: 50 })
+            ]);
+
+            const workerSelect = document.getElementById('jwoWorkerSelect');
+            workers.forEach(w => {
+                const opt = new Option(`${w.name} (${w.city} • ₹${w.defaultRate}/pc)`, w.id);
+                if (preselectedWorkerId && w.id === preselectedWorkerId) opt.selected = true;
+                workerSelect.add(opt);
+            });
+
+            const whSelect = document.getElementById('jwoWarehouseSelect');
+            warehouses.forEach(w => whSelect.add(new Option(`${w.name} (${w.warehouseCode})`, w.id)));
+
+            const prodSelect = document.getElementById('jwoProdSelect');
+            prodSelect.add(new Option('-- Direct Standalone Job Work --', ''));
+            (prods.items || []).forEach(p => {
+                prodSelect.add(new Option(`${p.productionOrderNumber} — ${p.productName} (${p.plannedQuantity} pcs)`, p.id));
+            });
+
+            updateCalculatedCharges();
+        }
+
+        function updateCalculatedCharges() {
+            const qty = parseInt(document.getElementById('jwoIssuedQtyInput').value) || 0;
+            const rate = parseFloat(document.getElementById('jwoRateInput').value) || 0;
+            const total = qty * rate;
+            document.getElementById('totalJobChargesDisplay').textContent = `₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function attachEvents() {
+            document.getElementById('jwoIssuedQtyInput').addEventListener('input', updateCalculatedCharges);
+            document.getElementById('jwoRateInput').addEventListener('input', updateCalculatedCharges);
+
+            document.getElementById('jobOrderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const jwoData = {
+                    jobWorkerId: document.getElementById('jwoWorkerSelect').value,
+                    serviceType: document.getElementById('jwoServiceSelect').value,
+                    title: document.getElementById('jwoTitleInput').value,
+                    productionOrderId: document.getElementById('jwoProdSelect').value,
+                    sourceWarehouseId: document.getElementById('jwoWarehouseSelect').value,
+                    issuedQuantity: document.getElementById('jwoIssuedQtyInput').value,
+                    ratePerUnit: document.getElementById('jwoRateInput').value,
+                    issueDate: document.getElementById('jwoIssueDateInput').value,
+                    expectedReturnDate: document.getElementById('jwoReturnDateInput').value,
+                    transportName: document.getElementById('jwoTransportInput').value,
+                    lrNumber: document.getElementById('jwoLrInput').value,
+                    submitNow: true
+                };
+
+                const res = await jobWorkService.createJobOrder(jwoData, user.name);
+                if (res.success) {
+                    showToast(`Job Work Order ${res.jobOrder.jobWorkOrderNumber} issued!`, 'success');
+                    setTimeout(() => {
+                        window.location.href = `./job-order-details.html?id=${res.jobOrder.id}`;
+                    }, 800);
+                } else {
+                    showToast(res.message || 'Failed to issue job order', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

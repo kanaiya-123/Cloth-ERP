@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Entries (Double-Entry Vouchers) — CLOTHERP</title>
+    <meta name="description" content="Create and post double-entry general ledger journal vouchers with strict debit and credit balancing in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./accounting.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Accounting</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Journal Entries</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
+                            <span>Journal Vouchers & Double-Entry Ledger</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Financial journal entries enforcing Total Debit = Total Credit with audit traceability.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./chart-of-accounts.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                            <span>COA Accounts</span>
+                        </a>
+
+                        <button id="btnOpenAddJvModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Journal Voucher</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Journals</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalJournals">0</div>
+                        <span class="text-[10px] text-slate-500">General Vouchers</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Posted Vouchers</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiPostedJournals">0</div>
+                        <span class="text-[10px] text-slate-500">Committed to Ledger</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Auto System Vouchers</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono">Sales & Purchases</div>
+                        <span class="text-[10px] text-slate-500">Automated Financial Sync</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Double-Entry Status</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono">100% Balanced</div>
+                        <span class="text-[10px] text-slate-500">Debit = Credit Enforced</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="jvSearchInput" 
+                            placeholder="Search voucher #, description, or ref..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="jvStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="POSTED">Posted Only</option>
+                            <option value="DRAFT">Draft Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Journals Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Voucher #</th>
+                                    <th class="py-3 px-4">Date</th>
+                                    <th class="py-3 px-4">Description</th>
+                                    <th class="py-3 px-4">Source Reference</th>
+                                    <th class="py-3 px-4 text-right">Debit (₹)</th>
+                                    <th class="py-3 px-4 text-right">Credit (₹)</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="jvTableBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Financial Accounting System</div>
+                <div class="font-mono text-[11px] text-slate-600">Double-Entry Journal Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE JOURNAL ENTRY -->
+    <div id="addJvModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-2xl w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900 my-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i>
+                    <span>Create Double-Entry Journal Voucher</span>
+                </h3>
+                <button id="btnCloseJvModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="addJvForm" class="space-y-4" novalidate>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Voucher Date *</label>
+                        <input type="date" id="jvDateInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Reference / Document #</label>
+                        <input type="text" id="jvRefInput" placeholder="e.g. DOC-9810" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Voucher Description / Narration *</label>
+                        <input type="text" id="jvDescInput" required placeholder="e.g. Machine maintenance and electricity expense allocation" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- JOURNAL LINES BUILDER -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold text-slate-300">Journal Lines (Debits & Credits)</span>
+                        <button type="button" id="btnAddJvLine" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center space-x-1">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>Add Line</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2.5" id="jvLinesContainer">
+                        <!-- Injected dynamically -->
+                    </div>
+
+                    <!-- TOTALS & BALANCE CHECK -->
+                    <div class="p-3 bg-slate-950/70 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs font-mono">
+                        <div class="space-x-4">
+                            <span>Debit: <strong class="text-emerald-400" id="totalDebitDisplay">₹0.00</strong></span>
+                            <span>Credit: <strong class="text-emerald-400" id="totalCreditDisplay">₹0.00</strong></span>
+                        </div>
+                        <div id="balanceIndicator" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            BALANCED
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelJv" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Post Journal Voucher</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { accountingService } from './assets/js/services/accountingService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.JOURNAL_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let accountsList = [];
+        let journalLines = [
+            { accountId: 'acc_5040', debit: 15000, credit: 0, narration: 'Factory Rent' },
+            { accountId: 'acc_1020', debit: 0, credit: 15000, narration: 'Bank Payment' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'journal-entries');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            document.getElementById('jvDateInput').value = new Date().toISOString().split('T')[0];
+
+            await loadAccounts();
+            await loadJournals();
+            renderJournalLines();
+            attachEvents();
+        });
+
+        async function loadAccounts() {
+            const res = await accountingService.getChartOfAccounts({ pageSize: 100 });
+            accountsList = res.items || [];
+        }
+
+        async function loadJournals() {
+            const search = document.getElementById('jvSearchInput').value;
+            const status = document.getElementById('jvStatusFilter').value;
+
+            const res = await accountingService.getJournalEntries({ search, status });
+
+            document.getElementById('kpiTotalJournals').textContent = res.summary.totalJournals;
+            document.getElementById('kpiPostedJournals').textContent = res.summary.postedCount;
+
+            renderTable(res.items);
+        }
+
+        function renderTable(journals) {
+            const tbody = document.getElementById('jvTableBody');
+            tbody.innerHTML = journals.map(j => `
+                <tr class="hover:bg-slate-850/60 transition">
+                    <td class="py-3 px-4 font-mono font-bold text-blue-400">${j.journalNumber}</td>
+                    <td class="py-3 px-4 font-mono text-slate-400">${j.date}</td>
+                    <td class="py-3 px-4 font-medium text-white">${j.description}</td>
+                    <td class="py-3 px-4 font-mono text-slate-400">${j.referenceNumber}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-emerald-400">₹${j.totalDebit.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-emerald-400">₹${j.totalCredit.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            j.status === 'POSTED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }">${j.status}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button class="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-white" onclick="alert('Voucher Lines:\\n${(j.lines || []).map(l => `${l.accountName}: Dr ₹${l.debit} / Cr ₹${l.credit}`).join('\\n')}')">View →</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderJournalLines() {
+            const container = document.getElementById('jvLinesContainer');
+            let totalDebit = 0;
+            let totalCredit = 0;
+
+            container.innerHTML = journalLines.map((line, idx) => {
+                const deb = parseFloat(line.debit) || 0;
+                const cred = parseFloat(line.credit) || 0;
+                totalDebit += deb;
+                totalCredit += cred;
+
+                return `
+                    <div class="flex items-center gap-2 text-xs">
+                        <select class="select-acc flex-1 px-2.5 py-1.5 bg-slate-950/80 border border-slate-700 rounded-lg text-slate-200 focus:outline-none" data-index="${idx}">
+                            ${accountsList.map(a => `
+                                <option value="${a.id}" ${line.accountId === a.id ? 'selected' : ''}>${a.accountCode} - ${a.name}</option>
+                            `).join('')}
+                        </select>
+                        <input type="number" value="${line.debit}" placeholder="Debit" class="input-debit w-24 px-2.5 py-1.5 bg-slate-950/80 border border-slate-700 rounded-lg text-white font-mono text-right focus:outline-none" data-index="${idx}">
+                        <input type="number" value="${line.credit}" placeholder="Credit" class="input-credit w-24 px-2.5 py-1.5 bg-slate-950/80 border border-slate-700 rounded-lg text-white font-mono text-right focus:outline-none" data-index="${idx}">
+                        <button type="button" class="btn-del-line text-slate-500 hover:text-red-400 p-1" data-index="${idx}">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalDebitDisplay').textContent = `₹${totalDebit.toFixed(2)}`;
+            document.getElementById('totalCreditDisplay').textContent = `₹${totalCredit.toFixed(2)}`;
+
+            const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01 && totalDebit > 0;
+            const ind = document.getElementById('balanceIndicator');
+            if (isBalanced) {
+                ind.textContent = 'BALANCED';
+                ind.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+            } else {
+                ind.textContent = 'UNBALANCED';
+                ind.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20';
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachLineEvents();
+        }
+
+        function attachLineEvents() {
+            document.querySelectorAll('.select-acc').forEach(el => {
+                el.addEventListener('change', (e) => { journalLines[e.target.dataset.index].accountId = e.target.value; });
+            });
+            document.querySelectorAll('.input-debit').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    journalLines[e.target.dataset.index].debit = parseFloat(e.target.value) || 0;
+                    if (journalLines[e.target.dataset.index].debit > 0) {
+                        journalLines[e.target.dataset.index].credit = 0;
+                    }
+                    renderJournalLines();
+                });
+            });
+            document.querySelectorAll('.input-credit').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    journalLines[e.target.dataset.index].credit = parseFloat(e.target.value) || 0;
+                    if (journalLines[e.target.dataset.index].credit > 0) {
+                        journalLines[e.target.dataset.index].debit = 0;
+                    }
+                    renderJournalLines();
+                });
+            });
+            document.querySelectorAll('.btn-del-line').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    journalLines.splice(el.dataset.index, 1);
+                    renderJournalLines();
+                });
+            });
+        }
+
+        function attachEvents() {
+            document.getElementById('jvSearchInput').addEventListener('input', loadJournals);
+            document.getElementById('jvStatusFilter').addEventListener('change', loadJournals);
+
+            document.getElementById('btnOpenAddJvModal').addEventListener('click', () => {
+                document.getElementById('addJvModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseJvModal').addEventListener('click', () => {
+                document.getElementById('addJvModal').classList.add('hidden');
+            });
+            document.getElementById('btnCancelJv').addEventListener('click', () => {
+                document.getElementById('addJvModal').classList.add('hidden');
+            });
+
+            document.getElementById('btnAddJvLine').addEventListener('click', () => {
+                journalLines.push({ accountId: accountsList[0] ? accountsList[0].id : 'acc_1010', debit: 0, credit: 0, narration: '' });
+                renderJournalLines();
+            });
+
+            document.getElementById('addJvForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const jvData = {
+                    date: document.getElementById('jvDateInput').value,
+                    referenceNumber: document.getElementById('jvRefInput').value,
+                    description: document.getElementById('jvDescInput').value,
+                    lines: journalLines,
+                    postNow: true
+                };
+
+                const res = await accountingService.createJournalEntry(jvData, user.name);
+                if (res.success) {
+                    showToast('Journal Voucher posted to General Ledger!', 'success');
+                    document.getElementById('addJvModal').classList.add('hidden');
+                    await loadJournals();
+                } else {
+                    showToast(res.message, 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

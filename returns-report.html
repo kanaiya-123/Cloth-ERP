@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Returns, Exchanges & Refunds Reports — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Return reasons analysis, defect rates, resalable vs damaged inspection metrics, and Credit Notes report in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Filter Bar -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./reports.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Reports</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-rose-400 font-bold font-mono">Returns & Adjustments</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="rotate-ccw" class="w-6 h-6 text-rose-400"></i>
+                            <span>Returns, Exchanges & Adjustments Report</span>
+                        </h1>
+                        <p class="text-xs text-slate-400" id="headerFilterSubtext">Customer return reasons, physical inspection rates, and supplier Debit Notes.</p>
+                    </div>
+
+                    <!-- Filter Controls & Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="datePresetSelect" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                            <option value="today">Today</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month" selected>This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_quarter">This Quarter</option>
+                            <option value="this_year">This Year</option>
+                        </select>
+
+                        <button id="btnExportCsv" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Export CSV</span>
+                        </button>
+
+                        <button id="btnPrintReport" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Sales Returns Value</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiSalesReturnVal">₹0.00</div>
+                        <span class="text-[10px] text-slate-500" id="kpiSalesReturnCount">0 claims</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Supplier Purchase Returns</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiPurchaseReturnVal">₹0.00</div>
+                        <span class="text-[10px] text-slate-500" id="kpiPurchaseReturnCount">0 consignments</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-indigo-400 font-medium">Product Exchanges</span>
+                        <div class="text-2xl font-extrabold text-indigo-300 font-mono" id="kpiExchangeCount">0</div>
+                        <span class="text-[10px] text-slate-500">Variant Swaps</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Disbursed Refunds</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiRefundVal">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Paid / Credit Notes</span>
+                    </div>
+                </div>
+
+                <!-- 2 TABS: SALES RETURNS VS PURCHASE RETURNS -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 text-xs">
+                    <button class="tab-btn px-4 py-2 rounded-xl font-bold transition text-white bg-slate-850 border border-slate-700" data-tab="tabSalesReturns">Customer Sales Returns Ledger</button>
+                    <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabPurchaseReturns">Supplier Purchase Returns Ledger</button>
+                </div>
+
+                <!-- TAB 1: SALES RETURNS LEDGER -->
+                <div id="tabSalesReturns" class="tab-pane space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Return Number</th>
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-4">Customer</th>
+                                        <th class="py-3 px-4">Return Reason</th>
+                                        <th class="py-3 px-3 text-center">Items Qty</th>
+                                        <th class="py-3 px-4 text-right font-bold text-rose-400">Claim Amount</th>
+                                        <th class="py-3 px-4 text-right text-emerald-400">Refunded</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesReturnsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Sales Return Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PURCHASE RETURNS LEDGER -->
+                <div id="tabPurchaseReturns" class="tab-pane hidden space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Purchase Return No</th>
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-4">Supplier</th>
+                                        <th class="py-3 px-4">Return Reason</th>
+                                        <th class="py-3 px-3 text-center">Debit Note</th>
+                                        <th class="py-3 px-4 text-right font-bold text-purple-300">Debit Claim (₹)</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseReturnsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Purchase Return Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Returns & Adjustments Report</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.REPORTS_RETURNS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadReturnsReport();
+            attachEvents();
+        });
+
+        async function loadReturnsReport() {
+            const preset = document.getElementById('datePresetSelect').value;
+            currentReportData = await reportingService.getReturnsReport({ preset });
+
+            document.getElementById('headerFilterSubtext').textContent = `Reporting Window: ${currentReportData.filters.displayRange}`;
+
+            // KPIs
+            document.getElementById('kpiSalesReturnVal').textContent = currentReportData.summary.totalSalesReturnsValueFormatted;
+            document.getElementById('kpiSalesReturnCount').textContent = `${currentReportData.summary.totalSalesReturns} return claims`;
+
+            document.getElementById('kpiPurchaseReturnVal').textContent = currentReportData.summary.totalPurchaseReturnsValueFormatted;
+            document.getElementById('kpiPurchaseReturnCount').textContent = `${currentReportData.summary.totalPurchaseReturns} consignments`;
+
+            document.getElementById('kpiExchangeCount').textContent = currentReportData.summary.totalExchanges;
+            document.getElementById('kpiRefundVal').textContent = currentReportData.summary.totalRefundedFormatted;
+
+            // Render Sales Returns
+            renderSalesReturnsTable(currentReportData.salesReturns);
+
+            // Render Purchase Returns
+            renderPurchaseReturnsTable(currentReportData.purchaseReturns);
+        }
+
+        function renderSalesReturnsTable(returns) {
+            const tbody = document.getElementById('salesReturnsTableBody');
+            if (returns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-sans">No customer sales returns recorded in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = returns.map(r => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4 font-mono">
+                        <a href="./return-details.html?id=${r.id}" class="font-bold text-rose-400 hover:underline">${r.returnNumber}</a>
+                    </td>
+                    <td class="py-3 px-3 text-slate-400 font-mono">${r.returnDate}</td>
+                    <td class="py-3 px-4 font-bold text-slate-200">${r.customerName}</td>
+                    <td class="py-3 px-4 text-slate-300">${r.reason}</td>
+                    <td class="py-3 px-3 text-center font-mono text-slate-200">${r.items.reduce((acc, i) => acc + (i.returnQuantity || 0), 0)}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-rose-400">₹${(r.grandTotal || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono text-emerald-400">₹${(r.refundedAmount || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                            r.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }">${r.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPurchaseReturnsTable(returns) {
+            const tbody = document.getElementById('purchaseReturnsTableBody');
+            if (returns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">No supplier purchase returns recorded in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = returns.map(r => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4 font-mono">
+                        <a href="./purchase-return-details.html?id=${r.id}" class="font-bold text-purple-400 hover:underline">${r.purchaseReturnNumber}</a>
+                    </td>
+                    <td class="py-3 px-3 text-slate-400 font-mono">${r.returnDate}</td>
+                    <td class="py-3 px-4 font-bold text-slate-200">${r.supplierName}</td>
+                    <td class="py-3 px-4 text-slate-300">${r.reason}</td>
+                    <td class="py-3 px-3 text-center font-mono text-purple-300 font-bold">${r.financialAdjustment ? (r.financialAdjustment.debitNoteNumber || 'Pending') : 'Pending'}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-purple-300">₹${(r.grandTotal || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                            r.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                        }">${r.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function attachEvents() {
+            document.getElementById('datePresetSelect').addEventListener('change', loadReturnsReport);
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                        b.classList.add('text-slate-400');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+                    btn.classList.add('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                    btn.classList.remove('text-slate-400');
+
+                    const target = btn.getAttribute('data-tab');
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCsv').addEventListener('click', () => {
+                if (!currentReportData || !currentReportData.salesReturns) return;
+                const headers = [
+                    { label: 'Return Number', key: 'returnNumber' },
+                    { label: 'Date', key: 'returnDate' },
+                    { label: 'Customer', key: 'customerName' },
+                    { label: 'Reason', key: 'reason' },
+                    { label: 'Grand Total (INR)', key: 'grandTotal' },
+                    { label: 'Refunded (INR)', key: 'refundedAmount' },
+                    { label: 'Status', key: 'status' }
+                ];
+                ReportExportService.exportToCsv('CLOTHERP_Sales_Returns_Report', headers, currentReportData.salesReturns);
+            });
+
+            // Print
+            document.getElementById('btnPrintReport').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variant Stock Ledger — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Detailed stock breakdown and chronological movement history ledger for apparel variants.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto" id="inventoryDetailMain">
+                
+                <!-- Loading State -->
+                <div id="loadingPlaceholder" class="p-12 text-center text-slate-500">
+                    <div class="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin mx-auto mb-3"></div>
+                    Loading variant inventory ledger and movements history...
+                </div>
+
+                <!-- Real Content Container -->
+                <div id="detailContainer" class="hidden space-y-6">
+                    
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <a href="./inventory.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Inventory</a>
+                                <span class="text-slate-600">/</span>
+                                <span class="text-xs text-blue-400 font-bold font-mono">Stock Ledger</span>
+                            </div>
+                            <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-3">
+                                <span id="headerProdName">Men's Cotton Oxford Shirt</span>
+                            </h1>
+                            <div class="flex items-center space-x-2.5 mt-1 text-xs text-slate-400">
+                                <span class="font-mono text-blue-300 font-bold" id="headerSku">SH-OXF-BLK-M</span>
+                                <span>•</span>
+                                <span class="font-mono text-slate-400" id="headerBarcode">89010101</span>
+                                <span>•</span>
+                                <span id="headerCategory">Shirts</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions Area -->
+                        <div class="flex items-center space-x-2">
+                            <a href="./inventory.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                                <span>Back to Inventory</span>
+                            </a>
+                            <a href="#" id="btnDetailStockIn" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                                <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
+                                <span>Stock IN</span>
+                            </a>
+                            <a href="#" id="btnDetailAdjust" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center space-x-1.5">
+                                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                <span>Adjust Stock</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Top Card: Variant Overview & Stock Breakdown -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-6">
+                        
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                            <div class="flex items-center space-x-4">
+                                <img id="detailImg" src="" alt="Product" class="w-16 h-16 rounded-2xl object-cover border border-slate-700 bg-slate-900 flex-shrink-0">
+                                <div class="space-y-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border" id="detailStatusBadge">In Stock</span>
+                                        <span class="text-xs text-slate-400" id="detailBrand">Loom & Thread Co.</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-sm font-bold text-white">
+                                        <span class="w-3.5 h-3.5 rounded-full border border-slate-700 inline-block" id="detailColorSwatch"></span>
+                                        <span id="detailColorName">Black</span>
+                                        <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-xs" id="detailSize">M</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reorder Threshold Config Bar -->
+                            <div class="flex items-center space-x-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 uppercase font-mono block">Reorder Buffer</span>
+                                    <span class="text-slate-200">Alert threshold level</span>
+                                </div>
+                                <div class="flex items-center space-x-1.5">
+                                    <input type="number" min="1" max="99" id="inputLowStockLevel" class="w-16 px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono text-center focus:outline-none focus:border-blue-500">
+                                    <button id="btnSaveThreshold" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold transition" title="Update threshold">Save</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Stock Breakdown Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                                <span class="text-[11px] text-blue-400 font-semibold uppercase font-mono block">Current Stock</span>
+                                <div class="text-2xl font-extrabold text-white font-mono" id="breakdownCurrent">0</div>
+                                <span class="text-[10px] text-slate-500">Physical units on hand</span>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                                <span class="text-[11px] text-emerald-400 font-semibold uppercase font-mono block">Available Stock</span>
+                                <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="breakdownAvailable">0</div>
+                                <span class="text-[10px] text-slate-500">Ready for POS & B2B sale</span>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                                <span class="text-[11px] text-amber-400 font-semibold uppercase font-mono block">Reserved Stock</span>
+                                <div class="text-2xl font-bold text-slate-400 font-mono" id="breakdownReserved">0</div>
+                                <span class="text-[10px] text-slate-500">Allocated to pending orders</span>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                                <span class="text-[11px] text-purple-400 font-semibold uppercase font-mono block">Incoming Stock</span>
+                                <div class="text-2xl font-bold text-slate-400 font-mono" id="breakdownIncoming">0</div>
+                                <span class="text-[10px] text-slate-500">Supplier POs in transit</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Stock Movement History Ledger -->
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl space-y-3">
+                        <div class="p-4 sm:p-5 border-b border-slate-800 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                    <i data-lucide="history" class="w-4 h-4 text-blue-400"></i>
+                                    <span>Stock Movement History Ledger</span>
+                                </h3>
+                                <p class="text-xs text-slate-400">Complete chronological audit trail of all IN, OUT, and Adjustment transactions for this SKU.</p>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-500 uppercase">AUDIT TRAIL</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Date & Time</th>
+                                        <th class="py-3 px-3">Type</th>
+                                        <th class="py-3 px-3">Reference</th>
+                                        <th class="py-3 px-3 text-center">Movement</th>
+                                        <th class="py-3 px-3 text-center">Qty</th>
+                                        <th class="py-3 px-3 text-center">Previous</th>
+                                        <th class="py-3 px-3 text-center font-bold text-slate-200">New Stock</th>
+                                        <th class="py-3 px-4">Reason / Notes</th>
+                                        <th class="py-3 px-4 text-right">User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="movementLedgerBody" class="divide-y divide-slate-800/60 font-mono">
+                                    <!-- Dynamic Movement Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Stock Ledger Detail</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { inventoryService } from './assets/js/services/inventoryService.js';
+        import { stockMovementService } from './assets/js/services/stockMovementService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.INVENTORY_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const canManage = authService.hasPermission(PERMISSIONS.INVENTORY_MANAGE);
+        const canAdjust = authService.hasPermission(PERMISSIONS.INVENTORY_ADJUST);
+
+        let currentVariant = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'inventory');
+            initTopbar('topbarMount');
+
+            if (!canManage) {
+                const inBtn = document.getElementById('btnDetailStockIn');
+                if (inBtn) inBtn.style.display = 'none';
+            }
+            if (!canAdjust) {
+                const adjBtn = document.getElementById('btnDetailAdjust');
+                if (adjBtn) adjBtn.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const variantId = urlParams.get('variantId');
+
+            if (!variantId) {
+                window.location.href = './inventory.html';
+                return;
+            }
+
+            await loadVariantDetails(variantId);
+            attachThresholdSaveEvent();
+        });
+
+        async function loadVariantDetails(variantId) {
+            currentVariant = await inventoryService.getInventoryVariant(variantId);
+
+            if (!currentVariant) {
+                document.getElementById('loadingPlaceholder').innerHTML = `
+                    <div class="text-red-400 font-bold mb-2">Variant Inventory Record Not Found</div>
+                    <a href="./inventory.html" class="text-blue-400 text-xs hover:underline">Return to Inventory</a>
+                `;
+                return;
+            }
+
+            // Populate header
+            document.getElementById('headerProdName').textContent = currentVariant.productName;
+            document.getElementById('headerSku').textContent = currentVariant.sku;
+            document.getElementById('headerBarcode').textContent = currentVariant.barcode;
+            document.getElementById('headerCategory').textContent = currentVariant.category;
+
+            document.getElementById('btnDetailStockIn').href = `./stock-in.html?variantId=${currentVariant.productVariantId}`;
+            document.getElementById('btnDetailAdjust').href = `./stock-adjustment.html?variantId=${currentVariant.productVariantId}`;
+
+            // Populate overview
+            document.getElementById('detailImg').src = currentVariant.primaryImage || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=80&q=80';
+            document.getElementById('detailBrand').textContent = currentVariant.brand;
+            document.getElementById('detailColorSwatch').style.backgroundColor = currentVariant.colorHex || '#111827';
+            document.getElementById('detailColorName').textContent = currentVariant.color;
+            document.getElementById('detailSize').textContent = currentVariant.size;
+            document.getElementById('inputLowStockLevel').value = currentVariant.lowStockLevel || 5;
+
+            // Status Badge
+            const badge = document.getElementById('detailStatusBadge');
+            badge.textContent = currentVariant.status;
+            badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                currentVariant.status === 'In Stock' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                currentVariant.status === 'Low Stock' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                'bg-red-500/10 text-red-400 border-red-500/20'
+            }`;
+
+            // Stock Breakdown
+            document.getElementById('breakdownCurrent').textContent = currentVariant.currentStock;
+            document.getElementById('breakdownAvailable').textContent = currentVariant.currentStock;
+            document.getElementById('breakdownReserved').textContent = currentVariant.reservedStock || 0;
+            document.getElementById('breakdownIncoming').textContent = currentVariant.incomingStock || 0;
+
+            // Load Movements
+            const movements = await stockMovementService.getMovementsForVariant(currentVariant.productVariantId);
+            renderMovementLedger(movements);
+
+            document.getElementById('loadingPlaceholder').classList.add('hidden');
+            document.getElementById('detailContainer').classList.remove('hidden');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderMovementLedger(movements) {
+            const tbody = document.getElementById('movementLedgerBody');
+
+            if (movements.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                            No recorded movements found for this product variant.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = movements.map(m => {
+                const isOut = m.movementType === 'STOCK_OUT' || m.movementType === 'ADJUSTMENT_OUT';
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 text-slate-400">${m.createdDate}</td>
+                        <td class="py-3 px-3">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-sans font-semibold border ${
+                                m.movementType === 'OPENING' ? 'bg-blue-500/10 text-blue-300 border-blue-500/20' :
+                                m.movementType === 'STOCK_IN' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' :
+                                m.movementType === 'STOCK_OUT' ? 'bg-red-500/10 text-red-300 border-red-500/20' :
+                                'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
+                            }">
+                                ${m.referenceType}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3 text-slate-300 font-bold">${m.referenceId}</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2 py-0.5 rounded font-bold text-[11px] ${isOut ? 'bg-red-500/20 text-red-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                                ${isOut ? 'OUT' : 'IN'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3 text-center font-bold ${isOut ? 'text-red-400' : 'text-emerald-400'}">
+                            ${isOut ? `-${m.quantity}` : `+${m.quantity}`}
+                        </td>
+                        <td class="py-3 px-3 text-center text-slate-400">${m.previousStock}</td>
+                        <td class="py-3 px-3 text-center font-bold text-white">${m.newStock}</td>
+                        <td class="py-3 px-4 font-sans text-slate-300 max-w-xs truncate">
+                            <span class="font-semibold">${m.reason}</span>
+                            ${m.notes ? `<span class="text-slate-500 text-[11px] block">${m.notes}</span>` : ''}
+                        </td>
+                        <td class="py-3 px-4 text-right font-sans text-slate-400">${m.createdBy}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function attachThresholdSaveEvent() {
+            document.getElementById('btnSaveThreshold').addEventListener('click', async () => {
+                const newLevel = document.getElementById('inputLowStockLevel').value;
+                const res = await inventoryService.updateLowStockLevel(currentVariant.productVariantId, newLevel);
+                if (res.success) {
+                    currentVariant.lowStockLevel = res.lowStockLevel;
+                    currentVariant.status = res.status;
+                    const badge = document.getElementById('detailStatusBadge');
+                    badge.textContent = res.status;
+                    badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                        res.status === 'In Stock' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        res.status === 'Low Stock' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                        'bg-red-500/10 text-red-400 border-red-500/20'
+                    }`;
+                    showToast('Reorder threshold updated successfully!', 'success');
+                } else {
+                    showToast(res.message || 'Error updating threshold.', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

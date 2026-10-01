@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Templates Library — CLOTHERP</title>
+    <meta name="description" content="Manage WhatsApp, SMS, and Email communication templates with dynamic variable placeholders in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./crm.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">CRM</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Templates</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="file-code" class="w-6 h-6 text-blue-400"></i>
+                            <span>Communication Templates Library</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Standardized message formats for WhatsApp, SMS, and Email with dynamic client merging.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./communications.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                            <span>Communications Center</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Template Variables Reference Bar -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                        <i data-lucide="variable" class="w-3.5 h-3.5 text-blue-400"></i>
+                        <span>Available Dynamic Variables:</span>
+                    </span>
+                    <div class="flex flex-wrap gap-2 text-xs font-mono">
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{customerName}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{invoiceNumber}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{invoiceAmount}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{dueDate}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{quotationNumber}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{lrNumber}}</span>
+                        <span class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">{{companyName}}</span>
+                    </div>
+                </div>
+
+                <!-- Templates Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="templatesContainer">
+                    <!-- Dynamic Cards -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Sales Automation</div>
+                <div class="font-mono text-[11px] text-slate-600">Template Variable Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.TEMPLATES_MANAGE });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'communication-templates');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadTemplates();
+        });
+
+        async function loadTemplates() {
+            const templates = await crmService.getTemplates();
+            const container = document.getElementById('templatesContainer');
+
+            container.innerHTML = templates.map(t => {
+                let preview = t.body;
+                preview = preview.replace('{{customerName}}', 'Royal Fashion Boutique');
+                preview = preview.replace('{{companyName}}', 'CLOTHERP Fabrics');
+                preview = preview.replace('{{invoiceAmount}}', '52,500');
+                preview = preview.replace('{{invoiceNumber}}', 'INV-2026-00001');
+                preview = preview.replace('{{dueDate}}', '2026-08-30');
+                preview = preview.replace('{{quotationNumber}}', 'QTN-2026-00001');
+                preview = preview.replace('{{transporterName}}', 'Mahalaxmi Cargo');
+                preview = preview.replace('{{lrNumber}}', 'LR-98124');
+                preview = preview.replace('{{deliveryDate}}', '2026-09-02');
+                preview = preview.replace('{{contactPerson}}', 'Anjali Sharma');
+                preview = preview.replace('{{salespersonName}}', 'Rohan Mehta');
+
+                return `
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-start justify-between">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                    t.channel === 'WHATSAPP' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                }">${t.channel}</span>
+                                <span class="text-[10px] text-slate-500 font-mono">${t.category}</span>
+                            </div>
+                            <h3 class="text-sm font-bold text-white">${t.name}</h3>
+                            ${t.subject ? `<div class="text-[11px] font-semibold text-blue-300">Subject: ${t.subject}</div>` : ''}
+                            
+                            <div class="p-3 bg-slate-950/70 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">
+                                ${preview}
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500 font-mono">
+                            <span>Ready for Automated Dispatch</span>
+                            <span class="text-emerald-400 font-bold">Active ✓</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

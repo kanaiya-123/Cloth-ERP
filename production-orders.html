@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Orders & Garment Batches — CLOTHERP</title>
+    <meta name="description" content="Track garment manufacturing batches, stage progress, cutting matrix, and finished goods intake in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./manufacturing.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Manufacturing</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Production Orders</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="layers" class="w-6 h-6 text-blue-400"></i>
+                            <span>Garment Production Orders</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Manage manufacturing work orders, material issues, stage progress, and finished goods intake.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./boms.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                            <span>BOM Master</span>
+                        </a>
+
+                        <a href="./create-production.html" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Create Production Order</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Orders</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalOrders">0</div>
+                        <span class="text-[10px] text-slate-500">All Factory Batches</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">In Production</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiInProduction">0</div>
+                        <span class="text-[10px] text-slate-500">Assembly & Stitching WIP</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Planned / Draft</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiPlanned">0</div>
+                        <span class="text-[10px] text-slate-500">Awaiting Material Issue</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Completed</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiCompleted">0</div>
+                        <span class="text-[10px] text-slate-500">Credited to Warehouse</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="prodSearchInput" 
+                            placeholder="Search order #, product, or BOM..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="prodStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="In Production">In Production</option>
+                            <option value="Planned">Planned</option>
+                            <option value="Quality Checked">Quality Checked</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+
+                        <select id="prodPriorityFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Priorities</option>
+                            <option value="CRITICAL">Critical Priority</option>
+                            <option value="HIGH">High Priority</option>
+                            <option value="NORMAL">Normal Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Production Orders Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Order #</th>
+                                    <th class="py-3 px-4">Garment Product</th>
+                                    <th class="py-3 px-4">BOM Spec</th>
+                                    <th class="py-3 px-4 text-center">Batch Output</th>
+                                    <th class="py-3 px-4">Stage Progress</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4">Target Date</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="prodTableBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="p-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span id="showingCount">Showing 0 of 0 orders</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Manufacturing Operations</div>
+                <div class="font-mono text-[11px] text-slate-600">Production Workflow Hub</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { productionService } from './assets/js/services/productionService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PRODUCTION_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentPage = 1;
+        const pageSize = 12;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'production-orders');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadProductionOrders();
+            attachEvents();
+        });
+
+        async function loadProductionOrders() {
+            const search = document.getElementById('prodSearchInput').value;
+            const status = document.getElementById('prodStatusFilter').value;
+            const priority = document.getElementById('prodPriorityFilter').value;
+
+            const res = await productionService.getProductionOrders({
+                page: currentPage,
+                pageSize,
+                search,
+                status,
+                priority
+            });
+
+            document.getElementById('kpiTotalOrders').textContent = res.summary.totalOrders;
+            document.getElementById('kpiInProduction').textContent = res.summary.inProductionCount;
+            document.getElementById('kpiPlanned').textContent = res.summary.plannedCount;
+            document.getElementById('kpiCompleted').textContent = res.summary.completedCount;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(orders, pagination) {
+            const tbody = document.getElementById('prodTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${orders.length} of ${pagination.totalItems} orders`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-slate-500">
+                            <i data-lucide="layers" class="w-6 h-6 mx-auto mb-2 text-slate-600"></i>
+                            <p class="font-bold text-slate-300">No production orders found</p>
+                            <p class="text-xs text-slate-500">Initiate a new garment production batch to begin tracking.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = orders.map(p => {
+                    const completedStages = (p.stages || []).filter(s => s.status === 'COMPLETED').length;
+                    const totalStages = (p.stages || []).length || 5;
+                    const pct = Math.round((completedStages / totalStages) * 100);
+
+                    const statusBadge = 
+                        p.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        p.status === 'In Production' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                        p.status === 'Quality Checked' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
+                        'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+                    return `
+                        <tr class="hover:bg-slate-850/60 transition">
+                            <td class="py-3.5 px-4 font-mono font-bold text-blue-400">
+                                <a href="./production-details.html?id=${p.id}" class="hover:underline flex items-center space-x-1">
+                                    <span>${p.productionOrderNumber}</span>
+                                    <i data-lucide="external-link" class="w-3 h-3 text-slate-500"></i>
+                                </a>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <div class="font-bold text-white">${p.productName}</div>
+                                <div class="text-[10px] text-slate-500 font-mono">${p.variantName}</div>
+                            </td>
+                            <td class="py-3.5 px-4 font-mono text-slate-400">${p.bomNumber} (${p.bomVersion})</td>
+                            <td class="py-3.5 px-4 text-center font-mono font-bold text-slate-200">
+                                ${p.plannedQuantity} pcs
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <div class="w-32 space-y-1">
+                                    <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                                        <span>${completedStages}/${totalStages} Stages</span>
+                                        <span>${pct}%</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-500 rounded-full" style="width: ${pct}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusBadge}">${p.status}</span>
+                            </td>
+                            <td class="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+                                ${p.expectedCompletionDate}
+                            </td>
+                            <td class="py-3.5 px-4 text-right">
+                                <a href="./production-details.html?id=${p.id}" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition inline-flex items-center space-x-1">
+                                    <span>Manage</span>
+                                    <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachEvents() {
+            document.getElementById('prodSearchInput').addEventListener('input', () => { currentPage = 1; loadProductionOrders(); });
+            document.getElementById('prodStatusFilter').addEventListener('change', () => { currentPage = 1; loadProductionOrders(); });
+            document.getElementById('prodPriorityFilter').addEventListener('change', () => { currentPage = 1; loadProductionOrders(); });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadProductionOrders();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadProductionOrders();
+            });
+        }
+    </script>
+</body>
+</html>

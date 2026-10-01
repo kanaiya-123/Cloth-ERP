@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120">
+  <defs>
+    <linearGradient id="logoGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="foldGradDark" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(15, 12)">
+    <path d="M48 6 L84 26 L84 70 L48 90 L12 70 L12 26 Z" fill="url(#logoGradDark)" />
+    <path d="M48 18 L74 33 L74 63 L48 78 L22 63 L22 33 Z" fill="#090d16" opacity="0.9" />
+    <path d="M48 18 L74 33 L48 48 L22 33 Z" fill="url(#foldGradDark)" />
+    <path d="M48 48 L74 63 L48 78 L22 63 Z" fill="url(#logoGradDark)" opacity="0.9" />
+    <circle cx="48" cy="48" r="4.5" fill="#38bdf8" />
+  </g>
+
+  <text x="125" y="68" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-weight="900" font-size="44" fill="#ffffff" letter-spacing="1">CLOTH</text>
+  <text x="300" y="68" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-weight="900" font-size="44" fill="#60a5fa" letter-spacing="2">ERP</text>
+  <text x="127" y="94" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="12" fill="#94a3b8" letter-spacing="3.5">CLOTHING BUSINESS ERP</text>
+
+  <rect x="420" y="38" width="55" height="18" rx="5" fill="#3b82f6" opacity="0.25" />
+  <text x="447" y="51" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="9" fill="#93c5fd" text-anchor="middle" letter-spacing="0.5">INDIA</text>
+</svg>

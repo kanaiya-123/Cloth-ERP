@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Order Details & Floor Execution — CLOTHERP</title>
+    <meta name="description" content="Manage material issues, production stage progress, quality check, and finished goods intake in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto" id="prodDetailsMain">
+                
+                <!-- Page Header & Action Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./production-orders.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Production Orders</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono" id="prodBreadcrumb">PROD-...</span>
+                        </div>
+                        <div class="flex items-center space-x-3 mt-1">
+                            <h1 class="text-2xl font-extrabold text-white" id="prodHeading">Garment Production Order</h1>
+                            <span id="prodStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border">...</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Recipe: <span id="prodBomText" class="text-slate-200 font-medium">BOM-...</span></p>
+                    </div>
+
+                    <!-- Dynamic Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-2" id="prodActionButtons">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Planned Batch</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="cardPlannedQty">0 pcs</div>
+                        <span class="text-[10px] text-slate-500 font-mono" id="cardProductName">...</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Material Status</span>
+                        <div class="text-sm font-bold text-blue-300" id="cardMaterialStatus">Issued to WIP</div>
+                        <span class="text-[10px] text-slate-500 font-mono" id="cardIssueNumber">MI-...</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Quality Passed</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="cardAcceptedQty">0 pcs</div>
+                        <span class="text-[10px] text-slate-500 font-mono" id="cardRejectedQty">0 pcs Rejected</span>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Unit Production Cost</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="cardUnitCost">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Materials + Assembly Labor</span>
+                    </div>
+                </div>
+
+                <!-- TABS BAR -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 text-xs font-semibold">
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-blue-500 text-white flex items-center space-x-1.5" data-tab="stagesTab">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        <span>Production Stages & Cutting Matrix</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="materialsTab">
+                        <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
+                        <span>Raw Material Issue & Consumption</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="costingTab">
+                        <i data-lucide="circle-dollar-sign" class="w-3.5 h-3.5"></i>
+                        <span>Production Costing Breakdown</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="activityTab">
+                        <i data-lucide="history" class="w-3.5 h-3.5"></i>
+                        <span>Audit Log</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: PRODUCTION STAGES -->
+                <div id="stagesTab" class="tab-content space-y-5">
+                    
+                    <!-- Cutting Size Matrix Breakdown -->
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <span class="text-xs font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-2">
+                            <i data-lucide="ruler" class="w-4 h-4 text-purple-400"></i>
+                            <span>Garment Size & Variant Matrix Distribution</span>
+                        </span>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs" id="sizeMatrixGrid">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Production Stages Sequence -->
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                        <span class="text-xs font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-400"></i>
+                            <span>Factory Floor Assembly Stages</span>
+                        </span>
+
+                        <div class="space-y-3" id="stagesContainer">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: RAW MATERIALS ISSUE -->
+                <div id="materialsTab" class="tab-content hidden space-y-4">
+                    <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="text-xs font-bold text-white flex items-center space-x-2">
+                                <i data-lucide="package" class="w-4 h-4 text-amber-400"></i>
+                                <span>Issued Raw Materials & Trims</span>
+                            </span>
+                            <span class="text-xs font-mono text-slate-400" id="matIssueDetails">Warehouse: Central Depot</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Raw Material</th>
+                                        <th class="py-2.5 px-3">Category</th>
+                                        <th class="py-2.5 px-3 text-center">Unit</th>
+                                        <th class="py-2.5 px-3 text-center">Issued Qty</th>
+                                        <th class="py-2.5 px-3 text-right">Est. Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60" id="issuedMaterialsBody">
+                                    <!-- Injected dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: COSTING -->
+                <div id="costingTab" class="tab-content hidden space-y-4">
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <span class="text-xs font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-3">
+                            <i data-lucide="circle-dollar-sign" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Production Costing & Unit Economics</span>
+                        </span>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                                <span class="text-[11px] text-slate-500 font-semibold uppercase block">Cost Component Breakdown</span>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Raw Materials & Trims:</span>
+                                    <span class="font-mono font-bold text-white" id="costRawMat">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Cutting & Stitching Labor:</span>
+                                    <span class="font-mono text-slate-300" id="costLabor">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Outsource Job Work:</span>
+                                    <span class="font-mono text-slate-300" id="costJobWork">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Finishing & Packaging:</span>
+                                    <span class="font-mono text-slate-300" id="costPkg">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                                <span class="text-[11px] text-slate-500 font-semibold uppercase block">Output Unit Economics</span>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Total Batch Cost:</span>
+                                    <span class="font-mono font-bold text-emerald-400" id="costTotal">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Planned Quantity:</span>
+                                    <span class="font-mono text-slate-200" id="costQty">0 pcs</span>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-slate-800">
+                                    <span class="text-slate-300 font-bold">Cost per Finished Garment:</span>
+                                    <span class="font-mono font-extrabold text-blue-400 text-sm" id="costPerUnitDisplay">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: ACTIVITY -->
+                <div id="activityTab" class="tab-content hidden space-y-4">
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <span class="text-xs font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-3">
+                            <i data-lucide="history" class="w-4 h-4 text-purple-400"></i>
+                            <span>Production History & Floor Audit Trail</span>
+                        </span>
+                        <div class="space-y-4" id="prodActivityTimeline"></div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Manufacturing Operations</div>
+                <div class="font-mono text-[11px] text-slate-600">Garment Batch Execution Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: QUALITY CHECK -->
+    <div id="qcModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="clipboard-check" class="w-4 h-4 text-teal-400"></i>
+                    <span>Quality Inspection Record</span>
+                </h3>
+                <button id="btnCloseQcModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="qcForm" class="space-y-3" novalidate>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Accepted Quantity (Pcs) *</label>
+                    <input type="number" id="qcAcceptedInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Rejected Quantity (Pcs)</label>
+                    <input type="number" id="qcRejectedInput" value="0" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Rework Required (Pcs)</label>
+                    <input type="number" id="qcReworkInput" value="0" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelQc" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Inspection</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: FINISHED GOODS RECEIPT -->
+    <div id="receiptModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="package-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Receive Finished Goods into Warehouse</span>
+                </h3>
+                <button id="btnCloseReceiptModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300">
+                This will execute <strong class="text-emerald-400 font-mono">PRODUCTION_RECEIPT</strong> stock intake into finished goods warehouse inventory and complete the batch.
+            </p>
+
+            <form id="receiptForm" class="space-y-3" novalidate>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Receipt Quantity (Pcs) *</label>
+                    <input type="number" id="receiptQtyInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelReceipt" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check-check" class="w-4 h-4"></i>
+                        <span>Confirm Receipt</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { productionService } from './assets/js/services/productionService.js';
+        import { bomService } from './assets/js/services/bomService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PRODUCTION_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const params = new URLSearchParams(window.location.search);
+        const prodId = params.get('id') || 'PROD-000001';
+        let currentOrder = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'production-orders');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadOrderDetails();
+            setupTabs();
+            attachModalEvents();
+        });
+
+        async function loadOrderDetails() {
+            currentOrder = await productionService.getProductionOrderById(prodId);
+            if (!currentOrder) {
+                document.getElementById('prodDetailsMain').innerHTML = `
+                    <div class="glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <i data-lucide="alert-octagon" class="w-8 h-8 mx-auto mb-2 text-red-400"></i>
+                        <p class="text-sm font-bold text-slate-200">Production Order Not Found</p>
+                        <a href="./production-orders.html" class="mt-3 inline-block px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold">Back to Orders</a>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            document.getElementById('prodBreadcrumb').textContent = currentOrder.productionOrderNumber;
+            document.getElementById('prodHeading').textContent = `${currentOrder.title}`;
+            document.getElementById('prodBomText').textContent = `${currentOrder.bomNumber} (${currentOrder.bomVersion}) • ${currentOrder.productName}`;
+
+            // Status Badge
+            const badgeEl = document.getElementById('prodStatusBadge');
+            badgeEl.textContent = currentOrder.status;
+            badgeEl.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+                currentOrder.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                currentOrder.status === 'In Production' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                'bg-amber-500/10 text-amber-400 border-amber-500/20'
+            }`;
+
+            // Cards
+            document.getElementById('cardPlannedQty').textContent = `${currentOrder.plannedQuantity} pcs`;
+            document.getElementById('cardProductName').textContent = currentOrder.productName;
+            document.getElementById('cardMaterialStatus').textContent = currentOrder.materialsIssued ? 'Issued to WIP' : 'Awaiting Issue';
+            document.getElementById('cardIssueNumber').textContent = currentOrder.materialIssueNumber || 'Pending';
+            document.getElementById('cardAcceptedQty').textContent = `${currentOrder.acceptedQuantity || 0} pcs`;
+            document.getElementById('cardRejectedQty').textContent = `${currentOrder.rejectedQuantity || 0} pcs Rejected`;
+            document.getElementById('cardUnitCost').textContent = `₹${(currentOrder.costing ? currentOrder.costing.unitCost : 0).toFixed(2)}`;
+
+            // Costing Tab
+            if (currentOrder.costing) {
+                document.getElementById('costRawMat').textContent = `₹${(currentOrder.costing.actualRawMaterialCost || 0).toLocaleString('en-IN')}`;
+                document.getElementById('costLabor').textContent = `₹${(currentOrder.costing.inHouseLaborCost || 0).toLocaleString('en-IN')}`;
+                document.getElementById('costJobWork').textContent = `₹${(currentOrder.costing.jobWorkCharges || 0).toLocaleString('en-IN')}`;
+                document.getElementById('costPkg').textContent = `₹${(currentOrder.costing.packagingCost || 0).toLocaleString('en-IN')}`;
+                document.getElementById('costTotal').textContent = `₹${(currentOrder.costing.totalProductionCost || 0).toLocaleString('en-IN')}`;
+                document.getElementById('costQty').textContent = `${currentOrder.plannedQuantity} pcs`;
+                document.getElementById('costPerUnitDisplay').textContent = `₹${(currentOrder.costing.unitCost || 0).toFixed(2)} / pc`;
+            }
+
+            renderActionButtons();
+            renderSizeMatrix();
+            renderStages();
+            await renderMaterials();
+            renderActivityTimeline();
+        }
+
+        function renderActionButtons() {
+            const container = document.getElementById('prodActionButtons');
+            let html = '';
+
+            if (!currentOrder.materialsIssued) {
+                html += `
+                    <button id="btnIssueMaterials" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                        <span>Issue Raw Materials to WIP</span>
+                    </button>
+                `;
+            } else if (currentOrder.status === 'In Production') {
+                html += `
+                    <button id="btnOpenQcModal" class="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>
+                        <span>Quality Inspection</span>
+                    </button>
+                `;
+            } else if (currentOrder.status === 'Quality Checked') {
+                html += `
+                    <button id="btnOpenReceiptModal" class="btn-primary px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="package-check" class="w-3.5 h-3.5"></i>
+                        <span>Receive Finished Goods (${currentOrder.acceptedQuantity} pcs)</span>
+                    </button>
+                `;
+            }
+
+            html += `
+                <button onclick="window.print()" class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 hover:text-white transition" title="Print Production Job Card">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+            if (window.lucide) lucide.createIcons();
+            attachLifecycleActions();
+        }
+
+        function renderSizeMatrix() {
+            const grid = document.getElementById('sizeMatrixGrid');
+            grid.innerHTML = (currentOrder.sizeMatrix || []).map(m => `
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-1">
+                    <span class="font-bold text-white text-xs block font-mono">Size ${m.size}</span>
+                    <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                        <span>Planned: <strong class="text-slate-200">${m.planned}</strong></span>
+                        <span>Cut: <strong class="text-blue-400">${m.cut || m.planned}</strong></span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderStages() {
+            const container = document.getElementById('stagesContainer');
+            container.innerHTML = (currentOrder.stages || []).map((s, idx) => `
+                <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs font-mono ${
+                            s.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                            s.status === 'IN_PROGRESS' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                            'bg-slate-800 text-slate-500'
+                        }">${idx + 1}</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${s.name}</h4>
+                            <span class="text-[10px] text-slate-400 font-mono">${s.operator ? `Operator: ${s.operator}` : 'Awaiting Floor Assignment'}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 self-end sm:self-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            s.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            s.status === 'IN_PROGRESS' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            'bg-slate-800 text-slate-400 border-slate-700'
+                        }">${s.status.replace('_', ' ')}</span>
+
+                        ${s.status === 'IN_PROGRESS' ? `
+                            <button class="btn-complete-stage px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition" data-index="${idx}">
+                                Complete Stage
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+
+            document.querySelectorAll('.btn-complete-stage').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const idx = parseInt(btn.getAttribute('data-index'));
+                    await productionService.updateStageProgress(currentOrder.id, idx, {
+                        status: 'COMPLETED',
+                        outputQty: currentOrder.plannedQuantity,
+                        operator: user.name
+                    }, user.name);
+                    showToast('Stage marked as completed!', 'success');
+                    await loadOrderDetails();
+                });
+            });
+        }
+
+        async function renderMaterials() {
+            const bom = await bomService.getBomById(currentOrder.bomId);
+            const tbody = document.getElementById('issuedMaterialsBody');
+            if (!bom) return;
+
+            const ratio = currentOrder.plannedQuantity / bom.outputQuantity;
+            tbody.innerHTML = (bom.materialLines || []).map(line => `
+                <tr class="hover:bg-slate-850/40 transition">
+                    <td class="py-2.5 px-3 font-semibold text-white">${line.rawMaterialName}</td>
+                    <td class="py-2.5 px-3 text-slate-400">${line.rawMaterialCategory}</td>
+                    <td class="py-2.5 px-3 text-center font-mono text-slate-300">${line.unit}</td>
+                    <td class="py-2.5 px-3 text-center font-mono font-bold text-blue-400">${(line.totalRequiredQuantity * ratio).toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">₹${((line.totalRequiredQuantity * ratio) * line.unitCost).toLocaleString('en-IN')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderActivityTimeline() {
+            const container = document.getElementById('prodActivityTimeline');
+            container.innerHTML = (currentOrder.activity || []).map(a => `
+                <div class="flex items-start space-x-3 text-xs">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                    </div>
+                    <div class="space-y-0.5">
+                        <p class="text-slate-200 font-medium">${a.action}</p>
+                        <div class="text-[10px] text-slate-500 font-mono">By <strong class="text-slate-400">${a.user}</strong> • ${a.time}</div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachLifecycleActions() {
+            const btnIssue = document.getElementById('btnIssueMaterials');
+            if (btnIssue) {
+                btnIssue.addEventListener('click', async () => {
+                    const res = await productionService.issueMaterials(currentOrder.id, user.name);
+                    if (res.success) {
+                        showToast('Materials issued to WIP! Order moved to In Production.', 'success');
+                        await loadOrderDetails();
+                    } else {
+                        showToast(res.message, 'error');
+                    }
+                });
+            }
+
+            const btnOpenQc = document.getElementById('btnOpenQcModal');
+            if (btnOpenQc) {
+                btnOpenQc.addEventListener('click', () => {
+                    document.getElementById('qcAcceptedInput').value = currentOrder.plannedQuantity;
+                    document.getElementById('qcModal').classList.remove('hidden');
+                });
+            }
+
+            const btnOpenRec = document.getElementById('btnOpenReceiptModal');
+            if (btnOpenRec) {
+                btnOpenRec.addEventListener('click', () => {
+                    document.getElementById('receiptQtyInput').value = currentOrder.acceptedQuantity || currentOrder.plannedQuantity;
+                    document.getElementById('receiptModal').classList.remove('hidden');
+                });
+            }
+        }
+
+        function attachModalEvents() {
+            document.getElementById('btnCloseQcModal').addEventListener('click', () => document.getElementById('qcModal').classList.add('hidden'));
+            document.getElementById('btnCancelQc').addEventListener('click', () => document.getElementById('qcModal').classList.add('hidden'));
+
+            document.getElementById('qcForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const qcData = {
+                    acceptedQuantity: document.getElementById('qcAcceptedInput').value,
+                    rejectedQuantity: document.getElementById('qcRejectedInput').value,
+                    reworkQuantity: document.getElementById('qcReworkInput').value
+                };
+
+                const res = await productionService.recordQualityCheck(currentOrder.id, qcData, user.name);
+                if (res.success) {
+                    showToast('Quality Inspection saved successfully!', 'success');
+                    document.getElementById('qcModal').classList.add('hidden');
+                    await loadOrderDetails();
+                } else {
+                    showToast(res.message, 'error');
+                }
+            });
+
+            document.getElementById('btnCloseReceiptModal').addEventListener('click', () => document.getElementById('receiptModal').classList.add('hidden'));
+            document.getElementById('btnCancelReceipt').addEventListener('click', () => document.getElementById('receiptModal').classList.add('hidden'));
+
+            document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const qty = document.getElementById('receiptQtyInput').value;
+                const res = await productionService.receiveFinishedGoods(currentOrder.id, { quantity: qty }, user.name);
+                if (res.success) {
+                    showToast(`Finished Goods received (${res.pgrNumber})! Credited to warehouse stock.`, 'success');
+                    document.getElementById('receiptModal').classList.add('hidden');
+                    await loadOrderDetails();
+                } else {
+                    showToast(res.message, 'error');
+                }
+            });
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('border-blue-500', 'text-white');
+                        b.classList.add('border-transparent', 'text-slate-400');
+                    });
+                    btn.classList.add('border-blue-500', 'text-white');
+                    btn.classList.remove('border-transparent', 'text-slate-400');
+
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

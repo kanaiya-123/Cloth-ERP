@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans Matrix — CLOTHERP</title>
+    <meta name="description" content="Manage SaaS subscription tiers, limits, and module access control in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./super-admin.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Platform</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Plans</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="layers" class="w-6 h-6 text-blue-400"></i>
+                            <span>Subscription Plans & Tiers Matrix</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Configure pricing, user quotas, branch limits, and enabled ERP modules for each subscription tier.</p>
+                    </div>
+                </div>
+
+                <!-- Plans Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plansContainer">
+                    <!-- Injected dynamically -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Subscription Management</div>
+                <div class="font-mono text-[11px] text-slate-600">SaaS Plan Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { saasService } from './assets/js/services/saasService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PLATFORM_PLANS_MANAGE });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'subscription-plans');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadPlans();
+        });
+
+        async function loadPlans() {
+            const plans = await saasService.getPlans();
+            const container = document.getElementById('plansContainer');
+
+            container.innerHTML = plans.map(p => `
+                <div class="glass-card hover-lift p-6 rounded-2xl border ${
+                    p.code === 'ENTERPRISE' ? 'border-purple-500/50 shadow-2xl' : 'border-slate-800'
+                } space-y-5 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                    p.code === 'ENTERPRISE' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                }">${p.code}</span>
+                                <h3 class="text-base font-bold text-white mt-1">${p.name}</h3>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono">${p.trialDays}-Day Trial</span>
+                        </div>
+
+                        <div class="text-2xl font-extrabold text-white font-mono">
+                            ₹${p.priceMonthly.toLocaleString('en-IN')} <span class="text-xs text-slate-400 font-normal">/ month</span>
+                        </div>
+
+                        <p class="text-xs text-slate-400">${p.description}</p>
+
+                        <div class="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1.5 text-xs font-mono">
+                            <div class="flex justify-between text-slate-300">
+                                <span>Max User Seats:</span>
+                                <span class="font-bold text-white">${p.maxUsers}</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span>Max Branch Nodes:</span>
+                                <span class="font-bold text-white">${p.maxBranches}</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span>Max Warehouses:</span>
+                                <span class="font-bold text-white">${p.maxWarehouses}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-xs">
+                            <span class="text-[11px] text-slate-400 font-bold uppercase block">Included Modules:</span>
+                            <div class="flex flex-wrap gap-1">
+                                ${p.enabledModules.map(m => `
+                                    <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono">${m}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-emerald-400 font-bold">Active Tier ✓</span>
+                        <button class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-semibold">Edit Tier</button>
+                    </div>
+                </div>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

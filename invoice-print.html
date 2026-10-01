@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyPrint Document — CLOTHERP</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- html2pdf for Direct Client-side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Toolbar styles on screen */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .print-control-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #090d16;
+            border-bottom: 1px solid #1e293b;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-toolbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary-print {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .btn-primary-print:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-download-pdf {
+            background: #059669;
+            color: #ffffff;
+        }
+        .btn-download-pdf:hover {
+            background: #047857;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+        .btn-secondary:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        .doc-wrapper {
+            padding: 24px 12px 60px;
+            display: flex;
+            justify-content: center;
+            color: #000000;
+        }
+
+        #printDocumentSurface {
+            color: #000000 !important;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Hide control bar on print */
+        @media print {
+            .print-control-bar {
+                display: none !important;
+            }
+            .doc-wrapper {
+                padding: 0 !important;
+            }
+            body {
+                background: transparent !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STICKY ACTION BAR -->
+    <div class="print-control-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="javascript:window.history.back()" class="btn-toolbar btn-secondary">
+                <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+                Back to ERP
+            </a>
+            <span style="font-size: 13px; font-weight: 700; color: #ffffff;" id="docTitleLabel">CLOTHERP EasyPrint</span>
+            <span style="font-size: 11px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.3);" id="docTypeBadge">TAX INVOICE</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" id="btnToggleDocType" class="btn-toolbar btn-secondary">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                Switch to Estimate
+            </button>
+            <button type="button" id="btnPrintNow" class="btn-toolbar btn-primary-print">
+                <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                Print Document
+            </button>
+            <button type="button" id="btnDownloadPdfNow" class="btn-toolbar btn-download-pdf">
+                <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                Download PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- DOCUMENT RENDER CONTAINER -->
+    <div class="doc-wrapper">
+        <div id="printDocumentSurface">
+            <!-- Dynamic A4 content injected here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { salesService } from './assets/js/services/salesService.js';
+        import { easyPrintService } from './assets/js/services/easyPrintService.js';
+
+        let currentDoc = null;
+        let activeType = 'INVOICE';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.lucide) lucide.createIcons();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id') || 'sal_301';
+            activeType = (urlParams.get('type') || 'invoice').toUpperCase();
+            if (activeType !== 'ESTIMATE') activeType = 'INVOICE';
+
+            currentDoc = await salesService.getSaleById(id);
+            if (!currentDoc) {
+                // Try from seed estimates if not in sales
+                const estList = JSON.parse(localStorage.getItem('clotherp_estimates_data') || '[]');
+                currentDoc = estList.find(e => e.id === id || e.estimateNumber === id);
+            }
+
+            if (!currentDoc) {
+                document.getElementById('printDocumentSurface').innerHTML = `
+                    <div style="color: #f87171; padding: 40px; text-align: center; font-weight: bold;">
+                        Document with ID "${id}" could not be found in ERP database.
+                    </div>
+                `;
+                return;
+            }
+
+            renderDocument();
+
+            document.getElementById('btnPrintNow').addEventListener('click', () => {
+                easyPrintService.print(currentDoc, activeType);
+            });
+
+            document.getElementById('btnDownloadPdfNow').addEventListener('click', async () => {
+                const btn = document.getElementById('btnDownloadPdfNow');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span>Saving PDF...</span>';
+                try {
+                    await easyPrintService.downloadPdf(currentDoc, activeType);
+                } finally {
+                    btn.innerHTML = orig;
+                }
+            });
+
+            document.getElementById('btnToggleDocType').addEventListener('click', () => {
+                activeType = activeType === 'INVOICE' ? 'ESTIMATE' : 'INVOICE';
+                renderDocument();
+            });
+
+            if (urlParams.get('autoprint') === 'true') {
+                setTimeout(() => {
+                    easyPrintService.print(currentDoc, activeType);
+                }, 500);
+            }
+        });
+
+        function renderDocument() {
+            const surface = document.getElementById('printDocumentSurface');
+            const titleLabel = document.getElementById('docTitleLabel');
+            const typeBadge = document.getElementById('docTypeBadge');
+            const toggleBtn = document.getElementById('btnToggleDocType');
+
+            if (activeType === 'ESTIMATE') {
+                surface.innerHTML = easyPrintService.generateEstimateHtml(currentDoc);
+                typeBadge.innerText = 'ESTIMATE / QUOTATION';
+                typeBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+                typeBadge.style.color = '#c7d2fe';
+                titleLabel.innerText = `Estimate: ${currentDoc.saleNumber ? currentDoc.saleNumber.replace('SAL-', 'EST-') : (currentDoc.estimateNumber || 'EST-2026-0001')}`;
+                toggleBtn.innerHTML = '<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Switch to Tax Invoice';
+            } else {
+                surface.innerHTML = easyPrintService.generateInvoiceHtml(currentDoc);
+                typeBadge.innerText = 'TAX INVOICE';
+                typeBadge.style.background = 'rgba(59, 130, 246, 0.2)';
+                typeBadge.style.color = '#93c5fd';
+                titleLabel.innerText = `Invoice: ${currentDoc.invoiceNumber || currentDoc.saleNumber || 'INV-2026-0001'}`;
+                toggleBtn.innerHTML = '<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Switch to Estimate';
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

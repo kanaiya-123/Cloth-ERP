@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Sales Return — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Structured sales return builder with returnable quantity limit validations, condition selection, and GST tax reversal.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./returns.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Sales Returns</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">New Request</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Initiate Sales Return</h1>
+                        <p class="text-xs text-slate-400">Select the original sale order, specify return quantities within eligible limits, and calculate GST reversal.</p>
+                    </div>
+
+                    <a href="./returns.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+
+                <form id="createReturnForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: ORIGINAL SALE SELECTION -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono text-[11px]">1</span>
+                            <span>Original Sale Order & Customer Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            
+                            <!-- Sale Selection -->
+                            <div class="space-y-1 sm:col-span-2">
+                                <label for="selectSale" class="block text-xs font-semibold text-slate-300">Select Sale Order / Invoice <span class="text-red-400">*</span></label>
+                                <select id="selectSale" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+                                    <option value="">-- Choose Original Sale Order --</option>
+                                </select>
+                                <div id="saleError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+
+                            <!-- Return Date -->
+                            <div class="space-y-1">
+                                <label for="inputReturnDate" class="block text-xs font-semibold text-slate-300">Return Date <span class="text-red-400">*</span></label>
+                                <input type="date" id="inputReturnDate" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+                            </div>
+
+                            <!-- Customer Meta Banner -->
+                            <div class="sm:col-span-3 p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs hidden" id="customerMetaBanner">
+                                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">CUSTOMER</span>
+                                        <span class="font-bold text-white" id="infoCustName">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">MOBILE & TYPE</span>
+                                        <span class="text-slate-300 font-mono" id="infoCustContact">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">ORIGINAL INVOICE</span>
+                                        <span class="text-blue-300 font-mono font-bold" id="infoCustInvoice">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block uppercase font-mono">TAX STRUCTURE</span>
+                                        <span class="text-emerald-400 font-mono font-bold" id="infoCustTax">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: RETURN ITEMS (RETURNABLE QUANTITY VALIDATION) -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white">
+                                <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono text-[11px]">2</span>
+                                <span>Return Items & Quantity Validation</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500 font-mono">Quantities validated against previous returns</span>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-3">Garment Style & Variant</th>
+                                        <th class="py-3 px-3">SKU</th>
+                                        <th class="py-3 px-2 text-center">Sold</th>
+                                        <th class="py-3 px-2 text-center text-amber-400">Prev. Ret.</th>
+                                        <th class="py-3 px-2 text-center text-emerald-400">Eligible</th>
+                                        <th class="py-3 px-3 w-24 text-center">Return Qty</th>
+                                        <th class="py-3 px-3 text-right">Original Rate</th>
+                                        <th class="py-3 px-3 text-center">GST %</th>
+                                        <th class="py-3 px-3 text-right font-bold text-slate-200">Return Value (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="returnItemsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <tr id="emptySaleItemsRow">
+                                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                                            Please select an original sale order above to load returnable items.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="itemsError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                    </div>
+
+                    <!-- SECTION 3 & 4: RETURN REASONS, CONDITION & FINANCIAL REVERSAL -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Return Reason & Inspection Condition -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono text-[11px]">3</span>
+                                <span>Reason, Condition & Refund Preference</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <div class="space-y-1">
+                                    <label for="selectReturnReason" class="block text-xs font-semibold text-slate-300">Return Reason <span class="text-red-400">*</span></label>
+                                    <select id="selectReturnReason" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="Wrong Size">Wrong Size</option>
+                                        <option value="Wrong Color">Wrong Color</option>
+                                        <option value="Damaged Product">Damaged Product</option>
+                                        <option value="Defective Product">Defective Product</option>
+                                        <option value="Quality Issue">Quality Issue</option>
+                                        <option value="Wrong Product Received">Wrong Product Received</option>
+                                        <option value="Customer Changed Mind">Customer Changed Mind</option>
+                                        <option value="Other">Other (Requires Notes)</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="selectInitialCondition" class="block text-xs font-semibold text-slate-300">Physical Condition Reported</label>
+                                    <select id="selectInitialCondition" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="Resalable">Resalable (Restores sellable stock)</option>
+                                        <option value="Damaged">Damaged (Quarantined, does NOT add to sellable stock)</option>
+                                        <option value="Defective">Defective (Factory defect, non-sellable)</option>
+                                        <option value="Used">Used / Opened</option>
+                                    </select>
+                                    <span class="text-[10px] text-slate-500 block">Note: Damaged/defective garments will not increase sellable inventory balance.</span>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label for="selectRefundMethod" class="block text-xs font-semibold text-slate-300">Preferred Settlement Method</label>
+                                    <select id="selectRefundMethod" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                        <option value="Credit Note">Credit Note (Recommended)</option>
+                                        <option value="Cash">Cash Refund</option>
+                                        <option value="UPI">UPI Transfer</option>
+                                        <option value="Bank Transfer">Bank Transfer (NEFT)</option>
+                                        <option value="Adjustment Against Future Order">Adjustment Against Future Order</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1 pt-1">
+                                    <label for="inputReturnNotes" class="block text-xs font-semibold text-slate-300">Return Remarks / Customer Notes</label>
+                                    <textarea id="inputReturnNotes" rows="2" placeholder="Specific customer notes or reason explanation..." class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial & GST Tax Reversal Summary -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono text-[11px]">4</span>
+                                <span>Financial & GST Tax Reversal Summary</span>
+                            </div>
+
+                            <div class="space-y-2.5 text-xs">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Total Return Gross</span>
+                                    <span class="font-mono text-slate-200" id="summaryGross">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Original Line Discounts Reversal</span>
+                                    <span class="font-mono text-emerald-400" id="summaryDiscount">-₹0.00</span>
+                                </div>
+                                <div class="flex justify-between border-t border-slate-800 pt-2 font-semibold text-slate-300">
+                                    <span>Taxable Sales Reversal</span>
+                                    <span class="font-mono text-white" id="summaryTaxable">₹0.00</span>
+                                </div>
+
+                                <!-- Dynamic GST breakdown -->
+                                <div id="gstBreakdownContainer" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-[11px] font-mono">
+                                    <div class="flex justify-between text-slate-400" id="rowCGST">
+                                        <span>CGST Reversal</span>
+                                        <span id="summaryCGST">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400" id="rowSGST">
+                                        <span>SGST Reversal</span>
+                                        <span id="summarySGST">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400 hidden" id="rowIGST">
+                                        <span>IGST Reversal (Inter-State)</span>
+                                        <span id="summaryIGST">₹0.00</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between border-t border-slate-800 pt-2.5 font-bold text-base text-white">
+                                    <span>Total Return / Refund Amount</span>
+                                    <span class="font-mono text-amber-300" id="summaryGrandTotal">₹0.00</span>
+                                </div>
+
+                                <div class="flex justify-between text-[11px] text-slate-500 pt-1">
+                                    <span>Total Units Returning: <strong class="text-slate-300 font-mono" id="summaryTotalUnits">0</strong></span>
+                                    <span>Return Type: <strong class="text-blue-400 font-mono" id="summaryReturnType">Partial</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./returns.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        <button type="submit" id="btnSubmitReturn" class="btn-primary px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shadow-lg shadow-amber-500/20 transition flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Submit Sales Return Request</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Sales Return Request Form</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { salesService } from './assets/js/services/salesService.js';
+        import { salesReturnService } from './assets/js/services/salesReturnService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.RETURNS_CREATE });
+        if (!user) throw new Error('Auth required');
+
+        let allSales = [];
+        let selectedSale = null;
+        let returnableItems = [];
+        let returnItemQuantities = {};
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'returns');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            document.getElementById('inputReturnDate').value = new Date().toISOString().split('T')[0];
+
+            await loadSales();
+            attachFormEvents();
+        });
+
+        async function loadSales() {
+            const res = await salesService.getSales({ pageSize: 100 });
+            // Only confirmed, processing, dispatched, or delivered sales can be returned
+            allSales = (res.items || []).filter(s => s.status !== 'Draft' && s.status !== 'Cancelled');
+
+            const select = document.getElementById('selectSale');
+            select.innerHTML = '<option value="">-- Choose Original Sale Order --</option>' +
+                allSales.map(s => `<option value="${s.id}">${s.saleNumber} — ${s.customerName} (${s.invoiceNumber || 'No Inv'} • ₹${s.grandTotal})</option>`).join('');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const saleId = urlParams.get('saleId');
+            if (saleId) {
+                select.value = saleId;
+                await handleSaleChange(saleId);
+            }
+        }
+
+        async function handleSaleChange(saleId) {
+            selectedSale = allSales.find(s => s.id === saleId);
+            const metaBanner = document.getElementById('customerMetaBanner');
+
+            if (!selectedSale) {
+                metaBanner.classList.add('hidden');
+                document.getElementById('returnItemsTableBody').innerHTML = `
+                    <tr id="emptySaleItemsRow">
+                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                            Please select an original sale order above to load returnable items.
+                        </td>
+                    </tr>
+                `;
+                returnableItems = [];
+                returnItemQuantities = {};
+                recalculateSummary();
+                return;
+            }
+
+            // Bind Meta Banner
+            document.getElementById('infoCustName').textContent = selectedSale.customerName;
+            document.getElementById('infoCustContact').textContent = `${selectedSale.customerMobile} (${selectedSale.customerType})`;
+            document.getElementById('infoCustInvoice').textContent = selectedSale.invoiceNumber || selectedSale.saleNumber;
+            document.getElementById('infoCustTax').textContent = selectedSale.isSameState ? 'Intra-State (CGST + SGST)' : 'Inter-State (IGST)';
+            metaBanner.classList.remove('hidden');
+
+            // Load returnable items with historical deduplication
+            returnableItems = await salesReturnService.getSaleReturnableItems(selectedSale.id);
+            returnItemQuantities = {};
+            renderReturnItemsTable();
+        }
+
+        function renderReturnItemsTable() {
+            const tbody = document.getElementById('returnItemsTableBody');
+
+            if (returnableItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                            No items found for this sale order.
+                        </td>
+                    </tr>
+                `;
+                recalculateSummary();
+                return;
+            }
+
+            tbody.innerHTML = returnableItems.map((item, idx) => {
+                const returnable = item.returnableQuantity;
+                const isFullyReturned = returnable <= 0;
+                const currentQty = returnItemQuantities[item.productVariantId] || 0;
+
+                const lineGross = item.sellingRate * currentQty;
+                const unitDisc = (item.discountAmount || 0) / (item.soldQuantity || 1);
+                const lineDisc = unitDisc * currentQty;
+                const lineTaxable = lineGross - lineDisc;
+                const gstRate = item.gstRate || 5;
+                const lineTax = (lineTaxable * gstRate) / 100;
+                const lineTotal = lineTaxable + lineTax;
+
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs ${isFullyReturned ? 'opacity-40' : ''}">
+                        <td class="py-2.5 px-3">
+                            <div class="font-bold text-slate-200">${item.productName}</div>
+                            <div class="flex items-center space-x-1.5 text-[10px] text-slate-400">
+                                <span>${item.color}</span>
+                                <span>•</span>
+                                <span class="font-mono font-bold text-slate-300">${item.size}</span>
+                            </div>
+                        </td>
+                        <td class="py-2.5 px-3 font-mono text-blue-300">${item.sku}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-slate-300">${item.soldQuantity}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-amber-400 font-bold">${item.alreadyReturned}</td>
+                        <td class="py-2.5 px-2 text-center font-mono font-bold ${returnable > 0 ? 'text-emerald-400' : 'text-slate-500'}">
+                            ${returnable} pcs
+                        </td>
+                        <td class="py-2.5 px-3 text-center">
+                            ${isFullyReturned ? `
+                                <span class="text-[10px] text-slate-500 font-mono">Fully Returned</span>
+                            ` : `
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    max="${returnable}" 
+                                    value="${currentQty}" 
+                                    class="item-return-qty w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs font-mono text-center text-white focus:outline-none focus:border-amber-500" 
+                                    data-varid="${item.productVariantId}"
+                                >
+                            `}
+                        </td>
+                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">₹${item.sellingRate}</td>
+                        <td class="py-2.5 px-3 text-center font-mono text-slate-400">${item.gstRate || 5}%</td>
+                        <td class="py-2.5 px-3 text-right font-mono font-bold text-amber-300">
+                            ₹${lineTotal.toFixed(2)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.item-return-qty').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const varId = e.target.getAttribute('data-varid');
+                    const targetItem = returnableItems.find(i => i.productVariantId === varId);
+                    let val = parseInt(e.target.value) || 0;
+
+                    if (val < 0) val = 0;
+                    if (val > targetItem.returnableQuantity) {
+                        val = targetItem.returnableQuantity;
+                        e.target.value = val;
+                    }
+
+                    returnItemQuantities[varId] = val;
+                    renderReturnItemsTable();
+                });
+            });
+
+            recalculateSummary();
+        }
+
+        function recalculateSummary() {
+            if (!selectedSale || returnableItems.length === 0) {
+                document.getElementById('summaryGross').textContent = '₹0.00';
+                document.getElementById('summaryDiscount').textContent = '-₹0.00';
+                document.getElementById('summaryTaxable').textContent = '₹0.00';
+                document.getElementById('summaryGrandTotal').textContent = '₹0.00';
+                document.getElementById('summaryTotalUnits').textContent = '0';
+                return;
+            }
+
+            let totalGross = 0;
+            let totalDisc = 0;
+            let totalTaxable = 0;
+            let cgstTotal = 0;
+            let sgstTotal = 0;
+            let igstTotal = 0;
+            let totalUnits = 0;
+
+            returnableItems.forEach(item => {
+                const qty = returnItemQuantities[item.productVariantId] || 0;
+                if (qty > 0) {
+                    const lineGross = item.sellingRate * qty;
+                    const unitDisc = (item.discountAmount || 0) / (item.soldQuantity || 1);
+                    const lineDisc = unitDisc * qty;
+                    const lineTaxable = lineGross - lineDisc;
+                    const gstRate = item.gstRate || 5;
+
+                    let lineCGST = 0;
+                    let lineSGST = 0;
+                    let lineIGST = 0;
+
+                    if (selectedSale.isSameState) {
+                        lineCGST = (lineTaxable * (gstRate / 2)) / 100;
+                        lineSGST = (lineTaxable * (gstRate / 2)) / 100;
+                    } else {
+                        lineIGST = (lineTaxable * gstRate) / 100;
+                    }
+
+                    totalGross += lineGross;
+                    totalDisc += lineDisc;
+                    totalTaxable += lineTaxable;
+                    cgstTotal += lineCGST;
+                    sgstTotal += lineSGST;
+                    igstTotal += lineIGST;
+                    totalUnits += qty;
+                }
+            });
+
+            const grandTotal = totalTaxable + cgstTotal + sgstTotal + igstTotal;
+
+            document.getElementById('summaryGross').textContent = `₹${totalGross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryDiscount').textContent = `-₹${totalDisc.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryTaxable').textContent = `₹${totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+            if (selectedSale.isSameState) {
+                document.getElementById('rowCGST').classList.remove('hidden');
+                document.getElementById('rowSGST').classList.remove('hidden');
+                document.getElementById('rowIGST').classList.add('hidden');
+                document.getElementById('summaryCGST').textContent = `₹${cgstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                document.getElementById('summarySGST').textContent = `₹${sgstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            } else {
+                document.getElementById('rowCGST').classList.add('hidden');
+                document.getElementById('rowSGST').classList.add('hidden');
+                document.getElementById('rowIGST').classList.remove('hidden');
+                document.getElementById('summaryIGST').textContent = `₹${igstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            }
+
+            document.getElementById('summaryGrandTotal').textContent = `₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryTotalUnits').textContent = totalUnits;
+            document.getElementById('summaryReturnType').textContent = totalUnits >= selectedSale.totalQuantity ? 'Full Return' : 'Partial Return';
+        }
+
+        function attachFormEvents() {
+            document.getElementById('selectSale').addEventListener('change', (e) => {
+                handleSaleChange(e.target.value);
+            });
+
+            document.getElementById('createReturnForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitReturn();
+            });
+        }
+
+        async function submitReturn() {
+            const saleId = document.getElementById('selectSale').value;
+            const saleErr = document.getElementById('saleError');
+            const itemErr = document.getElementById('itemsError');
+
+            saleErr.classList.add('hidden');
+            itemErr.classList.add('hidden');
+
+            let isValid = true;
+            if (!saleId) {
+                saleErr.textContent = 'Please select an original sale order.';
+                saleErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            const itemsToReturn = [];
+            returnableItems.forEach(item => {
+                const qty = returnItemQuantities[item.productVariantId] || 0;
+                if (qty > 0) {
+                    itemsToReturn.push({
+                        saleItemId: item.id,
+                        productVariantId: item.productVariantId,
+                        returnQuantity: qty,
+                        condition: document.getElementById('selectInitialCondition').value
+                    });
+                }
+            });
+
+            if (itemsToReturn.length === 0) {
+                itemErr.textContent = 'Please specify a return quantity of at least 1 for at least one item.';
+                itemErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const reason = document.getElementById('selectReturnReason').value;
+            const notes = document.getElementById('inputReturnNotes').value.trim();
+
+            if (reason === 'Other' && !notes) {
+                itemErr.textContent = 'Please enter notes/explanation when reason is "Other".';
+                itemErr.classList.remove('hidden');
+                return;
+            }
+
+            const payload = {
+                saleId,
+                returnDate: document.getElementById('inputReturnDate').value,
+                items: itemsToReturn,
+                reason,
+                condition: document.getElementById('selectInitialCondition').value,
+                preferredRefundMethod: document.getElementById('selectRefundMethod').value,
+                notes
+            };
+
+            const res = await salesReturnService.createSalesReturn(payload, user.name);
+
+            if (res.success) {
+                showToast(`Return ${res.returnRecord.returnNumber} created successfully!`, 'success');
+                setTimeout(() => {
+                    window.location.href = `./return-details.html?id=${res.returnRecord.id}`;
+                }, 500);
+            } else {
+                showToast(res.message || 'Error creating return request.', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

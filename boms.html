@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill of Materials (BOM) — CLOTHERP</title>
+    <meta name="description" content="Manage garment recipes, raw material consumption ratios, cutting wastage allowances, and versioned BOMs in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./manufacturing.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Manufacturing</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">BOM Master</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="file-spreadsheet" class="w-6 h-6 text-blue-400"></i>
+                            <span>Bill of Materials (BOM)</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Garment production recipes, raw material consumption rates, fabric allowances, and version tracking.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./create-production.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                            <span>Plan Production</span>
+                        </a>
+
+                        <a href="./create-bom.html" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Create New BOM</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total BOMs</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalBoms">0</div>
+                        <span class="text-[10px] text-slate-500">Garment Recipes</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Active Production BOMs</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiActiveBoms">0</div>
+                        <span class="text-[10px] text-slate-500">Ready for Batch Issue</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Material Line Items</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiMaterialLines">0</div>
+                        <span class="text-[10px] text-slate-500">Fabrics, Threads & Trims</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Avg Material Cost / Pc</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono">₹483.10</div>
+                        <span class="text-[10px] text-slate-500">Standard BOM Estimation</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="bomSearchInput" 
+                            placeholder="Search BOM number, product name, or recipe..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="bomStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="ACTIVE" selected>Active Only</option>
+                            <option value="INACTIVE">Inactive Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- BOM Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="bomsContainer">
+                    <!-- Injected dynamically -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Location ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Bill of Materials Specification Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { bomService } from './assets/js/services/bomService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.BOM_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'boms');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadBoms();
+            attachEvents();
+        });
+
+        async function loadBoms() {
+            const search = document.getElementById('bomSearchInput').value;
+            const status = document.getElementById('bomStatusFilter').value;
+
+            const res = await bomService.getBoms({ search, status });
+
+            document.getElementById('kpiTotalBoms').textContent = res.summary.totalBoms;
+            document.getElementById('kpiActiveBoms').textContent = res.summary.activeCount;
+            document.getElementById('kpiMaterialLines').textContent = `${res.summary.totalItemsCount} lines`;
+
+            renderBomsGrid(res.items);
+        }
+
+        function renderBomsGrid(boms) {
+            const container = document.getElementById('bomsContainer');
+            if (boms.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <i data-lucide="file-spreadsheet" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                        <p class="text-sm font-bold text-slate-300">No BOMs found</p>
+                        <p class="text-xs text-slate-500">Create a new Bill of Materials to define fabric & trim consumption.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = boms.map(b => `
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-mono text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">${b.bomNumber}</span>
+                                        <span class="font-mono text-[10px] font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">${b.version}</span>
+                                        ${b.isDefault ? '<span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">DEFAULT RECIPE</span>' : ''}
+                                    </div>
+                                    <h3 class="text-sm font-bold text-white mt-1">${b.name}</h3>
+                                    <p class="text-xs text-slate-400">Garment: <strong class="text-slate-300">${b.productName}</strong></p>
+                                </div>
+
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    b.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                                }">${b.status}</span>
+                            </div>
+
+                            <!-- Material Line Items Preview -->
+                            <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-2">
+                                <span class="text-[10px] text-slate-500 uppercase font-mono font-semibold block">Batch Output: ${b.outputQuantity} ${b.outputUnit}</span>
+                                <div class="space-y-1.5 text-xs text-slate-300">
+                                    ${(b.materialLines || []).slice(0, 3).map(line => `
+                                        <div class="flex justify-between items-center text-[11px]">
+                                            <span class="truncate max-w-[200px] text-slate-300">• ${line.rawMaterialName}</span>
+                                            <span class="font-mono text-slate-400">${line.totalRequiredQuantity} ${line.unit} (${line.wastagePercentage}% waste)</span>
+                                        </div>
+                                    `).join('')}
+                                    ${(b.materialLines || []).length > 3 ? `
+                                        <span class="text-[10px] text-blue-400 block pt-0.5">+ ${(b.materialLines || []).length - 3} more raw material & trim components</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Costing Footprint -->
+                            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
+                                <span class="text-slate-500">Est. Material Cost:</span>
+                                <span class="font-mono font-bold text-emerald-400">₹${b.totalEstimatedMaterialCost.toLocaleString('en-IN')} (₹${b.estimatedCostPerUnit}/pc)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
+                            <a href="./create-production.html?bomId=${b.id}" class="btn-primary px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1">
+                                <i data-lucide="plus" class="w-3 h-3"></i>
+                                <span>Create Production Order</span>
+                            </a>
+
+                            <button class="btn-toggle-bom p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition" data-id="${b.id}" title="Toggle Active/Inactive">
+                                <i data-lucide="${b.status === 'ACTIVE' ? 'power-off' : 'power'}" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachCardEvents();
+        }
+
+        function attachCardEvents() {
+            document.querySelectorAll('.btn-toggle-bom').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    await bomService.toggleBomStatus(id, user.name);
+                    await loadBoms();
+                });
+            });
+        }
+
+        function attachEvents() {
+            document.getElementById('bomSearchInput').addEventListener('input', loadBoms);
+            document.getElementById('bomStatusFilter').addEventListener('change', loadBoms);
+        }
+    </script>
+</body>
+</html>

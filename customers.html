@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Manage retail, wholesale, and corporate customers in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">People & CRM</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Clients</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Customer Management</h1>
+                        <p class="text-xs text-slate-400">Manage retail buyers, wholesale distributors, GSTIN credentials, and credit ledgers.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-2">
+                        <button id="btnOpenAddModal" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-1.5">
+                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                            <span>Add Customer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Customers</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalCustomers">0</div>
+                        <span class="text-[10px] text-slate-500">Registered Client Accounts</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Active Accounts</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiActiveCustomers">0</div>
+                        <span class="text-[10px] text-slate-500">Open for Ordering</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Wholesale / B2B</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiWholesaleCount">0</div>
+                        <span class="text-[10px] text-slate-500">Distributors & Boutiques</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Avg Credit Term</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono">15-30 Days</div>
+                        <span class="text-[10px] text-slate-500">Payment settlement cycle</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="relative w-full sm:w-80">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="customerSearchInput" 
+                            placeholder="Search by name, mobile, GSTIN, city..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                        <select id="customerTypeFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Customer Types</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Wholesale">Wholesale</option>
+                            <option value="Business">Business</option>
+                        </select>
+
+                        <select id="statusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+
+                        <button id="btnClearFilters" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white border border-slate-700 text-xs transition" title="Clear filters">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customers Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/70 text-slate-400 border-b border-slate-800 uppercase font-mono text-[11px]">
+                                    <th class="py-3 px-4">Customer Name</th>
+                                    <th class="py-3 px-4">Mobile & Email</th>
+                                    <th class="py-3 px-3 text-center">Type</th>
+                                    <th class="py-3 px-4">GSTIN & Location</th>
+                                    <th class="py-3 px-3 text-center">Credit Term</th>
+                                    <th class="py-3 px-3 text-center">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400" id="paginationFooter">
+                        <span id="showingCount">Showing 0 of 0 customers</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Customers CRM Module</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- ADD / EDIT CUSTOMER MODAL -->
+    <div id="customerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="customerModalCard">
+            
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white" id="modalTitle">Add New Customer</h3>
+                        <span class="text-[10px] text-slate-400">Enter client information, address, and credit terms</span>
+                    </div>
+                </div>
+                <button id="btnCloseModal" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form id="customerForm" class="space-y-4" novalidate>
+                <input type="hidden" id="editCustomerId" value="">
+
+                <!-- Row 1: Name, Contact & Type -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="space-y-1 sm:col-span-2">
+                        <label for="inputCustName" class="block text-xs font-semibold text-slate-300">Customer / Business Name <span class="text-red-400">*</span></label>
+                        <input type="text" id="inputCustName" placeholder="e.g. Royal Fashion Boutique" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                        <div id="custNameError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="selectCustType" class="block text-xs font-semibold text-slate-300">Customer Type</label>
+                        <select id="selectCustType" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="Retail">Retail</option>
+                            <option value="Wholesale">Wholesale</option>
+                            <option value="Business">Business / Corporate</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Contact Person, Mobile, Email -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="space-y-1">
+                        <label for="inputCustContactPerson" class="block text-xs font-semibold text-slate-300">Contact Person</label>
+                        <input type="text" id="inputCustContactPerson" placeholder="e.g. Anjali Sharma" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="inputCustMobile" class="block text-xs font-semibold text-slate-300">Mobile Number <span class="text-red-400">*</span></label>
+                        <input type="text" id="inputCustMobile" placeholder="+91 98200 11223" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                        <div id="custMobileError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="inputCustEmail" class="block text-xs font-semibold text-slate-300">Email Address</label>
+                        <input type="email" id="inputCustEmail" placeholder="client@example.com" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Row 3: GSTIN & PAN -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label for="inputCustGstin" class="block text-xs font-semibold text-slate-300">GSTIN Number</label>
+                        <input type="text" id="inputCustGstin" placeholder="27AABCR1234F1Z6" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="inputCustPan" class="block text-xs font-semibold text-slate-300">PAN Number</label>
+                        <input type="text" id="inputCustPan" placeholder="AABCR1234F" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase placeholder-slate-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Row 4: Billing Address -->
+                <div class="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
+                    <div class="text-[11px] font-bold text-slate-300 uppercase font-mono">Billing Address</div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="space-y-1 sm:col-span-3">
+                            <input type="text" id="inputBillingAddr1" placeholder="Address Line 1 (Shop/Flat No., Street)" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none">
+                        </div>
+
+                        <div class="space-y-1">
+                            <input type="text" id="inputBillingCity" placeholder="City (e.g. Mumbai)" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none">
+                        </div>
+
+                        <div class="space-y-1">
+                            <input type="text" id="inputBillingState" placeholder="State (e.g. Maharashtra)" value="Maharashtra" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none">
+                        </div>
+
+                        <div class="space-y-1">
+                            <input type="text" id="inputBillingPincode" placeholder="PIN Code" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono placeholder-slate-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 5: Payment Terms & Credit Limit -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="space-y-1">
+                        <label for="selectCustTerms" class="block text-xs font-semibold text-slate-300">Payment Terms</label>
+                        <select id="selectCustTerms" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="Net 15 Days">Net 15 Days</option>
+                            <option value="Net 30 Days" selected>Net 30 Days</option>
+                            <option value="Immediate / COD">Immediate / COD</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="inputCreditLimit" class="block text-xs font-semibold text-slate-300">Credit Limit (₹)</label>
+                        <input type="number" id="inputCreditLimit" value="100000" min="0" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="inputCreditDays" class="block text-xs font-semibold text-slate-300">Credit Days</label>
+                        <input type="number" id="inputCreditDays" value="30" min="0" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Submit Area -->
+                <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+                    <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" id="btnSaveCustomer" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-2">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Customer</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { customerService } from './assets/js/services/customerService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.CUSTOMERS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const canManage = authService.hasPermission(PERMISSIONS.CUSTOMERS_MANAGE);
+
+        let currentPage = 1;
+        const pageSize = 10;
+        let loadedCustomers = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'customers');
+            initTopbar('topbarMount');
+
+            if (!canManage) {
+                const addBtn = document.getElementById('btnOpenAddModal');
+                if (addBtn) addBtn.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadCustomers();
+            attachFilterEvents();
+            attachModalEvents();
+        });
+
+        async function loadCustomers() {
+            const search = document.getElementById('customerSearchInput').value;
+            const customerType = document.getElementById('customerTypeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            const res = await customerService.getCustomers({
+                page: currentPage,
+                pageSize,
+                search,
+                customerType,
+                status
+            });
+
+            loadedCustomers = res.items || [];
+            document.getElementById('kpiTotalCustomers').textContent = res.totalCustomers;
+            document.getElementById('kpiActiveCustomers').textContent = res.activeCustomers;
+            document.getElementById('kpiWholesaleCount').textContent = res.wholesaleCustomers;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(customers, pagination) {
+            const tbody = document.getElementById('customersTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${customers.length} of ${pagination.totalItems} customers`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (customers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-500 font-sans">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-300 mb-1">No customers found</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">No client records match your active search filters.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = customers.map(c => {
+                    const city = c.billingAddress ? c.billingAddress.city : '';
+                    const state = c.billingAddress ? c.billingAddress.state : '';
+
+                    return `
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                            <td class="py-3 px-4">
+                                <div class="font-bold text-slate-200">
+                                    <a href="./customer-details.html?id=${c.id}" class="hover:text-blue-400 transition">${c.name}</a>
+                                </div>
+                                <div class="text-[10px] text-slate-500 font-mono">${c.customerCode} ${c.contactPerson ? `• ${c.contactPerson}` : ''}</div>
+                            </td>
+                            <td class="py-3 px-4 font-mono text-slate-300">
+                                <div>${c.mobile}</div>
+                                <div class="text-[10px] text-slate-500 lowercase">${c.email || ''}</div>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    c.customerType === 'Wholesale' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                    c.customerType === 'Business' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                    'bg-slate-800 text-slate-300 border-slate-700'
+                                }">
+                                    ${c.customerType}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="font-mono text-blue-300 font-bold">${c.gstin || 'Unregistered'}</div>
+                                <div class="text-[10px] text-slate-400">${city}, ${state}</div>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 font-mono text-[10px]">${c.paymentTerms || 'Net 30'}</span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                    c.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                                }">
+                                    ${c.status}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="flex items-center justify-end space-x-1">
+                                    <a href="./customer-details.html?id=${c.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="View Profile & Orders">
+                                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                    ${canManage ? `
+                                        <button class="btn-edit-cust p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition" data-id="${c.id}" title="Edit Customer">
+                                            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button class="btn-toggle-cust p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" data-id="${c.id}" title="Toggle Active/Inactive">
+                                            <i data-lucide="power" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachRowActionListeners();
+        }
+
+        function attachRowActionListeners() {
+            document.querySelectorAll('.btn-edit-cust').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const cust = loadedCustomers.find(c => c.id === id);
+                    if (cust) openModal(cust);
+                });
+            });
+
+            document.querySelectorAll('.btn-toggle-cust').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    const res = await customerService.toggleStatus(id);
+                    if (res.success) {
+                        showToast(`Customer status updated to ${res.status}`, 'success');
+                        await loadCustomers();
+                    }
+                });
+            });
+        }
+
+        function attachFilterEvents() {
+            let debounceTimer;
+            document.getElementById('customerSearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadCustomers();
+                }, 300);
+            });
+
+            document.getElementById('customerTypeFilter').addEventListener('change', () => {
+                currentPage = 1;
+                loadCustomers();
+            });
+
+            document.getElementById('statusFilter').addEventListener('change', () => {
+                currentPage = 1;
+                loadCustomers();
+            });
+
+            document.getElementById('btnClearFilters').addEventListener('click', () => {
+                document.getElementById('customerSearchInput').value = '';
+                document.getElementById('customerTypeFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                currentPage = 1;
+                loadCustomers();
+            });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadCustomers();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadCustomers();
+            });
+        }
+
+        function attachModalEvents() {
+            document.getElementById('btnOpenAddModal').addEventListener('click', () => openModal());
+            document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+            document.getElementById('customerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('inputCustName').value.trim();
+                const mobile = document.getElementById('inputCustMobile').value.trim();
+                const nameErr = document.getElementById('custNameError');
+                const mobErr = document.getElementById('custMobileError');
+
+                nameErr.classList.add('hidden');
+                mobErr.classList.add('hidden');
+
+                let isValid = true;
+                if (!name) {
+                    nameErr.textContent = 'Customer name is required.';
+                    nameErr.classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!mobile) {
+                    mobErr.textContent = 'Mobile number is required.';
+                    mobErr.classList.remove('hidden');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                const payload = {
+                    name,
+                    contactPerson: document.getElementById('inputCustContactPerson').value.trim(),
+                    mobile,
+                    email: document.getElementById('inputCustEmail').value.trim(),
+                    customerType: document.getElementById('selectCustType').value,
+                    gstin: document.getElementById('inputCustGstin').value.trim(),
+                    pan: document.getElementById('inputCustPan').value.trim(),
+                    billingAddressLine1: document.getElementById('inputBillingAddr1').value.trim(),
+                    billingCity: document.getElementById('inputBillingCity').value.trim(),
+                    billingState: document.getElementById('inputBillingState').value.trim(),
+                    billingPincode: document.getElementById('inputBillingPincode').value.trim(),
+                    paymentTerms: document.getElementById('selectCustTerms').value,
+                    creditLimit: document.getElementById('inputCreditLimit').value,
+                    creditDays: document.getElementById('inputCreditDays').value,
+                    sameAsBilling: true
+                };
+
+                const editId = document.getElementById('editCustomerId').value;
+                let res;
+                if (editId) {
+                    res = await customerService.updateCustomer(editId, payload);
+                } else {
+                    res = await customerService.createCustomer(payload);
+                }
+
+                if (res.success) {
+                    closeModal();
+                    showToast(editId ? 'Customer updated successfully!' : 'Customer created successfully!', 'success');
+                    await loadCustomers();
+                } else {
+                    showToast(res.message || 'Error saving customer.', 'error');
+                }
+            });
+        }
+
+        function openModal(cust = null) {
+            document.getElementById('customerForm').reset();
+            document.getElementById('custNameError').classList.add('hidden');
+            document.getElementById('custMobileError').classList.add('hidden');
+
+            if (cust) {
+                document.getElementById('modalTitle').textContent = `Edit Customer: ${cust.name}`;
+                document.getElementById('editCustomerId').value = cust.id;
+                document.getElementById('inputCustName').value = cust.name;
+                document.getElementById('selectCustType').value = cust.customerType || 'Retail';
+                document.getElementById('inputCustContactPerson').value = cust.contactPerson || '';
+                document.getElementById('inputCustMobile').value = cust.mobile || '';
+                document.getElementById('inputCustEmail').value = cust.email || '';
+                document.getElementById('inputCustGstin').value = cust.gstin || '';
+                document.getElementById('inputCustPan').value = cust.pan || '';
+                
+                const bAddr = cust.billingAddress || {};
+                document.getElementById('inputBillingAddr1').value = bAddr.addressLine1 || '';
+                document.getElementById('inputBillingCity').value = bAddr.city || '';
+                document.getElementById('inputBillingState').value = bAddr.state || 'Maharashtra';
+                document.getElementById('inputBillingPincode').value = bAddr.pincode || '';
+
+                document.getElementById('selectCustTerms').value = cust.paymentTerms || 'Net 30 Days';
+                document.getElementById('inputCreditLimit').value = cust.creditLimit || 100000;
+                document.getElementById('inputCreditDays').value = cust.creditDays || 30;
+            } else {
+                document.getElementById('modalTitle').textContent = 'Add New Customer';
+                document.getElementById('editCustomerId').value = '';
+                document.getElementById('inputBillingState').value = 'Maharashtra';
+            }
+
+            const modal = document.getElementById('customerModal');
+            const card = document.getElementById('customerModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customerModal');
+            const card = document.getElementById('customerModalCard');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

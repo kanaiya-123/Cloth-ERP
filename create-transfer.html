@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Stock Transfer — CLOTHERP</title>
+    <meta name="description" content="Initiate inter-branch inventory transfer and dispatch request in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./transfers.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Stock Transfers</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Create</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="arrow-left-right" class="w-6 h-6 text-blue-400"></i>
+                            <span>Create Stock Transfer Consignment</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Specify source depot, destination warehouse, line items with live stock validation, and logistics tracking.</p>
+                    </div>
+
+                    <a href="./transfers.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Back</span>
+                    </a>
+                </div>
+
+                <form id="transferForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: LOCATION ROUTE SELECTION -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="map" class="w-4 h-4 text-blue-400"></i>
+                            <span>1. Transfer Route & Warehouse Nodes</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- SOURCE -->
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
+                                <span class="text-xs font-bold text-amber-400 flex items-center space-x-1.5">
+                                    <i data-lucide="box" class="w-3.5 h-3.5"></i>
+                                    <span>Origin / Source Location</span>
+                                </span>
+
+                                <div>
+                                    <label class="block text-[11px] text-slate-400 font-medium mb-1">Source Branch *</label>
+                                    <select id="sourceBranchSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                        <!-- Injected dynamically -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] text-slate-400 font-medium mb-1">Source Warehouse *</label>
+                                    <select id="sourceWarehouseSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                        <!-- Injected dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- DESTINATION -->
+                            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
+                                <span class="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
+                                    <i data-lucide="warehouse" class="w-3.5 h-3.5"></i>
+                                    <span>Destination / Receiving Location</span>
+                                </span>
+
+                                <div>
+                                    <label class="block text-[11px] text-slate-400 font-medium mb-1">Destination Branch *</label>
+                                    <select id="destinationBranchSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                        <!-- Injected dynamically -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] text-slate-400 font-medium mb-1">Destination Warehouse *</label>
+                                    <select id="destinationWarehouseSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                        <!-- Injected dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DATES & LOGISTICS -->
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Transfer Date *</label>
+                                <input type="date" id="transferDateInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none font-mono">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Expected Delivery Date</label>
+                                <input type="date" id="expectedReceiveDateInput" required class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none font-mono">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Transport Carrier</label>
+                                <input type="text" id="transportNameInput" placeholder="VRL / SafeExpress" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">LR / Consignment No.</label>
+                                <input type="text" id="lrNumberInput" placeholder="LR-AHM-9910" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 font-mono focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: LINE ITEMS & VARIANT PICKER -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white">
+                                <i data-lucide="tag" class="w-4 h-4 text-purple-400"></i>
+                                <span>2. Garment Products & Transfer Quantities</span>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400" id="totalTransferCount">Total Items: 0 pcs</span>
+                        </div>
+
+                        <!-- Product Selector Input Bar -->
+                        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-end gap-3">
+                            <div class="flex-1">
+                                <label class="block text-[11px] text-slate-400 font-medium mb-1">Select Garment Variant to Add</label>
+                                <select id="variantPickerSelect" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                                    <!-- Injected dynamically with live available stock -->
+                                </select>
+                            </div>
+
+                            <div class="w-32">
+                                <label class="block text-[11px] text-slate-400 font-medium mb-1">Transfer Qty (Pcs)</label>
+                                <input type="number" id="itemQtyInput" min="1" value="10" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                            </div>
+
+                            <button type="button" id="btnAddItemRow" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5 flex-shrink-0">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Add to Transfer</span>
+                            </button>
+                        </div>
+
+                        <!-- Line Items Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Product Name & Variant</th>
+                                        <th class="py-2.5 px-3">SKU</th>
+                                        <th class="py-2.5 px-3 text-center">Available Stock in Origin</th>
+                                        <th class="py-2.5 px-3 text-center">Transfer Quantity</th>
+                                        <th class="py-2.5 px-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60" id="transferItemsTableBody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: NOTES -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-2">
+                        <label class="block text-xs font-semibold text-slate-300">Transfer Notes & Dispatch Remarks</label>
+                        <textarea id="transferNotesInput" rows="2" placeholder="e.g. Stock replenishment for high weekend sales demand in Surat..." class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./transfers.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        
+                        <button type="button" id="btnSaveDraft" class="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition">
+                            Save as Draft
+                        </button>
+
+                        <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-2">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Submit for Approval</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Location ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Stock Transfer Dispatch Builder</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { branchService } from './assets/js/services/branchService.js';
+        import { warehouseService } from './assets/js/services/warehouseService.js';
+        import { locationService } from './assets/js/services/locationService.js';
+        import { stockTransferService } from './assets/js/services/stockTransferService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.STOCK_TRANSFERS_CREATE });
+        if (!user) throw new Error('Auth required');
+
+        let selectedItems = [];
+        let allProducts = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'transfers');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            const future = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+            document.getElementById('transferDateInput').value = today;
+            document.getElementById('expectedReceiveDateInput').value = future;
+
+            await loadBranchesAndWarehouses();
+            await loadProductVariants();
+            attachEvents();
+        });
+
+        async function loadBranchesAndWarehouses() {
+            const branches = await branchService.getActiveBranches();
+            const srcBranchSelect = document.getElementById('sourceBranchSelect');
+            const dstBranchSelect = document.getElementById('destinationBranchSelect');
+
+            branches.forEach((b, idx) => {
+                const opt1 = new Option(b.name, b.id);
+                const opt2 = new Option(b.name, b.id);
+                srcBranchSelect.add(opt1);
+                dstBranchSelect.add(opt2);
+            });
+
+            // Set different default destination
+            if (branches.length > 1) {
+                dstBranchSelect.selectedIndex = 1;
+            }
+
+            await updateWarehousesForBranch('source');
+            await updateWarehousesForBranch('destination');
+        }
+
+        async function updateWarehousesForBranch(type) {
+            const branchSelect = document.getElementById(`${type}BranchSelect`);
+            const whSelect = document.getElementById(`${type}WarehouseSelect`);
+            const branchId = branchSelect.value;
+
+            whSelect.innerHTML = '';
+            const warehouses = await warehouseService.getWarehousesByBranch(branchId);
+            warehouses.forEach(w => {
+                const opt = new Option(`${w.name} (${w.warehouseCode})`, w.id);
+                if (w.isDefault) opt.selected = true;
+                whSelect.add(opt);
+            });
+
+            if (type === 'source') {
+                updateVariantStockLabels();
+            }
+        }
+
+        async function loadProductVariants() {
+            const res = await productService.getProducts({ pageSize: 100 });
+            allProducts = res.items || [];
+            updateVariantStockLabels();
+        }
+
+        function updateVariantStockLabels() {
+            const picker = document.getElementById('variantPickerSelect');
+            picker.innerHTML = '';
+            const srcWhId = document.getElementById('sourceWarehouseSelect').value;
+
+            allProducts.forEach(p => {
+                (p.variants || []).forEach(v => {
+                    const avail = locationService.getVariantStockInWarehouse(v.id, srcWhId);
+                    const opt = document.createElement('option');
+                    opt.value = JSON.stringify({
+                        productId: p.id,
+                        productName: p.name,
+                        productVariantId: v.id,
+                        variantName: `${v.color} / ${v.size}`,
+                        color: v.color,
+                        size: v.size,
+                        sku: v.sku,
+                        availableStock: avail
+                    });
+                    opt.textContent = `${p.name} — ${v.color} / ${v.size} (SKU: ${v.sku}) [Avail: ${avail} pcs]`;
+                    picker.appendChild(opt);
+                });
+            });
+        }
+
+        function renderItemsTable() {
+            const tbody = document.getElementById('transferItemsTableBody');
+            const totalCountEl = document.getElementById('totalTransferCount');
+            const totalQty = selectedItems.reduce((acc, i) => acc + (parseInt(i.requestedQuantity) || 0), 0);
+            totalCountEl.textContent = `Total Items: ${totalQty} pcs (${selectedItems.length} variants)`;
+
+            if (selectedItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-500">
+                            No garment variants added yet. Select a product variant above and click "Add to Transfer".
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = selectedItems.map((item, idx) => `
+                    <tr class="hover:bg-slate-850/40 transition">
+                        <td class="py-3 px-3">
+                            <span class="font-bold text-white block">${item.productName}</span>
+                            <span class="text-[11px] text-blue-400 font-mono">${item.variantName}</span>
+                        </td>
+                        <td class="py-3 px-3 font-mono text-slate-400">${item.sku}</td>
+                        <td class="py-3 px-3 text-center font-mono font-bold text-slate-300">
+                            ${item.availableStock} pcs
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <input 
+                                type="number" 
+                                min="1" 
+                                max="${item.availableStock}"
+                                value="${item.requestedQuantity}" 
+                                class="item-qty-input w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono text-center focus:outline-none"
+                                data-index="${idx}"
+                            >
+                        </td>
+                        <td class="py-3 px-3 text-right">
+                            <button type="button" class="btn-remove-item text-slate-500 hover:text-red-400 transition" data-index="${idx}">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachTableEvents();
+        }
+
+        function attachTableEvents() {
+            document.querySelectorAll('.item-qty-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const idx = parseInt(input.getAttribute('data-index'));
+                    const val = parseInt(input.value) || 1;
+                    if (val > selectedItems[idx].availableStock) {
+                        showToast(`Requested quantity exceeds available stock (${selectedItems[idx].availableStock} pcs)`, 'error');
+                        input.value = selectedItems[idx].availableStock;
+                        selectedItems[idx].requestedQuantity = selectedItems[idx].availableStock;
+                    } else {
+                        selectedItems[idx].requestedQuantity = val;
+                    }
+                    renderItemsTable();
+                });
+            });
+
+            document.querySelectorAll('.btn-remove-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.getAttribute('data-index'));
+                    selectedItems.splice(idx, 1);
+                    renderItemsTable();
+                });
+            });
+        }
+
+        function attachEvents() {
+            document.getElementById('sourceBranchSelect').addEventListener('change', () => updateWarehousesForBranch('source'));
+            document.getElementById('destinationBranchSelect').addEventListener('change', () => updateWarehousesForBranch('destination'));
+            document.getElementById('sourceWarehouseSelect').addEventListener('change', updateVariantStockLabels);
+
+            document.getElementById('btnAddItemRow').addEventListener('click', () => {
+                const pickerVal = document.getElementById('variantPickerSelect').value;
+                const qtyVal = parseInt(document.getElementById('itemQtyInput').value) || 1;
+
+                if (!pickerVal) return;
+                const itemData = JSON.parse(pickerVal);
+
+                if (itemData.availableStock <= 0) {
+                    showToast('Selected variant has 0 stock in origin warehouse.', 'error');
+                    return;
+                }
+
+                const existing = selectedItems.find(i => i.productVariantId === itemData.productVariantId);
+                if (existing) {
+                    existing.requestedQuantity += qtyVal;
+                    if (existing.requestedQuantity > itemData.availableStock) {
+                        existing.requestedQuantity = itemData.availableStock;
+                    }
+                } else {
+                    selectedItems.push({
+                        ...itemData,
+                        requestedQuantity: Math.min(qtyVal, itemData.availableStock)
+                    });
+                }
+
+                renderItemsTable();
+                showToast(`Added ${itemData.productName} (${itemData.variantName})`, 'info');
+            });
+
+            document.getElementById('btnSaveDraft').addEventListener('click', (e) => submitTransferForm(false));
+            document.getElementById('transferForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitTransferForm(true);
+            });
+        }
+
+        async function submitTransferForm(submitNow) {
+            const srcWh = document.getElementById('sourceWarehouseSelect').value;
+            const dstWh = document.getElementById('destinationWarehouseSelect').value;
+
+            if (srcWh === dstWh) {
+                showToast('Origin and Destination warehouse cannot be identical.', 'error');
+                return;
+            }
+
+            if (selectedItems.length === 0) {
+                showToast('Please add at least one garment variant to transfer.', 'error');
+                return;
+            }
+
+            const transferData = {
+                sourceBranchId: document.getElementById('sourceBranchSelect').value,
+                sourceWarehouseId: srcWh,
+                destinationBranchId: document.getElementById('destinationBranchSelect').value,
+                destinationWarehouseId: dstWh,
+                transferDate: document.getElementById('transferDateInput').value,
+                expectedReceiveDate: document.getElementById('expectedReceiveDateInput').value,
+                transportName: document.getElementById('transportNameInput').value,
+                lrNumber: document.getElementById('lrNumberInput').value,
+                notes: document.getElementById('transferNotesInput').value,
+                items: selectedItems,
+                submitNow
+            };
+
+            const res = await stockTransferService.createTransfer(transferData, user.name);
+            if (res.success) {
+                showToast(`Transfer ${res.transfer.transferNumber} created successfully!`, 'success');
+                setTimeout(() => {
+                    window.location.href = `./transfer-details.html?id=${res.transfer.id}`;
+                }, 800);
+            } else {
+                showToast(res.message || 'Failed to create transfer', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

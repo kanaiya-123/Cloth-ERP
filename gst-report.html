@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Tax & Compliance Reports — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Detailed GST tax reports, Output CGST/SGST/IGST, Input Tax Credit, and return reversals in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Filter Bar -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./reports.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Reports</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-emerald-400 font-bold font-mono">GST & Tax Compliance</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="receipt" class="w-6 h-6 text-emerald-400"></i>
+                            <span>GST Tax & Compliance Report</span>
+                        </h1>
+                        <p class="text-xs text-slate-400" id="headerFilterSubtext">Intra-State and Inter-State GST liability reconciliation.</p>
+                    </div>
+
+                    <!-- Filter Controls & Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="datePresetSelect" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                            <option value="today">Today</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month" selected>This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_quarter">This Quarter</option>
+                            <option value="this_year">This Year</option>
+                        </select>
+
+                        <button id="btnExportCsv" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Export CSV</span>
+                        </button>
+
+                        <button id="btnPrintReport" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Output GST (Sales)</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiOutputGst">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Collected from clients</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Input Tax Credit (ITC)</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiInputGst">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Paid on Fabric Procurement</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Return Tax Reversal</span>
+                        <div class="text-2xl font-extrabold text-rose-300 font-mono" id="kpiReturnTax">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Sales Return Tax Deductions</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Net GST Position</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiNetGst">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Net Liability for Month</span>
+                    </div>
+                </div>
+
+                <!-- 2 TABS: OUTPUT SALES TAX VS INPUT PURCHASE TAX -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 text-xs">
+                    <button class="tab-btn px-4 py-2 rounded-xl font-bold transition text-white bg-slate-850 border border-slate-700" data-tab="tabSalesGst">Sales Output GST Ledger</button>
+                    <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabPurchaseGst">Purchase Input ITC Ledger</button>
+                </div>
+
+                <!-- TAB 1: SALES OUTPUT GST LEDGER -->
+                <div id="tabSalesGst" class="tab-pane space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Invoice / Sale No.</th>
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-4">Customer</th>
+                                        <th class="py-3 px-4 text-right">Taxable Value</th>
+                                        <th class="py-3 px-3 text-right">CGST</th>
+                                        <th class="py-3 px-3 text-right">SGST</th>
+                                        <th class="py-3 px-3 text-right">IGST</th>
+                                        <th class="py-3 px-4 text-right font-bold text-emerald-400">Total Tax</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesGstTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Sales Tax Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PURCHASE INPUT ITC LEDGER -->
+                <div id="tabPurchaseGst" class="tab-pane hidden space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">PO Number</th>
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-4">Supplier</th>
+                                        <th class="py-3 px-4 text-right">Taxable Value</th>
+                                        <th class="py-3 px-3 text-right">CGST</th>
+                                        <th class="py-3 px-3 text-right">SGST</th>
+                                        <th class="py-3 px-3 text-right">IGST</th>
+                                        <th class="py-3 px-4 text-right font-bold text-amber-400">Input Tax (ITC)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseGstTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Purchase Tax Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">GST Tax & Compliance Report</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.REPORTS_GST_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadGstReport();
+            attachEvents();
+        });
+
+        async function loadGstReport() {
+            const preset = document.getElementById('datePresetSelect').value;
+            currentReportData = await reportingService.getGstReport({ preset });
+
+            document.getElementById('headerFilterSubtext').textContent = `Reporting Window: ${currentReportData.filters.displayRange}`;
+
+            // KPIs
+            document.getElementById('kpiOutputGst').textContent = currentReportData.summary.totalOutputGst;
+            document.getElementById('kpiInputGst').textContent = currentReportData.summary.totalInputGst;
+            document.getElementById('kpiReturnTax').textContent = currentReportData.summary.returnGstReversal;
+            document.getElementById('kpiNetGst').textContent = currentReportData.summary.netGstPayableFormatted;
+
+            // Render Sales Output GST Table
+            renderSalesGstTable(currentReportData.salesTransactions);
+
+            // Render Purchase Input ITC Table
+            renderPurchaseGstTable(currentReportData.purchaseTransactions);
+        }
+
+        function renderSalesGstTable(sales) {
+            const tbody = document.getElementById('salesGstTableBody');
+            if (sales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-sans">No sales tax transactions in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sales.map(s => {
+                const tax = (s.cgstTotal || 0) + (s.sgstTotal || 0) + (s.igstTotal || 0);
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-mono font-bold text-blue-400">${s.saleNumber}</td>
+                        <td class="py-3 px-3 text-slate-400 font-mono">${s.saleDate}</td>
+                        <td class="py-3 px-4 font-bold text-slate-200">${s.customerName}</td>
+                        <td class="py-3 px-4 text-right font-mono text-slate-300">₹${(s.finalTaxableAmount || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(s.cgstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(s.sgstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(s.igstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-emerald-400">₹${tax.toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPurchaseGstTable(purchases) {
+            const tbody = document.getElementById('purchaseGstTableBody');
+            if (purchases.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-sans">No purchase tax transactions in this period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = purchases.map(p => {
+                const tax = (p.cgstTotal || 0) + (p.sgstTotal || 0) + (p.igstTotal || 0);
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-mono font-bold text-amber-400">${p.purchaseNumber}</td>
+                        <td class="py-3 px-3 text-slate-400 font-mono">${(p.orderDate || '').split('T')[0]}</td>
+                        <td class="py-3 px-4 font-bold text-slate-200">${p.supplierName}</td>
+                        <td class="py-3 px-4 text-right font-mono text-slate-300">₹${(p.finalTaxableAmount || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(p.cgstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(p.sgstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-right font-mono text-slate-400">₹${(p.igstTotal || 0).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-amber-400">₹${tax.toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function attachEvents() {
+            document.getElementById('datePresetSelect').addEventListener('change', loadGstReport);
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                        b.classList.add('text-slate-400');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+                    btn.classList.add('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                    btn.classList.remove('text-slate-400');
+
+                    const target = btn.getAttribute('data-tab');
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCsv').addEventListener('click', () => {
+                if (!currentReportData || !currentReportData.salesTransactions) return;
+                const headers = [
+                    { label: 'Sale Number', key: 'saleNumber' },
+                    { label: 'Date', key: 'saleDate' },
+                    { label: 'Customer', key: 'customerName' },
+                    { label: 'Taxable Amount (INR)', key: 'finalTaxableAmount' },
+                    { label: 'CGST (INR)', key: 'cgstTotal' },
+                    { label: 'SGST (INR)', key: 'sgstTotal' },
+                    { label: 'IGST (INR)', key: 'igstTotal' },
+                    { label: 'Grand Total (INR)', key: 'grandTotal' }
+                ];
+                ReportExportService.exportToCsv('CLOTHERP_GST_Output_Tax_Report', headers, currentReportData.salesTransactions);
+            });
+
+            // Print
+            document.getElementById('btnPrintReport').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        }
+    </script>
+</body>
+</html>

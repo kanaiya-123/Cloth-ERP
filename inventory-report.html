@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Valuation & Stock Reports — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Detailed warehouse inventory valuation, variant stock levels, and low stock depletion reports in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./reports.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Reports</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-purple-400 font-bold font-mono">Inventory Valuation</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="boxes" class="w-6 h-6 text-purple-400"></i>
+                            <span>Inventory Valuation & Stock Report</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Real-time stock balances, cost-basis inventory valuation, and replenishment alerts.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-2">
+                        <button id="btnExportCsv" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Export CSV</span>
+                        </button>
+
+                        <button id="btnPrintReport" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Inventory Valuation</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiValuation">₹0.00</div>
+                        <span class="text-[10px] text-slate-500">Cost-basis Valuation</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Total Physical Units</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiTotalUnits">0 pcs</div>
+                        <span class="text-[10px] text-slate-500">Available Warehouse Stock</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Low Stock Alerts</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiLowStock">0</div>
+                        <span class="text-[10px] text-slate-500">Below Reorder Threshold</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Out of Stock Variants</span>
+                        <div class="text-2xl font-extrabold text-rose-300 font-mono" id="kpiOutOfStock">0</div>
+                        <span class="text-[10px] text-slate-500">Zero Inventory</span>
+                    </div>
+                </div>
+
+                <!-- 2 TABS: VARIANT VALUATION VS LOW STOCK -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 text-xs">
+                    <button class="tab-btn px-4 py-2 rounded-xl font-bold transition text-white bg-slate-850 border border-slate-700" data-tab="tabValuation">Full Variant Valuation Matrix</button>
+                    <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabDepletion">Critical Low Stock & Depletion</button>
+                </div>
+
+                <!-- TAB 1: FULL VARIANT VALUATION MATRIX -->
+                <div id="tabValuation" class="tab-pane space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Garment Style</th>
+                                        <th class="py-3 px-3">Variant (Color × Size)</th>
+                                        <th class="py-3 px-4">SKU</th>
+                                        <th class="py-3 px-3 text-center font-bold text-blue-400">Current Stock</th>
+                                        <th class="py-3 px-4 text-right">Cost Price (₹)</th>
+                                        <th class="py-3 px-4 text-right font-bold text-purple-300">Total Stock Value</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Inventory Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CRITICAL LOW STOCK & DEPLETION -->
+                <div id="tabDepletion" class="tab-pane hidden space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-4">Garment Style</th>
+                                        <th class="py-3 px-3">Variant</th>
+                                        <th class="py-3 px-4">SKU</th>
+                                        <th class="py-3 px-3 text-center text-amber-400 font-bold">Current Stock</th>
+                                        <th class="py-3 px-3 text-center font-mono">Reorder Level</th>
+                                        <th class="py-3 px-3 text-center text-emerald-400 font-bold">Suggested Reorder Qty</th>
+                                        <th class="py-3 px-3 text-center">Risk Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Low Stock Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Inventory Valuation Report</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { reportingService } from './assets/js/services/reporting/reportingService.js';
+        import { ReportExportService } from './assets/js/services/reporting/reportExportService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.REPORTS_INVENTORY_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadInventoryReport();
+            attachEvents();
+        });
+
+        async function loadInventoryReport() {
+            currentReportData = await reportingService.getInventoryReport();
+
+            // KPIs
+            document.getElementById('kpiValuation').textContent = currentReportData.summary.totalValuationFormatted;
+            document.getElementById('kpiTotalUnits').textContent = `${currentReportData.summary.totalStockUnits} pcs`;
+            document.getElementById('kpiLowStock').textContent = currentReportData.summary.lowStockCount;
+            document.getElementById('kpiOutOfStock').textContent = currentReportData.summary.outOfStockCount;
+
+            // Render Full Valuation Table
+            renderValuationTable(currentReportData.inventory);
+
+            // Render Low Stock Table
+            renderLowStockTable(currentReportData.lowStockItems);
+        }
+
+        function renderValuationTable(items) {
+            const tbody = document.getElementById('inventoryTableBody');
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">No inventory items found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map(i => {
+                const cost = i.baseCostPrice || 500;
+                const totalVal = (i.currentStock || 0) * cost;
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-bold text-slate-200">${i.productName}</td>
+                        <td class="py-3 px-3 text-slate-300 font-medium">${i.color} / <strong class="font-mono text-slate-200">${i.size}</strong></td>
+                        <td class="py-3 px-4 font-mono text-blue-300">${i.sku}</td>
+                        <td class="py-3 px-3 text-center font-mono font-bold text-slate-100">${i.currentStock || 0}</td>
+                        <td class="py-3 px-4 text-right font-mono text-slate-400">₹${cost.toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-purple-300">₹${totalVal.toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                i.currentStock <= 0 ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                i.currentStock <= (i.reorderLevel || 10) ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            }">
+                                ${i.currentStock <= 0 ? 'Out of Stock' : i.currentStock <= (i.reorderLevel || 10) ? 'Low Stock' : 'In Stock'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderLowStockTable(items) {
+            const tbody = document.getElementById('lowStockTableBody');
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">No variants currently in low stock state. All items healthy!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map(i => {
+                const reorder = (i.reorderLevel || 10) * 3;
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-bold text-slate-200">${i.productName}</td>
+                        <td class="py-3 px-3 text-slate-300 font-medium">${i.color} / ${i.size}</td>
+                        <td class="py-3 px-4 font-mono text-blue-300">${i.sku}</td>
+                        <td class="py-3 px-3 text-center font-mono font-bold text-amber-400">${i.currentStock}</td>
+                        <td class="py-3 px-3 text-center font-mono text-slate-400">${i.reorderLevel || 10}</td>
+                        <td class="py-3 px-3 text-center font-mono font-bold text-emerald-400">+${reorder} pcs</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-amber-500/10 text-amber-400 border-amber-500/20">REORDER NEEDED</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function attachEvents() {
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                        b.classList.add('text-slate-400');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+                    btn.classList.add('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                    btn.classList.remove('text-slate-400');
+
+                    const target = btn.getAttribute('data-tab');
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCsv').addEventListener('click', () => {
+                if (!currentReportData || !currentReportData.inventory) return;
+                const headers = [
+                    { label: 'Garment Style', key: 'productName' },
+                    { label: 'Colorway', key: 'color' },
+                    { label: 'Size', key: 'size' },
+                    { label: 'SKU', key: 'sku' },
+                    { label: 'Current Stock', key: 'currentStock' },
+                    { label: 'Cost Price (INR)', key: 'baseCostPrice' }
+                ];
+                ReportExportService.exportToCsv('CLOTHERP_Inventory_Valuation_Report', headers, currentReportData.inventory);
+            });
+
+            // Print
+            document.getElementById('btnPrintReport').addEventListener('click', () => {
+                ReportExportService.triggerPrint();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Variant-level stock monitoring and real-time inventory tracking for CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Action Buttons -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Operations Hub</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Stock Control</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Variant-Level Inventory</h1>
+                        <p class="text-xs text-slate-400">Monitor live stock balances, reorder buffer levels, and inventory movements across all SKUs.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap items-center gap-2" id="inventoryActionButtons">
+                        <a href="./opening-stock.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-200 text-xs font-semibold transition flex items-center space-x-1.5" id="btnOpeningStock">
+                            <i data-lucide="folder-plus" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Opening Stock</span>
+                        </a>
+                        <a href="./stock-in.html" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-1.5" id="btnStockIn">
+                            <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
+                            <span>Stock IN</span>
+                        </a>
+                        <a href="./stock-out.html" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center space-x-1.5" id="btnStockOut">
+                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-amber-400"></i>
+                            <span>Stock OUT</span>
+                        </a>
+                        <a href="./stock-adjustment.html" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center space-x-1.5" id="btnStockAdjust">
+                            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            <span>Adjust Stock</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5 Inventory KPI Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Products</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiProducts">0</div>
+                        <span class="text-[10px] text-slate-500">Clothing Styles</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total SKUs</span>
+                        <div class="text-2xl font-extrabold text-slate-200 font-mono" id="kpiVariants">0</div>
+                        <span class="text-[10px] text-slate-500">Matrix Variants</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Total Stock Units</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiTotalStock">0</div>
+                        <span class="text-[10px] text-slate-500">Garments in Hub</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Low Stock</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiLowStock">0</div>
+                        <span class="text-[10px] text-slate-500">≤ Threshold</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-red-400 font-medium">Out of Stock</span>
+                        <div class="text-2xl font-extrabold text-red-300 font-mono" id="kpiOutOfStock">0</div>
+                        <span class="text-[10px] text-slate-500">0 Units Balance</span>
+                    </div>
+                </div>
+
+                <!-- Table Filter & Search Controls -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+                    
+                    <!-- Search Input (Product Name, SKU, Barcode) -->
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="inventorySearchInput" 
+                            placeholder="Search product, SKU or barcode..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <!-- Dropdown Filters -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="categoryFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Categories</option>
+                        </select>
+
+                        <select id="brandFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Brands</option>
+                        </select>
+
+                        <select id="stockStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Stock Status</option>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
+
+                        <select id="sortByFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="name_asc">Product Name (A-Z)</option>
+                            <option value="stock_desc">Stock: High to Low</option>
+                            <option value="stock_asc">Stock: Low to High</option>
+                        </select>
+
+                        <button id="btnClearFilters" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white border border-slate-700 text-xs transition" title="Clear all filters">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Inventory Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/70 text-slate-400 border-b border-slate-800 uppercase font-mono text-[11px]">
+                                    <th class="py-3 px-4">Product Style</th>
+                                    <th class="py-3 px-3">Variant (Color × Size)</th>
+                                    <th class="py-3 px-4">SKU / Barcode</th>
+                                    <th class="py-3 px-3 text-center">Current Stock</th>
+                                    <th class="py-3 px-3 text-center">Reorder Level</th>
+                                    <th class="py-3 px-3 text-center">Status</th>
+                                    <th class="py-3 px-4 text-center">Last Movement</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                <!-- Dynamic Inventory Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400" id="paginationFooter">
+                        <span id="showingCount">Showing 0 of 0 variants</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Inventory & Stock Control Module</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { inventoryService } from './assets/js/services/inventoryService.js';
+        import { categoryService } from './assets/js/services/categoryService.js';
+        import { brandService } from './assets/js/services/brandService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.INVENTORY_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const canManage = authService.hasPermission(PERMISSIONS.INVENTORY_MANAGE);
+        const canAdjust = authService.hasPermission(PERMISSIONS.INVENTORY_ADJUST);
+
+        let currentPage = 1;
+        const pageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'inventory');
+            initTopbar('topbarMount');
+
+            // Hide action buttons for read-only roles
+            if (!canManage) {
+                const openBtn = document.getElementById('btnOpeningStock');
+                const inBtn = document.getElementById('btnStockIn');
+                const outBtn = document.getElementById('btnStockOut');
+                if (openBtn) openBtn.style.display = 'none';
+                if (inBtn) inBtn.style.display = 'none';
+                if (outBtn) outBtn.style.display = 'none';
+            }
+
+            if (!canAdjust) {
+                const adjBtn = document.getElementById('btnStockAdjust');
+                if (adjBtn) adjBtn.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            await populateDropdowns();
+            await loadInventory();
+            attachFilterEvents();
+        });
+
+        async function populateDropdowns() {
+            const [categories, brands] = await Promise.all([
+                categoryService.getCategories(),
+                brandService.getBrands()
+            ]);
+
+            const catSelect = document.getElementById('categoryFilter');
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name;
+                catSelect.appendChild(opt);
+            });
+
+            const brandSelect = document.getElementById('brandFilter');
+            brands.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.name;
+                opt.textContent = b.name;
+                brandSelect.appendChild(opt);
+            });
+        }
+
+        async function loadInventory() {
+            const search = document.getElementById('inventorySearchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const brand = document.getElementById('brandFilter').value;
+            const stockStatus = document.getElementById('stockStatusFilter').value;
+            const sortBy = document.getElementById('sortByFilter').value;
+
+            const res = await inventoryService.getInventory({
+                page: currentPage,
+                pageSize,
+                search,
+                category,
+                brand,
+                stockStatus,
+                sortBy
+            });
+
+            // Update KPI Cards
+            document.getElementById('kpiProducts').textContent = res.summary.totalProducts;
+            document.getElementById('kpiVariants').textContent = res.summary.totalVariants;
+            document.getElementById('kpiTotalStock').textContent = res.summary.totalStockUnits.toLocaleString('en-IN');
+            document.getElementById('kpiLowStock').textContent = res.summary.lowStockCount;
+            document.getElementById('kpiOutOfStock').textContent = res.summary.outOfStockCount;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(items, pagination) {
+            const tbody = document.getElementById('inventoryTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${items.length} of ${pagination.totalItems} variants`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-12 text-center text-slate-500">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                                <i data-lucide="boxes" class="w-6 h-6"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-300 mb-1">No inventory records found</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">No variant records match your active search or stock filters.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = items.map(i => `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center space-x-3">
+                                <img src="${i.primaryImage || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=80&q=80'}" alt="${i.productName}" class="w-8 h-8 rounded-lg object-cover border border-slate-700 bg-slate-900 flex-shrink-0">
+                                <div>
+                                    <a href="./inventory-details.html?variantId=${i.productVariantId}" class="font-bold text-slate-200 hover:text-blue-400 transition">${i.productName}</a>
+                                    <div class="text-[10px] text-slate-500 font-mono">${i.category} • ${i.brand}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3.5 h-3.5 rounded-full border border-slate-700 inline-block flex-shrink-0" style="background-color: ${i.colorHex || '#111827'};"></span>
+                                <span class="text-slate-200 font-medium">${i.color}</span>
+                                <span class="px-1.5 py-0.2 rounded bg-slate-900 border border-slate-700 text-slate-300 font-mono font-bold text-[10px]">${i.size}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-mono font-bold text-blue-300">${i.sku}</div>
+                            <div class="font-mono text-[10px] text-slate-500">${i.barcode}</div>
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="font-mono font-bold text-sm ${
+                                i.currentStock === 0 ? 'text-red-400' :
+                                i.currentStock <= i.lowStockLevel ? 'text-amber-400' : 'text-slate-100'
+                            }">
+                                ${i.currentStock}
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono block">Units</span>
+                        </td>
+                        <td class="py-3 px-3 text-center font-mono text-slate-400">
+                            ${i.lowStockLevel}
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                i.status === 'In Stock' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                i.status === 'Low Stock' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                'bg-red-500/10 text-red-400 border-red-500/20'
+                            }">
+                                ${i.status}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center font-mono text-[11px] text-slate-500">
+                            ${i.lastUpdated || '—'}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end space-x-1">
+                                <a href="./inventory-details.html?variantId=${i.productVariantId}" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="View History & Ledger">
+                                    <i data-lucide="history" class="w-3.5 h-3.5"></i>
+                                </a>
+                                ${canManage ? `
+                                    <a href="./stock-in.html?variantId=${i.productVariantId}" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition" title="Stock IN">
+                                        <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                ` : ''}
+                                ${canAdjust ? `
+                                    <a href="./stock-adjustment.html?variantId=${i.productVariantId}" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition" title="Adjust Stock">
+                                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachFilterEvents() {
+            let debounceTimer;
+            document.getElementById('inventorySearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadInventory();
+                }, 300);
+            });
+
+            document.getElementById('categoryFilter').addEventListener('change', () => { currentPage = 1; loadInventory(); });
+            document.getElementById('brandFilter').addEventListener('change', () => { currentPage = 1; loadInventory(); });
+            document.getElementById('stockStatusFilter').addEventListener('change', () => { currentPage = 1; loadInventory(); });
+            document.getElementById('sortByFilter').addEventListener('change', () => { currentPage = 1; loadInventory(); });
+
+            document.getElementById('btnClearFilters').addEventListener('click', () => {
+                document.getElementById('inventorySearchInput').value = '';
+                document.getElementById('categoryFilter').value = '';
+                document.getElementById('brandFilter').value = '';
+                document.getElementById('stockStatusFilter').value = '';
+                document.getElementById('sortByFilter').value = 'name_asc';
+                currentPage = 1;
+                loadInventory();
+            });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadInventory();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadInventory();
+            });
+        }
+    </script>
+</body>
+</html>

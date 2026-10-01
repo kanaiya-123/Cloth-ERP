@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Preferences & Smart Alert Rules — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Configure enterprise smart alert rules, notification preferences, and sound settings in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./notifications.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Notifications</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Preferences</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="settings" class="w-6 h-6 text-blue-400"></i>
+                            <span>Smart Alert Rules & Preferences</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Customize in-app notification triggers, priority filters, and alert evaluation behavior.</p>
+                    </div>
+
+                    <a href="./notifications.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Back</span>
+                    </a>
+                </div>
+
+                <form id="preferencesForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: INVENTORY & STOCK ALERTS -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="boxes" class="w-4 h-4 text-purple-400"></i>
+                            <span>Inventory & Warehouse Stock Alerts</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Low Stock Warnings</span>
+                                    <span class="text-[11px] text-slate-400">Trigger alerts when garment variants drop to or below configured reorder level.</span>
+                                </div>
+                                <input type="checkbox" id="prefLowStock" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Critical Out of Stock Alerts</span>
+                                    <span class="text-[11px] text-slate-400">High priority alert when physical warehouse inventory reaches 0 pcs.</span>
+                                </div>
+                                <input type="checkbox" id="prefOutOfStock" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: ACCOUNTS & PAYMENT ALERTS -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Billing, Invoicing & Payment Alerts</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Overdue Payment Reminders</span>
+                                    <span class="text-[11px] text-slate-400">Alert for sales invoices with outstanding unpaid balance.</span>
+                                </div>
+                                <input type="checkbox" id="prefPaymentOverdue" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Payment Received Confirmations</span>
+                                    <span class="text-[11px] text-slate-400">Notify authorized accounts when customer receipts are recorded.</span>
+                                </div>
+                                <input type="checkbox" id="prefPaymentReceived" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: ORDER FULFILLMENT & RETURNS -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="truck" class="w-4 h-4 text-amber-400"></i>
+                            <span>Fulfillment & Returns Operations</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Sales Order Delay Alerts</span>
+                                    <span class="text-[11px] text-slate-400">Notify if confirmed sales orders exceed expected delivery dates.</span>
+                                </div>
+                                <input type="checkbox" id="prefOrderDelayed" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Customer Return Requests</span>
+                                    <span class="text-[11px] text-slate-400">Alert managers when a customer initiates a product return or exchange.</span>
+                                </div>
+                                <input type="checkbox" id="prefReturnAlerts" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+
+                            <label class="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-900/60 transition">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">Pending Refund Disbursals</span>
+                                    <span class="text-[11px] text-slate-400">Alert accounts when inspected returns require customer refund settlement.</span>
+                                </div>
+                                <input type="checkbox" id="prefRefundAlerts" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./notifications.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-2">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Save Preferences</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Smart Alert Preferences</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { notificationService } from './assets/js/services/notificationService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.NOTIFICATIONS_SETTINGS });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSidebar('sidebarMount', 'settings');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            loadPreferences();
+            attachEvents();
+        });
+
+        function loadPreferences() {
+            const prefs = notificationService.getNotificationPreferences();
+            document.getElementById('prefLowStock').checked = !!prefs.lowStock;
+            document.getElementById('prefOutOfStock').checked = !!prefs.outOfStock;
+            document.getElementById('prefPaymentOverdue').checked = !!prefs.paymentOverdue;
+            document.getElementById('prefPaymentReceived').checked = !!prefs.paymentReceived;
+            document.getElementById('prefOrderDelayed').checked = !!prefs.orderDelayed;
+            document.getElementById('prefReturnAlerts').checked = !!prefs.returnAlerts;
+            document.getElementById('prefRefundAlerts').checked = !!prefs.refundAlerts;
+        }
+
+        function attachEvents() {
+            document.getElementById('preferencesForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newPrefs = {
+                    lowStock: document.getElementById('prefLowStock').checked,
+                    outOfStock: document.getElementById('prefOutOfStock').checked,
+                    paymentOverdue: document.getElementById('prefPaymentOverdue').checked,
+                    paymentReceived: document.getElementById('prefPaymentReceived').checked,
+                    orderDelayed: document.getElementById('prefOrderDelayed').checked,
+                    returnAlerts: document.getElementById('prefReturnAlerts').checked,
+                    refundAlerts: document.getElementById('prefRefundAlerts').checked,
+                    systemAlerts: true,
+                    inAppSound: false
+                };
+
+                notificationService.saveNotificationPreferences(newPrefs);
+                showToast('Notification preferences saved successfully!', 'success');
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

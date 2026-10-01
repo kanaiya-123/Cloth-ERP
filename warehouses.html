@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Master — CLOTHERP Multi-Location Platform</title>
+    <meta name="description" content="Manage central apparel warehouses, regional stockrooms, and quarantine depots in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Masters</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Warehouses</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="warehouse" class="w-6 h-6 text-blue-400"></i>
+                            <span>Warehouse Master</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Manage central storage depots, finished goods stockrooms, retail backrooms, and return quarantine bays.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <a href="./transfers.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                            <span>Stock Transfers</span>
+                        </a>
+
+                        <button id="btnOpenAddWarehouseModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Warehouse</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Warehouses</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalWarehouses">0</div>
+                        <span class="text-[10px] text-slate-500">Physical Stock Depots</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Active Depots</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiActiveWarehouses">0</div>
+                        <span class="text-[10px] text-slate-500">Receiving & Shipping</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Main & Finished Goods</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiMainWarehouses">0</div>
+                        <span class="text-[10px] text-slate-500">Sellable Inventory</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-red-400 font-medium">Quarantine & Damage</span>
+                        <div class="text-2xl font-extrabold text-red-300 font-mono" id="kpiDamageWarehouses">0</div>
+                        <span class="text-[10px] text-slate-500">Non-Sellable Stock</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="warehouseSearchInput" 
+                            placeholder="Search warehouse code, name, or branch..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="branchFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Branches</option>
+                        </select>
+
+                        <select id="warehouseTypeFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Warehouse Types</option>
+                            <option value="MAIN">Main Distribution Depot</option>
+                            <option value="FINISHED_GOODS">Finished Goods Warehouse</option>
+                            <option value="RETAIL">Retail Backroom</option>
+                            <option value="DAMAGE">Damage Quarantine</option>
+                        </select>
+
+                        <select id="warehouseStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="ACTIVE">Active Only</option>
+                            <option value="INACTIVE">Inactive Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Warehouses Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="warehousesContainer">
+                    <!-- Dynamic Warehouse Cards -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Warehouse Storage</div>
+                <div class="font-mono text-[11px] text-slate-600">Stock Depot Topology</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT WAREHOUSE -->
+    <div id="warehouseModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-2xl w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-5 bg-slate-900 my-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2" id="modalTitle">
+                    <i data-lucide="warehouse" class="w-4 h-4 text-blue-400"></i>
+                    <span>Add New Warehouse</span>
+                </h3>
+                <button id="btnCloseModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="warehouseForm" class="space-y-4" novalidate>
+                <input type="hidden" id="editWarehouseId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Warehouse Name *</label>
+                        <input type="text" id="warehouseNameInput" required placeholder="e.g. Surat Regional Depot" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Warehouse Code * (Unique)</label>
+                        <input type="text" id="warehouseCodeInput" required placeholder="e.g. WH-SUR-REG" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Associated Branch *</label>
+                        <select id="warehouseBranchInput" required class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <!-- Injected dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Warehouse Type *</label>
+                        <select id="warehouseTypeInput" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="MAIN">Main Central Depot</option>
+                            <option value="FINISHED_GOODS" selected>Finished Goods Warehouse</option>
+                            <option value="RETAIL">Retail Backroom</option>
+                            <option value="DAMAGE">Damage Quarantine</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Person</label>
+                        <input type="text" id="warehouseContactInput" placeholder="Mahesh Solanki" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+                        <input type="text" id="warehousePhoneInput" placeholder="+91 261 2899 118" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Address *</label>
+                        <input type="text" id="warehouseAddressInput" required placeholder="Godown 12-14, Millennium Textile Market, Ring Road, Surat" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Description / Notes</label>
+                        <textarea id="warehouseDescInput" rows="2" placeholder="Storage area purpose and operational details..." class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="warehouseIsDefaultInput" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-0">
+                            <span>Set as Default Warehouse for this Branch</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Warehouse</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { warehouseService } from './assets/js/services/warehouseService.js';
+        import { branchService } from './assets/js/services/branchService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.WAREHOUSES_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'warehouses');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await populateBranchDropdowns();
+            await loadWarehouses();
+            attachEvents();
+        });
+
+        async function populateBranchDropdowns() {
+            const branches = await branchService.getActiveBranches();
+            const filter = document.getElementById('branchFilter');
+            const formSelect = document.getElementById('warehouseBranchInput');
+
+            branches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = `${b.name} (${b.branchCode})`;
+                filter.appendChild(opt.cloneNode(true));
+                formSelect.appendChild(opt);
+            });
+        }
+
+        async function loadWarehouses() {
+            const search = document.getElementById('warehouseSearchInput').value;
+            const branchId = document.getElementById('branchFilter').value;
+            const status = document.getElementById('warehouseStatusFilter').value;
+            const type = document.getElementById('warehouseTypeFilter').value;
+
+            const res = await warehouseService.getWarehouses({ search, branchId, status, type });
+
+            document.getElementById('kpiTotalWarehouses').textContent = res.summary.totalWarehouses;
+            document.getElementById('kpiActiveWarehouses').textContent = res.summary.activeCount;
+            document.getElementById('kpiMainWarehouses').textContent = res.summary.mainCount;
+            document.getElementById('kpiDamageWarehouses').textContent = res.summary.damageCount;
+
+            renderGrid(res.items);
+        }
+
+        function renderGrid(warehouses) {
+            const container = document.getElementById('warehousesContainer');
+            if (warehouses.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <i data-lucide="warehouse" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                        <p class="text-sm font-bold text-slate-300">No warehouses found</p>
+                        <p class="text-xs text-slate-500">Create a new storage location under an active branch.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = warehouses.map(w => `
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-mono text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">${w.warehouseCode}</span>
+                                        ${w.isDefault ? '<span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">DEFAULT DEPOT</span>' : ''}
+                                    </div>
+                                    <h3 class="text-sm font-bold text-white mt-1">${w.name}</h3>
+                                    <p class="text-xs text-slate-400 flex items-center space-x-1 mt-0.5">
+                                        <i data-lucide="map" class="w-3 h-3 text-slate-500"></i>
+                                        <span>Branch: <strong class="text-slate-300">${w.branchName}</strong></span>
+                                    </p>
+                                </div>
+
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    w.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                                }">${w.status}</span>
+                            </div>
+
+                            <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-1.5 text-xs text-slate-300">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-500">Type:</span>
+                                    <span class="font-semibold text-slate-200">${w.type.replace('_', ' ')}</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-slate-500">Contact:</span>
+                                    <span class="font-semibold text-slate-200">${w.contactPerson || 'N/A'}</span>
+                                </div>
+                                ${w.phone ? `
+                                    <div class="flex justify-between text-[11px]">
+                                        <span class="text-slate-500">Phone:</span>
+                                        <span class="font-mono text-[10px] text-slate-400">${w.phone}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <p class="text-[11px] text-slate-400 leading-normal line-clamp-2">${w.address}</p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+                            <a href="./inventory.html?warehouseId=${w.id}" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center space-x-1">
+                                <span>View Stock</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
+
+                            <div class="flex items-center space-x-1.5">
+                                <button class="btn-edit-wh p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition" data-id="${w.id}" title="Edit Warehouse">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button class="btn-toggle-wh-status p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition" data-id="${w.id}" title="Toggle Active/Inactive">
+                                    <i data-lucide="${w.status === 'ACTIVE' ? 'power-off' : 'power'}" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachCardActions();
+        }
+
+        function attachCardActions() {
+            document.querySelectorAll('.btn-edit-wh').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    const wh = await warehouseService.getWarehouseById(id);
+                    if (wh) openModal(wh);
+                });
+            });
+
+            document.querySelectorAll('.btn-toggle-wh-status').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    await warehouseService.toggleWarehouseStatus(id, user.name);
+                    showToast('Warehouse status updated', 'success');
+                    await loadWarehouses();
+                });
+            });
+        }
+
+        function openModal(wh = null) {
+            const modal = document.getElementById('warehouseModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('warehouseForm');
+
+            form.reset();
+
+            if (wh) {
+                title.innerHTML = `<i data-lucide="edit" class="w-4 h-4 text-blue-400"></i><span>Edit Warehouse: ${wh.name}</span>`;
+                document.getElementById('editWarehouseId').value = wh.id;
+                document.getElementById('warehouseNameInput').value = wh.name;
+                document.getElementById('warehouseCodeInput').value = wh.warehouseCode;
+                document.getElementById('warehouseBranchInput').value = wh.branchId;
+                document.getElementById('warehouseTypeInput').value = wh.type;
+                document.getElementById('warehouseContactInput').value = wh.contactPerson || '';
+                document.getElementById('warehousePhoneInput').value = wh.phone || '';
+                document.getElementById('warehouseAddressInput').value = wh.address || '';
+                document.getElementById('warehouseDescInput').value = wh.description || '';
+                document.getElementById('warehouseIsDefaultInput').checked = !!wh.isDefault;
+            } else {
+                title.innerHTML = `<i data-lucide="plus" class="w-4 h-4 text-blue-400"></i><span>Add New Warehouse</span>`;
+                document.getElementById('editWarehouseId').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('warehouseModal').classList.add('hidden');
+        }
+
+        function attachEvents() {
+            document.getElementById('btnOpenAddWarehouseModal').addEventListener('click', () => openModal());
+            document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+            document.getElementById('warehouseSearchInput').addEventListener('input', loadWarehouses);
+            document.getElementById('branchFilter').addEventListener('change', loadWarehouses);
+            document.getElementById('warehouseTypeFilter').addEventListener('change', loadWarehouses);
+            document.getElementById('warehouseStatusFilter').addEventListener('change', loadWarehouses);
+
+            document.getElementById('warehouseForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const editId = document.getElementById('editWarehouseId').value;
+                const whData = {
+                    name: document.getElementById('warehouseNameInput').value,
+                    warehouseCode: document.getElementById('warehouseCodeInput').value,
+                    branchId: document.getElementById('warehouseBranchInput').value,
+                    type: document.getElementById('warehouseTypeInput').value,
+                    contactPerson: document.getElementById('warehouseContactInput').value,
+                    phone: document.getElementById('warehousePhoneInput').value,
+                    address: document.getElementById('warehouseAddressInput').value,
+                    description: document.getElementById('warehouseDescInput').value,
+                    isDefault: document.getElementById('warehouseIsDefaultInput').checked
+                };
+
+                let res;
+                if (editId) {
+                    res = await warehouseService.updateWarehouse(editId, whData, user.name);
+                } else {
+                    res = await warehouseService.createWarehouse(whData, user.name);
+                }
+
+                if (res.success) {
+                    showToast(editId ? 'Warehouse updated successfully!' : 'Warehouse created successfully!', 'success');
+                    closeModal();
+                    await loadWarehouses();
+                } else {
+                    showToast(res.message || 'Failed to save warehouse', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback & Reviews — CLOTHERP</title>
+    <meta name="description" content="Customer ratings, feedback testimonials, and satisfaction metrics in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./crm.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">CRM</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Feedback</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="star" class="w-6 h-6 text-amber-400"></i>
+                            <span>Customer Feedback & NPS Ratings</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Post-sale customer ratings, garment satisfaction feedback, and delivery reviews.</p>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Average CSAT Rating</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono">4.8 / 5.0</div>
+                        <span class="text-[10px] text-slate-500">★★★★★ High Satisfaction</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Net Promoter Score</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono">+84 NPS</div>
+                        <span class="text-[10px] text-slate-500">World-Class Loyalty</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Fabric Quality Score</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono">98.2%</div>
+                        <span class="text-[10px] text-slate-500">Colorfast & Weave Quality</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Repeat Purchase Intent</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono">92%</div>
+                        <span class="text-[10px] text-slate-500">Wholesale Re-order</span>
+                    </div>
+                </div>
+
+                <!-- Feedback Reviews Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="feedbackContainer">
+                    <!-- Dynamic Cards -->
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Customer Satisfaction</div>
+                <div class="font-mono text-[11px] text-slate-600">NPS & CSAT Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.FEEDBACK_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'feedback');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadFeedback();
+        });
+
+        async function loadFeedback() {
+            const list = await crmService.getFeedback();
+            const container = document.getElementById('feedbackContainer');
+
+            container.innerHTML = list.map(f => {
+                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                return `
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="text-sm font-bold text-white">${f.customerName}</h3>
+                                <span class="text-[11px] font-mono text-blue-400">Order: ${f.orderNumber}</span>
+                            </div>
+                            <span class="text-amber-400 font-mono text-base font-bold">${stars}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 italic bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">"${f.feedback}"</p>
+                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                            <span>Review Date: ${f.date}</span>
+                            <span class="text-emerald-400 font-bold">Verified Buyer ✓</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

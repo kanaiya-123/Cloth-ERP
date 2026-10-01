@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Return Details — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Detailed sales return view, inspection report, refund ledger, credit notes, and inventory audit in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto">
+                
+                <!-- Loading State -->
+                <div id="loadingPlaceholder" class="p-12 text-center text-slate-500">
+                    <div class="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin mx-auto mb-3"></div>
+                    Loading sales return case, inspection status, and credit ledger...
+                </div>
+
+                <!-- Real Container -->
+                <div id="returnContainer" class="hidden space-y-6">
+                    
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <a href="./returns.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Returns</a>
+                                <span class="text-slate-600">/</span>
+                                <span class="text-xs text-amber-400 font-bold font-mono" id="headerReturnNum">RET-000001</span>
+                            </div>
+                            <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-3">
+                                <span id="headerCustomerName">Royal Fashion Boutique</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border" id="headerStatusBadge">Completed</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono border" id="headerInventoryBadge">Stock Restocked</span>
+                            </h1>
+                            <div class="flex items-center space-x-2.5 mt-1 text-xs text-slate-400">
+                                <span>Original Sale: <a href="#" id="headerSaleLink" class="font-mono text-blue-300 font-bold hover:underline">SAL-000001</a></span>
+                                <span>•</span>
+                                <span>Date: <strong class="font-mono text-slate-200" id="headerDate">2026-08-28</strong></span>
+                                <span>•</span>
+                                <span>Reason: <strong class="text-slate-300 font-medium" id="headerReason">Wrong Size</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-2" id="headerActions">
+                            <a href="./returns.html" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                                <span>Back</span>
+                            </a>
+
+                            <button id="btnApproveReturn" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition hidden flex items-center space-x-1.5">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                <span>Approve Return</span>
+                            </button>
+
+                            <button id="btnOpenReceiveModal" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition hidden flex items-center space-x-1.5">
+                                <i data-lucide="package-check" class="w-3.5 h-3.5"></i>
+                                <span>Receive & Inspect Items</span>
+                            </button>
+
+                            <a href="#" id="btnProcessRefundHeader" class="btn-primary px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition hidden flex items-center space-x-1.5">
+                                <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                                <span>Process Refund</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 4 Summary KPI Cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-slate-400 font-medium">Return Value</span>
+                            <div class="text-2xl font-extrabold text-white font-mono" id="cardGrandTotal">₹0.00</div>
+                            <span class="text-[10px] text-slate-500">Gross Return Claim</span>
+                        </div>
+
+                        <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-emerald-400 font-medium">Refund Settled</span>
+                            <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="cardRefundedAmount">₹0.00</div>
+                            <span class="text-[10px] text-slate-500" id="cardRefundStatus">Completed</span>
+                        </div>
+
+                        <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-amber-400 font-medium">Refund Balance Due</span>
+                            <div class="text-2xl font-extrabold text-amber-300 font-mono" id="cardRefundBalance">₹0.00</div>
+                            <span class="text-[10px] text-slate-500">Pending Disbursal</span>
+                        </div>
+
+                        <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-blue-400 font-medium">Garments Returned</span>
+                            <div class="text-2xl font-extrabold text-blue-300 font-mono" id="cardTotalUnits">0</div>
+                            <span class="text-[10px] text-slate-500" id="cardReturnType">Partial Return</span>
+                        </div>
+                    </div>
+
+                    <!-- 6 TABS NAVIGATION -->
+                    <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 text-xs overflow-x-auto">
+                        <button class="tab-btn px-4 py-2 rounded-xl font-bold transition text-white bg-slate-850 border border-slate-700" data-tab="tabOverview">Overview</button>
+                        <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabItems">Items (<span id="tabItemCount">0</span>)</button>
+                        <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabInspection">Inspection & Condition</button>
+                        <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabRefund">Refund & Credit Note</button>
+                        <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabInventory">Inventory Movements</button>
+                        <button class="tab-btn px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white transition" data-tab="tabActivity">Activity Audit</button>
+                    </div>
+
+                    <!-- TAB 1: OVERVIEW CONTENT -->
+                    <div id="tabOverview" class="tab-pane space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Customer & Reason Details -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                                <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                    <i data-lucide="user" class="w-4 h-4 text-blue-400"></i>
+                                    <span>Client & Return Case Context</span>
+                                </div>
+                                <div class="space-y-3 text-xs">
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Customer Name</span>
+                                        <a href="#" id="ovCustomerLink" class="font-bold text-slate-200 hover:text-blue-400 transition text-sm">Royal Fashion Boutique</a>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Mobile Number</span>
+                                        <span class="font-mono text-slate-300" id="ovMobile">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">GSTIN Registration</span>
+                                        <span class="font-mono font-bold text-blue-300" id="ovGstin">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Return Reason & Notes</span>
+                                        <span class="text-slate-200 block font-medium" id="ovReason">Wrong Size</span>
+                                        <span class="text-slate-400 text-[11px]" id="ovNotes">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Financial Reversal Breakdown -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                                <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                    <i data-lucide="receipt" class="w-4 h-4 text-amber-400"></i>
+                                    <span>GST Tax Reversal Breakdown</span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Gross Return Amount</span>
+                                        <span class="font-mono text-slate-200" id="ovGross">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Original Discounts Reversal</span>
+                                        <span class="font-mono text-emerald-400" id="ovDiscount">-₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between border-t border-slate-800 pt-2 font-semibold text-slate-300">
+                                        <span>Taxable Sales Reversal</span>
+                                        <span class="font-mono text-white" id="ovTaxable">₹0.00</span>
+                                    </div>
+                                    <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1 text-[11px] font-mono">
+                                        <div class="flex justify-between text-slate-400" id="ovRowCGST">
+                                            <span>CGST Reversal</span>
+                                            <span id="ovCGST">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between text-slate-400" id="ovRowSGST">
+                                            <span>SGST Reversal</span>
+                                            <span id="ovSGST">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between text-slate-400 hidden" id="ovRowIGST">
+                                            <span>IGST Reversal</span>
+                                            <span id="ovIGST">₹0.00</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between border-t border-slate-800 pt-2 font-bold text-sm text-white">
+                                        <span>Total Return / Refund Amount</span>
+                                        <span class="font-mono text-amber-300" id="ovGrandTotal">₹0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ITEMS CONTENT -->
+                    <div id="tabItems" class="tab-pane hidden space-y-4">
+                        <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                            <th class="py-3 px-4">Garment Style</th>
+                                            <th class="py-3 px-3">Variant (Color × Size)</th>
+                                            <th class="py-3 px-4">SKU</th>
+                                            <th class="py-3 px-3 text-center">Return Qty</th>
+                                            <th class="py-3 px-4 text-right">Selling Rate</th>
+                                            <th class="py-3 px-4 text-right">Taxable</th>
+                                            <th class="py-3 px-3 text-center">Condition</th>
+                                            <th class="py-3 px-4 text-right font-bold text-slate-200">Return Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="returnItemsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                        <!-- Dynamic Return Rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: INSPECTION & CONDITION -->
+                    <div id="tabInspection" class="tab-pane hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            
+                            <!-- Inspection Details Card -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                                <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                    <i data-lucide="package-search" class="w-4 h-4 text-blue-400"></i>
+                                    <span>Quality Inspection Status</span>
+                                </div>
+                                <div class="space-y-3 text-xs">
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Inspection Status</span>
+                                        <span class="font-bold text-slate-200" id="inspStatus">Approved</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Condition Result</span>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border inline-block mt-0.5" id="inspConditionBadge">Resalable</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Inspected By & Date</span>
+                                        <span class="text-slate-300 font-mono" id="inspMeta">—</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[11px] block">Inspection Notes</span>
+                                        <p class="text-slate-300 text-[11px]" id="inspNotes">—</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Restocking Policy Info -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-3 md:col-span-2 text-xs">
+                                <div class="flex items-center space-x-2 font-bold text-white border-b border-slate-800 pb-3">
+                                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>Inventory Restocking Rules</span>
+                                </div>
+                                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-2">
+                                    <div class="flex items-start space-x-2 text-slate-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></span>
+                                        <span><strong>Resalable Items:</strong> Automatically returned into active warehouse inventory stock via stock movement <code class="text-emerald-300 font-mono">SALE_RETURN (IN)</code>.</span>
+                                    </div>
+                                    <div class="flex items-start space-x-2 text-slate-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0"></span>
+                                        <span><strong>Damaged / Defective Items:</strong> Quarantined into non-sellable return stock. Does NOT increase available sellable inventory balance.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: REFUND & CREDIT NOTE -->
+                    <div id="tabRefund" class="tab-pane hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Refund Summary Card -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                                <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                    <i data-lucide="credit-card" class="w-4 h-4 text-emerald-400"></i>
+                                    <span>Refund Disbursal Summary</span>
+                                </div>
+                                <div class="space-y-3 text-xs font-mono">
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Total Return Amount:</span>
+                                        <span class="text-white font-bold" id="refTotalAmount">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Amount Refunded / Settled:</span>
+                                        <span class="text-emerald-400 font-bold" id="refSettledAmount">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Remaining Balance Due:</span>
+                                        <span class="text-amber-400 font-bold" id="refDueAmount">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Settlement Method:</span>
+                                        <span class="text-slate-200 font-sans" id="refMethod">Credit Note</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Credit Note Document Preview -->
+                            <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-3 text-xs" id="creditNoteDocCard">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                    <div class="flex items-center space-x-2 font-bold text-white">
+                                        <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
+                                        <span>Credit Note Document</span>
+                                    </div>
+                                    <span class="font-mono font-bold text-purple-300" id="cnDocNumber">CN-000001</span>
+                                </div>
+                                <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs font-mono">
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Issued To:</span>
+                                        <span class="text-white font-bold" id="cnCustName">Royal Fashion Boutique</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Credit Amount:</span>
+                                        <span class="text-emerald-400 font-bold" id="cnAmount">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Tax Reversal Credit:</span>
+                                        <span class="text-slate-300" id="cnTax">₹0.00</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 pt-1 font-sans">This Credit Note can be adjusted against future orders or invoices.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: INVENTORY MOVEMENTS -->
+                    <div id="tabInventory" class="tab-pane hidden space-y-4">
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4 text-xs">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <div class="flex items-center space-x-2 font-bold text-white">
+                                    <i data-lucide="package" class="w-4 h-4 text-blue-400"></i>
+                                    <span>Stock Movement Transactions (Audit Trail)</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono border bg-emerald-500/10 text-emerald-400 border-emerald-500/20" id="invAuditDeductionStatus">Processed</span>
+                            </div>
+                            <div id="invMovementLogs" class="space-y-3">
+                                <!-- Dynamic Movement Log Items -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 6: ACTIVITY AUDIT -->
+                    <div id="tabActivity" class="tab-pane hidden space-y-4">
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <h4 class="text-xs font-bold text-white">Sales Return Audit History</h4>
+                            <div class="space-y-3" id="returnActivityList">
+                                <!-- Dynamic Activity Logs -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Sales Return Detail Screen</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- RECEIVE & INSPECT MODAL -->
+    <div id="receiveModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="relative w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="receiveModalCard">
+            
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="package-check" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white">Receive & Inspect Return Items</h3>
+                </div>
+                <button id="btnCloseReceiveModal" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form id="receiveInspectionForm" class="space-y-3 text-xs" novalidate>
+                <div class="space-y-1">
+                    <label for="selectInspectionResult" class="block text-slate-300 font-semibold">Physical Inspection Result <span class="text-red-400">*</span></label>
+                    <select id="selectInspectionResult" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                        <option value="Resalable">Resalable (Restores sellable inventory)</option>
+                        <option value="Damaged">Damaged (Quarantine stock, non-sellable)</option>
+                        <option value="Defective">Defective (Factory fault, non-sellable)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1">
+                    <label for="inputInspectionNotes" class="block text-slate-300 font-semibold">Inspection Findings / Memo</label>
+                    <input type="text" id="inputInspectionNotes" placeholder="e.g. Tags intact, folded, no visible wear..." class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelReceiveModal" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition">Submit Inspection</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { salesReturnService } from './assets/js/services/salesReturnService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.RETURNS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentReturn = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'returns');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnId = urlParams.get('id');
+
+            if (!returnId) {
+                window.location.href = './returns.html';
+                return;
+            }
+
+            await loadReturnDetails(returnId);
+            attachTabEvents();
+            attachModalEvents();
+        });
+
+        async function loadReturnDetails(id) {
+            currentReturn = await salesReturnService.getSalesReturnById(id);
+
+            if (!currentReturn) {
+                document.getElementById('loadingPlaceholder').innerHTML = `
+                    <div class="text-red-400 font-bold mb-2">Sales Return Record Not Found</div>
+                    <a href="./returns.html" class="text-blue-400 text-xs hover:underline">Return to Returns Hub</a>
+                `;
+                return;
+            }
+
+            // Bind Header
+            document.getElementById('headerReturnNum').textContent = currentReturn.returnNumber;
+            document.getElementById('headerCustomerName').textContent = currentReturn.customerName;
+            document.getElementById('headerDate').textContent = currentReturn.returnDate;
+            document.getElementById('headerReason').textContent = currentReturn.reason;
+
+            const saleLink = document.getElementById('headerSaleLink');
+            saleLink.textContent = currentReturn.saleNumber;
+            saleLink.href = `./sale-details.html?id=${currentReturn.saleId}`;
+
+            const badge = document.getElementById('headerStatusBadge');
+            badge.textContent = currentReturn.status;
+            badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                currentReturn.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                currentReturn.status === 'Approved' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                currentReturn.status === 'Inspected' || currentReturn.status === 'Item Received' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                currentReturn.status === 'Requested' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                currentReturn.status === 'Cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                'bg-slate-800 text-slate-300 border-slate-700'
+            }`;
+
+            const invBadge = document.getElementById('headerInventoryBadge');
+            invBadge.textContent = currentReturn.inventoryProcessed ? 'Stock Processed' : 'Stock Not Processed';
+            invBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-mono border ${
+                currentReturn.inventoryProcessed ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+            }`;
+
+            // Contextual Action Buttons
+            const btnApprove = document.getElementById('btnApproveReturn');
+            const btnReceive = document.getElementById('btnOpenReceiveModal');
+            const btnRefund = document.getElementById('btnProcessRefundHeader');
+
+            if (currentReturn.status === 'Requested') {
+                btnApprove.classList.remove('hidden');
+                btnApprove.onclick = async () => {
+                    const res = await salesReturnService.approveSalesReturn(currentReturn.id, user.name);
+                    if (res.success) {
+                        showToast('Return approved successfully!', 'success');
+                        await loadReturnDetails(currentReturn.id);
+                    }
+                };
+            } else {
+                btnApprove.classList.add('hidden');
+            }
+
+            if ((currentReturn.status === 'Approved' || currentReturn.status === 'Requested') && !currentReturn.inventoryProcessed) {
+                btnReceive.classList.remove('hidden');
+            } else {
+                btnReceive.classList.add('hidden');
+            }
+
+            if (currentReturn.refundStatus !== 'Completed' && currentReturn.status !== 'Cancelled') {
+                btnRefund.classList.remove('hidden');
+                btnRefund.href = `./refund-return.html?id=${currentReturn.id}`;
+            } else {
+                btnRefund.classList.add('hidden');
+            }
+
+            // Bind Cards
+            document.getElementById('cardGrandTotal').textContent = `₹${(currentReturn.grandTotal || 0).toLocaleString('en-IN')}`;
+            document.getElementById('cardRefundedAmount').textContent = `₹${(currentReturn.refundedAmount || 0).toLocaleString('en-IN')}`;
+            document.getElementById('cardRefundStatus').textContent = `Status: ${currentReturn.refundStatus}`;
+            document.getElementById('cardRefundBalance').textContent = `₹${(currentReturn.refundBalance || 0).toLocaleString('en-IN')}`;
+            document.getElementById('cardTotalUnits').textContent = currentReturn.totalQuantity;
+            document.getElementById('cardReturnType').textContent = currentReturn.returnType || 'Partial Return';
+
+            // Tab 1: Overview
+            document.getElementById('ovCustomerLink').textContent = currentReturn.customerName;
+            document.getElementById('ovCustomerLink').href = `./customer-details.html?id=${currentReturn.customerId}`;
+            document.getElementById('ovMobile').textContent = currentReturn.customerMobile;
+            document.getElementById('ovGstin').textContent = currentReturn.customerGstin || 'Unregistered';
+            document.getElementById('ovReason').textContent = currentReturn.reason;
+            document.getElementById('ovNotes').textContent = currentReturn.notes || 'No remarks recorded.';
+
+            document.getElementById('ovGross').textContent = `₹${(currentReturn.totalReturnGross || 0).toLocaleString('en-IN')}`;
+            document.getElementById('ovDiscount').textContent = `-₹${(currentReturn.totalReturnDiscount || 0).toLocaleString('en-IN')}`;
+            document.getElementById('ovTaxable').textContent = `₹${(currentReturn.subtotalTaxable || 0).toLocaleString('en-IN')}`;
+
+            if (currentReturn.isSameState) {
+                document.getElementById('ovRowCGST').classList.remove('hidden');
+                document.getElementById('ovRowSGST').classList.remove('hidden');
+                document.getElementById('ovRowIGST').classList.add('hidden');
+                document.getElementById('ovCGST').textContent = `₹${(currentReturn.cgstTotal || 0).toLocaleString('en-IN')}`;
+                document.getElementById('ovSGST').textContent = `₹${(currentReturn.sgstTotal || 0).toLocaleString('en-IN')}`;
+            } else {
+                document.getElementById('ovRowCGST').classList.add('hidden');
+                document.getElementById('ovRowSGST').classList.add('hidden');
+                document.getElementById('ovRowIGST').classList.remove('hidden');
+                document.getElementById('ovIGST').textContent = `₹${(currentReturn.igstTotal || 0).toLocaleString('en-IN')}`;
+            }
+            document.getElementById('ovGrandTotal').textContent = `₹${(currentReturn.grandTotal || 0).toLocaleString('en-IN')}`;
+
+            // Tab 2: Items Table
+            document.getElementById('tabItemCount').textContent = currentReturn.items.length;
+            renderItemsTable(currentReturn.items);
+
+            // Tab 3: Inspection
+            const insp = currentReturn.inspection || {};
+            document.getElementById('inspStatus').textContent = insp.status || 'Pending';
+            const cBadge = document.getElementById('inspConditionBadge');
+            cBadge.textContent = insp.result || 'Unknown';
+            cBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold border inline-block mt-0.5 ${
+                insp.result === 'Resalable' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'
+            }`;
+            document.getElementById('inspMeta').textContent = `${insp.inspectedBy || 'Pending'} • ${insp.inspectionDate || '—'}`;
+            document.getElementById('inspNotes').textContent = insp.notes || 'No inspection notes.';
+
+            // Tab 4: Refund & Credit Note
+            document.getElementById('refTotalAmount').textContent = `₹${(currentReturn.grandTotal || 0).toLocaleString('en-IN')}`;
+            document.getElementById('refSettledAmount').textContent = `₹${(currentReturn.refundedAmount || 0).toLocaleString('en-IN')}`;
+            document.getElementById('refDueAmount').textContent = `₹${(currentReturn.refundBalance || 0).toLocaleString('en-IN')}`;
+            document.getElementById('refMethod').textContent = currentReturn.refund ? currentReturn.refund.method : 'Credit Note';
+
+            const cnNum = currentReturn.refund ? currentReturn.refund.creditNoteNumber : '';
+            if (cnNum) {
+                document.getElementById('cnDocNumber').textContent = cnNum;
+                document.getElementById('cnCustName').textContent = currentReturn.customerName;
+                document.getElementById('cnAmount').textContent = `₹${(currentReturn.refundedAmount || currentReturn.grandTotal).toLocaleString('en-IN')}`;
+                document.getElementById('cnTax').textContent = `₹${(currentReturn.totalTax || 0).toLocaleString('en-IN')}`;
+                document.getElementById('creditNoteDocCard').classList.remove('hidden');
+            } else {
+                document.getElementById('creditNoteDocCard').classList.add('hidden');
+            }
+
+            // Tab 5: Inventory
+            renderInventoryAudit(currentReturn);
+
+            // Tab 6: Activity
+            renderActivity(currentReturn.activity || []);
+
+            document.getElementById('loadingPlaceholder').classList.add('hidden');
+            document.getElementById('returnContainer').classList.remove('hidden');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderItemsTable(items) {
+            const tbody = document.getElementById('returnItemsTableBody');
+            tbody.innerHTML = items.map(i => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-3 px-4 font-bold text-slate-200">${i.productName}</td>
+                    <td class="py-3 px-3">
+                        <span class="text-slate-300 font-medium">${i.variantName || `${i.color} / ${i.size}`}</span>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-blue-300">${i.sku}</td>
+                    <td class="py-3 px-3 text-center font-mono font-bold text-amber-300">${i.returnQuantity}</td>
+                    <td class="py-3 px-4 text-right font-mono text-slate-300">₹${(i.sellingRate || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4 text-right font-mono text-slate-300">₹${(i.taxableAmount || 0).toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${
+                            i.condition === 'Resalable' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'
+                        }">
+                            ${i.condition}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-slate-100">₹${(i.totalAmount || 0).toLocaleString('en-IN')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderInventoryAudit(ret) {
+            const container = document.getElementById('invMovementLogs');
+            const isProcessed = ret.inventoryProcessed;
+            document.getElementById('invAuditDeductionStatus').textContent = isProcessed ? 'Processed' : 'Pending Intake';
+
+            if (!isProcessed) {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-slate-950 text-slate-400 text-center">Items have not been physically received or inspected into inventory yet.</div>`;
+                return;
+            }
+
+            const isResalable = ret.inspection && ret.inspection.result === 'Resalable';
+
+            container.innerHTML = `
+                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-200">Stock Movement: ${isResalable ? 'SALE_RETURN (IN)' : 'DAMAGED_RETURN_QUARANTINE'}</span>
+                        <span class="text-emerald-400 font-mono font-bold">${isResalable ? `+${ret.totalQuantity} Sellable Units` : `${ret.totalQuantity} Quarantined Units`}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-mono">Reference: ${ret.returnNumber} • Sale: ${ret.saleNumber}</div>
+                    <p class="text-[11px] text-slate-300">${isResalable ? 'Physical units added back to available sellable warehouse stock.' : 'Damaged/defective items logged into quarantine (sellable stock unchanged).'}</p>
+                </div>
+            `;
+        }
+
+        function renderActivity(activities) {
+            const container = document.getElementById('returnActivityList');
+            if (activities.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-xs py-4">No recorded activity history.</div>`;
+                return;
+            }
+
+            container.innerHTML = activities.map(act => `
+                <div class="flex items-start space-x-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs">
+                    <div class="w-2 h-2 mt-1.5 rounded-full bg-amber-400 ring-4 ring-amber-400/20 flex-shrink-0"></div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-0.5">
+                            <span class="font-bold text-slate-200">${act.user}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${act.time}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">${act.action}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function attachTabEvents() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                        b.classList.add('text-slate-400');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+                    btn.classList.add('text-white', 'bg-slate-850', 'border', 'border-slate-700');
+                    btn.classList.remove('text-slate-400');
+
+                    const targetTab = btn.getAttribute('data-tab');
+                    document.getElementById(targetTab).classList.remove('hidden');
+                });
+            });
+        }
+
+        function attachModalEvents() {
+            const modal = document.getElementById('receiveModal');
+            const card = document.getElementById('receiveModalCard');
+
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+            };
+
+            const closeModal = () => {
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            };
+
+            document.getElementById('btnOpenReceiveModal').addEventListener('click', openModal);
+            document.getElementById('btnCloseReceiveModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelReceiveModal').addEventListener('click', closeModal);
+
+            document.getElementById('receiveInspectionForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const condition = document.getElementById('selectInspectionResult').value;
+                const notes = document.getElementById('inputInspectionNotes').value.trim();
+
+                const res = await salesReturnService.receiveAndInspectItems(currentReturn.id, { condition, notes }, user.name);
+
+                if (res.success) {
+                    closeModal();
+                    showToast(`Inspection submitted: ${condition}!`, 'success');
+                    await loadReturnDetails(currentReturn.id);
+                } else {
+                    showToast(res.message || 'Error processing inspection.', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

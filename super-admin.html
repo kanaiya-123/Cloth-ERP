@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Super Admin Dashboard — CLOTHERP</title>
+    <meta name="description" content="Super Admin platform dashboard, multi-tenant monitoring, plan distribution, and security events in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Platform</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Super Admin</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="shield" class="w-6 h-6 text-blue-400"></i>
+                            <span>SaaS Platform Super Admin Hub</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Multi-tenant management, subscription tiers, platform module dependencies, and system-wide controls.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="./tenants.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="building" class="w-3.5 h-3.5"></i>
+                            <span>Manage Tenants</span>
+                        </a>
+
+                        <a href="./announcements.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="megaphone" class="w-3.5 h-3.5"></i>
+                            <span>Broadcast Alert</span>
+                        </a>
+
+                        <a href="./subscription-plans.html" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                            <span>Subscription Plans</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Total Active Tenants</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalTenants">0</div>
+                        <span class="text-[10px] text-slate-500">Live Garment ERP Clients</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Paid Subscriptions</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiPaidTenants">0</div>
+                        <span class="text-[10px] text-slate-500">Enterprise & Pro Tiers</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Active Trials</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiTrialTenants">0</div>
+                        <span class="text-[10px] text-slate-500">14-Day Free Tier</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-rose-400 font-medium">Suspended / Overdue</span>
+                        <div class="text-2xl font-extrabold text-rose-300 font-mono" id="kpiSuspendedTenants">0</div>
+                        <span class="text-[10px] text-slate-500">Action Required</span>
+                    </div>
+                </div>
+
+                <!-- 4 CORE SAAS MODULE CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    
+                    <!-- Tenants Directory Card -->
+                    <a href="./tenants.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="building" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Tenants Directory</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Onboard new garment brands, toggle tenant status (Active/Suspended), and view usage limits.</p>
+                        </div>
+                        <span class="text-xs text-blue-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Open Directory</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Subscription Plans Card -->
+                    <a href="./subscription-plans.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Subscription Plans</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Configure Starter, Professional, and Enterprise tiers with user, branch, and module quotas.</p>
+                        </div>
+                        <span class="text-xs text-emerald-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Manage Plans</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Module Master Card -->
+                    <a href="./modules.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+                            <i data-lucide="grid" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Module Master</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Control global ERP feature modules, enforce dependencies (e.g. Accounting $\rightarrow$ Sales/Purchase).</p>
+                        </div>
+                        <span class="text-xs text-purple-400 font-semibold inline-flex items-center space-x-1">
+                            <span>View Modules</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- System Controls Card -->
+                    <a href="./system-settings.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                            <i data-lucide="sliders" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">System Settings & Controls</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Platform maintenance mode, lockout policies, session timeout, and security audit logs.</p>
+                        </div>
+                        <span class="text-xs text-amber-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Open Settings</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- LIVE TENANT ROSTER SUMMARY -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden space-y-4 p-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="building" class="w-4 h-4 text-blue-400"></i>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Active Multi-Tenant Organizations</h3>
+                        </div>
+                        <a href="./tenants.html" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">View All Tenants →</a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-2.5 px-3">Tenant Code</th>
+                                    <th class="py-2.5 px-3">Organization Name</th>
+                                    <th class="py-2.5 px-3">Primary Contact</th>
+                                    <th class="py-2.5 px-3">Plan</th>
+                                    <th class="py-2.5 px-3">Renewal Date</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="superAdminTenantsBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Multi-Tenant SaaS Platform</div>
+                <div class="font-mono text-[11px] text-slate-600">Platform Super Admin Console</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { saasService } from './assets/js/services/saasService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PLATFORM_DASHBOARD_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'super-admin');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            const res = await saasService.getTenants();
+
+            document.getElementById('kpiTotalTenants').textContent = res.summary.totalTenants;
+            document.getElementById('kpiPaidTenants').textContent = res.summary.activeCount;
+            document.getElementById('kpiTrialTenants').textContent = res.summary.trialCount;
+            document.getElementById('kpiSuspendedTenants').textContent = res.summary.suspendedCount;
+
+            const tbody = document.getElementById('superAdminTenantsBody');
+            tbody.innerHTML = (res.items || []).map(t => `
+                <tr class="hover:bg-slate-850/40 transition">
+                    <td class="py-3 px-3 font-mono font-bold text-blue-400">${t.tenantCode}</td>
+                    <td class="py-3 px-3 font-bold text-white">${t.companyName}</td>
+                    <td class="py-3 px-3 text-slate-300">
+                        <div>${t.primaryContact}</div>
+                        <div class="text-[10px] text-slate-500 font-mono">${t.email}</div>
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                            t.planName.includes('Enterprise') ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
+                            t.planName.includes('Professional') ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                            'bg-slate-800 text-slate-300'
+                        }">${t.planName}</span>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-slate-400">${t.renewalDate}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            t.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                        }">${t.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Center & Smart Alerts — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="View, search, and manage all enterprise business notifications, low stock warnings, and payment alerts in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto">
+                
+                <!-- Page Header & Global Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">System</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Smart Alerts</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="bell" class="w-6 h-6 text-blue-400"></i>
+                            <span>Notification Center & Smart Alerts</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Actionable ERP alerts for inventory depletion, overdue payments, delayed orders, and pending returns.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="btnEvaluateAlerts" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            <span>Scan ERP Alerts</span>
+                        </button>
+
+                        <button id="btnMarkAllReadPage" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                            <span>Mark All Read</span>
+                        </button>
+
+                        <a href="./notification-settings.html" class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-400 hover:text-white transition" title="Notification Preferences">
+                            <i data-lucide="settings" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 SUMMARY KPI CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Notifications</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalNotifs">0</div>
+                        <span class="text-[10px] text-slate-500">Active Alert History</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Unread Alerts</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiUnreadNotifs">0</div>
+                        <span class="text-[10px] text-slate-500">Awaiting Action</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-red-400 font-medium">Critical Priority</span>
+                        <div class="text-2xl font-extrabold text-red-300 font-mono" id="kpiCriticalNotifs">0</div>
+                        <span class="text-[10px] text-slate-500">Out of Stock & Urgent</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">High Priority</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiHighNotifs">0</div>
+                        <span class="text-[10px] text-slate-500">Low Stock & Overdue Dues</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="notifSearchInput" 
+                            placeholder="Search title, message, or reference SKU/Sale..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="priorityFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Priorities</option>
+                            <option value="CRITICAL">Critical Priority</option>
+                            <option value="HIGH">High Priority</option>
+                            <option value="NORMAL">Normal Priority</option>
+                        </select>
+
+                        <select id="readStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="unread" selected>Unread Only</option>
+                            <option value="read">Read Only</option>
+                        </select>
+
+                        <select id="typeFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Alert Types</option>
+                            <option value="LOW_STOCK">Low Stock</option>
+                            <option value="OUT_OF_STOCK">Out of Stock</option>
+                            <option value="PAYMENT_OVERDUE">Overdue Payments</option>
+                            <option value="RETURN_REQUESTED">Returns</option>
+                            <option value="REFUND_PENDING">Refunds</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="space-y-3" id="notifListContainer">
+                    <!-- Dynamic Notification Cards -->
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="p-4 glass-card rounded-2xl border border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                    <span id="showingCount">Showing 0 of 0 notifications</span>
+                    <div class="flex items-center space-x-2">
+                        <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                        <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                        <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Smart Alert Hub</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { notificationService } from './assets/js/services/notificationService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.NOTIFICATIONS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentPage = 1;
+        const pageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'notifications');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadNotifications();
+            attachEvents();
+        });
+
+        async function loadNotifications() {
+            const search = document.getElementById('notifSearchInput').value;
+            const priority = document.getElementById('priorityFilter').value;
+            const readStatus = document.getElementById('readStatusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+
+            const res = await notificationService.getNotifications({
+                page: currentPage,
+                pageSize,
+                search,
+                priority,
+                readStatus,
+                type,
+                userRole: user.role
+            });
+
+            // KPIs
+            document.getElementById('kpiTotalNotifs').textContent = res.summary.totalCount;
+            document.getElementById('kpiUnreadNotifs').textContent = res.summary.unreadCount;
+            document.getElementById('kpiCriticalNotifs').textContent = res.summary.criticalCount;
+            document.getElementById('kpiHighNotifs').textContent = res.summary.highCount;
+
+            renderList(res.items, res.pagination);
+        }
+
+        function renderList(notifications, pagination) {
+            const container = document.getElementById('notifListContainer');
+            document.getElementById('showingCount').textContent = `Showing ${notifications.length} of ${pagination.totalItems} notifications`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card p-12 text-center text-slate-500 rounded-2xl border border-slate-800">
+                        <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                            <i data-lucide="bell-off" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-sm font-bold text-slate-300 mb-1">No notifications match filters</p>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto">You're all caught up! Genuinely new business alerts will appear here.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = notifications.map(n => `
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800/90 hover:border-slate-700 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${!n.isRead ? 'bg-slate-900/60 ring-1 ring-blue-500/20' : 'opacity-70'}">
+                        
+                        <div class="flex items-start space-x-3.5">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                                n.priority === 'CRITICAL' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                n.priority === 'HIGH' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                                'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                            }">
+                                <i data-lucide="${
+                                    n.type === 'OUT_OF_STOCK' || n.priority === 'CRITICAL' ? 'alert-octagon' :
+                                    n.type === 'LOW_STOCK' || n.priority === 'HIGH' ? 'alert-triangle' :
+                                    n.type === 'RETURN_REQUESTED' ? 'rotate-ccw' :
+                                    n.type === 'REFUND_PENDING' ? 'credit-card' : 'bell'
+                                }" class="w-5 h-5"></i>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <h4 class="text-xs font-bold text-white">${n.title}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold border ${
+                                        n.priority === 'CRITICAL' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                        n.priority === 'HIGH' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                        'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                    }">${n.priority}</span>
+                                    ${!n.isRead ? '<span class="w-2 h-2 rounded-full bg-blue-500"></span>' : ''}
+                                </div>
+                                <p class="text-xs text-slate-300 leading-normal max-w-2xl">${n.message}</p>
+                                <div class="flex items-center space-x-3 text-[10px] text-slate-500 font-mono pt-0.5">
+                                    <span>${n.relativeTime}</span>
+                                    <span>•</span>
+                                    <span>Source: ${n.createdBy}</span>
+                                    ${n.referenceNumber ? `<span>• Ref: <strong class="text-slate-400">${n.referenceNumber}</strong></span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 self-end sm:self-center flex-shrink-0">
+                            ${n.actionUrl ? `
+                                <a href="${n.actionUrl}" class="px-3 py-1.5 rounded-xl bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/20 text-blue-300 text-xs font-semibold transition flex items-center space-x-1">
+                                    <span>View Record</span>
+                                    <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+                                </a>
+                            ` : ''}
+
+                            <button class="btn-toggle-read p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition" data-id="${n.id}" data-read="${n.isRead}" title="${n.isRead ? 'Mark as Unread' : 'Mark as Read'}">
+                                <i data-lucide="${n.isRead ? 'mail' : 'mail-open'}" class="w-3.5 h-3.5"></i>
+                            </button>
+
+                            <button class="btn-dismiss p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-red-400 transition" data-id="${n.id}" title="Dismiss Notification">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+            attachCardActions();
+        }
+
+        function attachCardActions() {
+            document.querySelectorAll('.btn-toggle-read').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    const isRead = btn.getAttribute('data-read') === 'true';
+
+                    if (isRead) await notificationService.markAsUnread(id);
+                    else await notificationService.markAsRead(id);
+
+                    await loadNotifications();
+                });
+            });
+
+            document.querySelectorAll('.btn-dismiss').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    await notificationService.dismissNotification(id);
+                    showToast('Notification dismissed', 'info');
+                    await loadNotifications();
+                });
+            });
+        }
+
+        function attachEvents() {
+            let debounceTimer;
+            document.getElementById('notifSearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadNotifications();
+                }, 300);
+            });
+
+            document.getElementById('priorityFilter').addEventListener('change', () => { currentPage = 1; loadNotifications(); });
+            document.getElementById('readStatusFilter').addEventListener('change', () => { currentPage = 1; loadNotifications(); });
+            document.getElementById('typeFilter').addEventListener('change', () => { currentPage = 1; loadNotifications(); });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadNotifications();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadNotifications();
+            });
+
+            // Mark all read button on page
+            document.getElementById('btnMarkAllReadPage').addEventListener('click', async () => {
+                await notificationService.markAllAsRead();
+                showToast('All notifications marked as read', 'success');
+                await loadNotifications();
+            });
+
+            // Evaluate smart alerts button
+            document.getElementById('btnEvaluateAlerts').addEventListener('click', async () => {
+                const res = await notificationService.evaluateSmartAlerts();
+                if (res.newAlertsCount > 0) {
+                    showToast(`Scanned ERP: ${res.newAlertsCount} new alert(s) detected!`, 'success');
+                } else {
+                    showToast('Scanned ERP: No new alert conditions found. All states up-to-date.', 'info');
+                }
+                await loadNotifications();
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

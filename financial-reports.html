@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Statements & Reports — CLOTHERP</title>
+    <meta name="description" content="Generate Trial Balance, Profit & Loss Statement, and Balance Sheet in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Action Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./accounting.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Accounting</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Statements</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-blue-400"></i>
+                            <span>Financial Statements & Reporting</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Real-time Trial Balance, Profit & Loss Statement, and Balance Sheet computed from General Ledger.</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Print Statement</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TABS BAR -->
+                <div class="flex items-center space-x-2 border-b border-slate-800 text-xs font-semibold">
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-blue-500 text-white flex items-center space-x-1.5" data-tab="trialBalanceTab">
+                        <i data-lucide="scale" class="w-3.5 h-3.5"></i>
+                        <span>Trial Balance</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="pnlTab">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                        <span>Profit & Loss Statement</span>
+                    </button>
+
+                    <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5" data-tab="balanceSheetTab">
+                        <i data-lucide="landmark" class="w-3.5 h-3.5"></i>
+                        <span>Balance Sheet</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: TRIAL BALANCE -->
+                <div id="trialBalanceTab" class="tab-content space-y-4">
+                    <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">General Ledger Trial Balance</span>
+                            <span id="tbBalanceBadge" class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TOTAL DEBIT = TOTAL CREDIT</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                    <tr>
+                                        <th class="py-3 px-4">Account Code</th>
+                                        <th class="py-3 px-4">Account Name</th>
+                                        <th class="py-3 px-4">Account Group</th>
+                                        <th class="py-3 px-4 text-right">Debit Balance (₹)</th>
+                                        <th class="py-3 px-4 text-right">Credit Balance (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60" id="tbTableBody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                                <tfoot class="bg-slate-950 border-t-2 border-slate-700 font-mono font-bold text-xs text-white">
+                                    <tr>
+                                        <td colspan="3" class="py-3 px-4 text-right uppercase">Grand Totals:</td>
+                                        <td class="py-3 px-4 text-right text-emerald-400" id="tbGrandDebit">₹0.00</td>
+                                        <td class="py-3 px-4 text-right text-emerald-400" id="tbGrandCredit">₹0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PROFIT & LOSS -->
+                <div id="pnlTab" class="tab-content hidden space-y-5">
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+                        
+                        <!-- Operating Revenue -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-xs font-bold text-white uppercase tracking-wider">1. Operating Revenue & Income</span>
+                                <span class="font-mono font-bold text-emerald-400 text-sm" id="pnlTotalRev">₹0.00</span>
+                            </div>
+                            <div class="space-y-1.5 text-xs" id="pnlIncomeList"></div>
+                        </div>
+
+                        <!-- COGS -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-xs font-bold text-white uppercase tracking-wider">2. Cost of Goods Sold (COGS)</span>
+                                <span class="font-mono font-bold text-amber-400 text-sm" id="pnlTotalCogs">₹0.00</span>
+                            </div>
+                            <div class="space-y-1.5 text-xs" id="pnlCogsList"></div>
+                        </div>
+
+                        <!-- Gross Profit -->
+                        <div class="p-4 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+                            <span class="font-bold text-slate-300 uppercase">Gross Operating Profit:</span>
+                            <span class="font-extrabold text-blue-400 text-base" id="pnlGrossProfit">₹0.00</span>
+                        </div>
+
+                        <!-- Operating Expenses -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-xs font-bold text-white uppercase tracking-wider">3. Operating Expenses & Overheads</span>
+                                <span class="font-mono font-bold text-rose-400 text-sm" id="pnlTotalOpex">₹0.00</span>
+                            </div>
+                            <div class="space-y-1.5 text-xs" id="pnlOpexList"></div>
+                        </div>
+
+                        <!-- Net Profit -->
+                        <div class="p-5 bg-gradient-to-r from-blue-900/30 via-slate-900 to-emerald-900/30 rounded-2xl border border-blue-500/30 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase font-mono font-semibold block">Fiscal Net Profit:</span>
+                                <span class="text-2xl font-extrabold text-emerald-400 font-mono" id="pnlNetProfit">₹0.00</span>
+                            </div>
+                            <span class="text-xs text-slate-400">Transferred to Balance Sheet Retained Earnings</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TAB 3: BALANCE SHEET -->
+                <div id="balanceSheetTab" class="tab-content hidden space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- ASSETS COLUMN -->
+                        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <span class="text-xs font-bold text-white uppercase tracking-wider">Assets</span>
+                                <span class="font-mono font-bold text-blue-400 text-sm" id="bsTotalAssets">₹0.00</span>
+                            </div>
+                            <div class="space-y-2 text-xs" id="bsAssetsList"></div>
+                        </div>
+
+                        <!-- LIABILITIES & EQUITY COLUMN -->
+                        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <span class="text-xs font-bold text-white uppercase tracking-wider">Liabilities & Equity</span>
+                                <span class="font-mono font-bold text-emerald-400 text-sm" id="bsTotalLiabEquity">₹0.00</span>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <span class="text-[11px] text-slate-500 font-bold uppercase block">Liabilities</span>
+                                <div class="space-y-2 text-xs" id="bsLiabList"></div>
+
+                                <span class="text-[11px] text-slate-500 font-bold uppercase block pt-2 border-t border-slate-800">Owner Equity & Retained Earnings</span>
+                                <div class="space-y-2 text-xs" id="bsEquityList"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Financial Management</div>
+                <div class="font-mono text-[11px] text-slate-600">Financial Reporting Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { accountingService } from './assets/js/services/accountingService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.FINANCIAL_REPORTS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'financial-reports');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            setupTabs();
+            await loadStatements();
+        });
+
+        async function loadStatements() {
+            await Promise.all([
+                loadTrialBalance(),
+                loadProfitAndLoss(),
+                loadBalanceSheet()
+            ]);
+        }
+
+        async function loadTrialBalance() {
+            const tb = await accountingService.getTrialBalance();
+
+            document.getElementById('tbGrandDebit').textContent = `₹${tb.totalDebit.toLocaleString('en-IN')}`;
+            document.getElementById('tbGrandCredit').textContent = `₹${tb.totalCredit.toLocaleString('en-IN')}`;
+
+            const tbody = document.getElementById('tbTableBody');
+            tbody.innerHTML = tb.rows.map(r => `
+                <tr class="hover:bg-slate-850/60 transition">
+                    <td class="py-2.5 px-4 font-mono font-bold text-blue-400">${r.accountCode}</td>
+                    <td class="py-2.5 px-4 font-semibold text-white">${r.name}</td>
+                    <td class="py-2.5 px-4 text-slate-400">${r.groupName}</td>
+                    <td class="py-2.5 px-4 text-right font-mono text-slate-200">${r.periodDebit > 0 ? `₹${r.periodDebit.toLocaleString('en-IN')}` : '-'}</td>
+                    <td class="py-2.5 px-4 text-right font-mono text-slate-200">${r.periodCredit > 0 ? `₹${r.periodCredit.toLocaleString('en-IN')}` : '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadProfitAndLoss() {
+            const pnl = await accountingService.getProfitAndLoss();
+
+            document.getElementById('pnlTotalRev').textContent = `₹${pnl.totalRevenue.toLocaleString('en-IN')}`;
+            document.getElementById('pnlTotalCogs').textContent = `₹${pnl.totalCogs.toLocaleString('en-IN')}`;
+            document.getElementById('pnlGrossProfit').textContent = `₹${pnl.grossProfit.toLocaleString('en-IN')}`;
+            document.getElementById('pnlTotalOpex').textContent = `₹${pnl.totalOpex.toLocaleString('en-IN')}`;
+            document.getElementById('pnlNetProfit').textContent = `₹${pnl.netProfit.toLocaleString('en-IN')}`;
+
+            document.getElementById('pnlIncomeList').innerHTML = pnl.incomeAccounts.map(a => `
+                <div class="flex justify-between text-slate-300">
+                    <span>${a.accountCode} - ${a.name}</span>
+                    <span class="font-mono font-semibold text-emerald-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('pnlCogsList').innerHTML = pnl.cogsAccounts.map(a => `
+                <div class="flex justify-between text-slate-300">
+                    <span>${a.accountCode} - ${a.name}</span>
+                    <span class="font-mono font-semibold text-amber-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('pnlOpexList').innerHTML = pnl.opexAccounts.map(a => `
+                <div class="flex justify-between text-slate-300">
+                    <span>${a.accountCode} - ${a.name}</span>
+                    <span class="font-mono font-semibold text-rose-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                </div>
+            `).join('');
+        }
+
+        async function loadBalanceSheet() {
+            const bs = await accountingService.getBalanceSheet();
+
+            document.getElementById('bsTotalAssets').textContent = `₹${bs.totalAssets.toLocaleString('en-IN')}`;
+            document.getElementById('bsTotalLiabEquity').textContent = `₹${(bs.totalLiabilities + bs.totalEquity).toLocaleString('en-IN')}`;
+
+            document.getElementById('bsAssetsList').innerHTML = bs.assetAccounts.map(a => `
+                <div class="flex justify-between text-slate-300">
+                    <span>${a.accountCode} - ${a.name}</span>
+                    <span class="font-mono font-bold text-blue-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('bsLiabList').innerHTML = bs.liabilityAccounts.map(a => `
+                <div class="flex justify-between text-slate-300">
+                    <span>${a.accountCode} - ${a.name}</span>
+                    <span class="font-mono font-bold text-amber-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('bsEquityList').innerHTML = `
+                ${bs.equityAccounts.map(a => `
+                    <div class="flex justify-between text-slate-300">
+                        <span>${a.accountCode} - ${a.name}</span>
+                        <span class="font-mono font-bold text-emerald-400">₹${(a.currentBalance || 0).toLocaleString('en-IN')}</span>
+                    </div>
+                `).join('')}
+                <div class="flex justify-between text-slate-300 font-semibold pt-1 border-t border-slate-800">
+                    <span>Current Fiscal Net Profit</span>
+                    <span class="font-mono font-bold text-purple-400">₹${bs.netProfitRetained.toLocaleString('en-IN')}</span>
+                </div>
+            `;
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('border-blue-500', 'text-white');
+                        b.classList.add('border-transparent', 'text-slate-400');
+                    });
+                    btn.classList.add('border-blue-500', 'text-white');
+                    btn.classList.remove('border-transparent', 'text-slate-400');
+
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

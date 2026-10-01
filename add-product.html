@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Create new clothing styles and generate matrix variants in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./products.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Products</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">New Garment Style</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Create Apparel Product</h1>
+                        <p class="text-xs text-slate-400">Define garment attributes, classification, base pricing, and generate matrix variants.</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2.5">
+                        <a href="./products.html" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition">
+                            Cancel
+                        </a>
+                        <button type="button" id="btnSubmitProduct" class="btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-xl shadow-blue-600/25 flex items-center space-x-2 transition">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Save Product & Variants</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Feedback Notification -->
+                <div id="formFeedback" class="hidden p-4 rounded-2xl text-xs font-medium transition-all"></div>
+
+                <!-- Multi-Section Form -->
+                <form id="addProductForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: BASIC INFORMATION -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">1. Basic Information</h3>
+                                <p class="text-[11px] text-slate-400">Essential style details and garment specifications</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2 space-y-1">
+                                <label for="prodName" class="block text-xs font-semibold text-slate-300">Product Name <span class="text-red-400">*</span></label>
+                                <input type="text" id="prodName" placeholder="e.g. Men's Cotton Oxford Shirt" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <div id="prodNameError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodCode" class="block text-xs font-semibold text-slate-300">Product Code / Style #</label>
+                                <input type="text" id="prodCode" placeholder="e.g. SH-OXF-01" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodGender" class="block text-xs font-semibold text-slate-300">Target Gender / Segment</label>
+                                <select id="prodGender" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="Men">Men</option>
+                                    <option value="Women">Women</option>
+                                    <option value="Unisex">Unisex</option>
+                                    <option value="Kids">Kids</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodFabric" class="block text-xs font-semibold text-slate-300">Fabric Composition</label>
+                                <input type="text" id="prodFabric" placeholder="e.g. 100% Oxford Cotton, 220 GSM" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodHsn" class="block text-xs font-semibold text-slate-300">HSN Code</label>
+                                <input type="text" id="prodHsn" value="6205" placeholder="e.g. 620520" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodGst" class="block text-xs font-semibold text-slate-300">GST Slab Rate</label>
+                                <select id="prodGst" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="5%">5% GST (Apparel under ₹1,000)</option>
+                                    <option value="12%">12% GST (Apparel above ₹1,000)</option>
+                                    <option value="18%">18% GST (Synthetics & Special)</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodStatus" class="block text-xs font-semibold text-slate-300">Status</label>
+                                <select id="prodStatus" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2 space-y-1">
+                                <label for="prodDescription" class="block text-xs font-semibold text-slate-300">Description</label>
+                                <textarea id="prodDescription" rows="2" placeholder="Garment weave details, styling advice, fit information..." class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: CLASSIFICATION -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                                <i data-lucide="folder-tree" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">2. Classification</h3>
+                                <p class="text-[11px] text-slate-400">Department and brand association</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="prodCategory" class="block text-xs font-semibold text-slate-300">Category <span class="text-red-400">*</span></label>
+                                <select id="prodCategory" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <!-- Dynamic Options -->
+                                </select>
+                                <div id="prodCategoryError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodBrand" class="block text-xs font-semibold text-slate-300">Brand</label>
+                                <select id="prodBrand" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <!-- Dynamic Options -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: BASE PRICING -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                                    <i data-lucide="badge-indian-rupee" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">3. Base Pricing</h3>
+                                    <p class="text-[11px] text-slate-400">Default wholesale cost and retail selling price (INR ₹)</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono">Variant prices can override base</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="prodCostPrice" class="block text-xs font-semibold text-slate-300">Base Cost Price (₹)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-mono text-xs">₹</span>
+                                    <input type="number" id="prodCostPrice" min="0" step="1" placeholder="450" class="w-full pl-8 pr-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="prodSellingPrice" class="block text-xs font-semibold text-slate-300">Base Selling Price (₹) <span class="text-red-400">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-mono text-xs">₹</span>
+                                    <input type="number" id="prodSellingPrice" min="0" step="1" placeholder="899" class="w-full pl-8 pr-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                </div>
+                                <div id="prodPriceError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: PRODUCT IMAGE -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                                <i data-lucide="image" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">4. Product Image</h3>
+                                <p class="text-[11px] text-slate-400">Primary visual preview for POS and inventory cards</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <div class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950 overflow-hidden flex items-center justify-center flex-shrink-0 relative group" id="imagePreviewWrapper">
+                                <img id="imagePreview" src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80" alt="Preview" class="w-full h-full object-cover">
+                            </div>
+
+                            <div class="space-y-2 flex-1 w-full">
+                                <label for="prodImageUrl" class="block text-xs font-semibold text-slate-300">Image Web URL or Select Sample</label>
+                                <input type="url" id="prodImageUrl" value="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=400&q=80" placeholder="https://..." class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <div class="flex items-center space-x-2 pt-1">
+                                    <button type="button" class="btn-sample-img text-[11px] text-blue-400 hover:underline" data-url="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=400&q=80">Oxford Shirt</button>
+                                    <span class="text-slate-600">•</span>
+                                    <button type="button" class="btn-sample-img text-[11px] text-blue-400 hover:underline" data-url="https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=400&q=80">Denim Jeans</button>
+                                    <span class="text-slate-600">•</span>
+                                    <button type="button" class="btn-sample-img text-[11px] text-blue-400 hover:underline" data-url="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=400&q=80">Silk Kurti</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: VARIANT BUILDER (THE ENGINE) -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                                    <i data-lucide="layers" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">5. Matrix Variant Builder</h3>
+                                    <p class="text-[11px] text-slate-400">Select colors and sizes to generate individual SKU combinations</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-mono text-[10px] font-bold border border-blue-500/20" id="variantCountBadge">
+                                0 Generated Variants
+                            </span>
+                        </div>
+
+                        <!-- 5A: Color Selection Pills -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-300">Select Available Colors</label>
+                            <div class="flex flex-wrap gap-2" id="colorPickerPills">
+                                <!-- Dynamic Color Checkbox Pills -->
+                            </div>
+                        </div>
+
+                        <!-- 5B: Size Selection Pills -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-300">Select Available Sizes</label>
+                            <div class="flex flex-wrap gap-2" id="sizePickerPills">
+                                <!-- Dynamic Size Checkbox Pills -->
+                            </div>
+                        </div>
+
+                        <!-- 5C: Action Trigger -->
+                        <div class="pt-2 flex items-center justify-between">
+                            <button type="button" id="btnGenerateVariants" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-2">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                <span>Generate Variants</span>
+                            </button>
+                            <span class="text-[11px] text-slate-400" id="combinationCountPreview">0 combinations will be generated</span>
+                        </div>
+
+                        <!-- 5D: Generated Variants Table -->
+                        <div class="space-y-3 pt-3">
+                            <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                            <th class="py-2.5 px-3">Color</th>
+                                            <th class="py-2.5 px-3">Size</th>
+                                            <th class="py-2.5 px-3">SKU Code</th>
+                                            <th class="py-2.5 px-3">Barcode</th>
+                                            <th class="py-2.5 px-3 text-right">Cost (₹)</th>
+                                            <th class="py-2.5 px-3 text-right">Selling (₹)</th>
+                                            <th class="py-2.5 px-3 text-center">Status</th>
+                                            <th class="py-2.5 px-3 text-right">Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="variantTableBody" class="divide-y divide-slate-800/60 font-mono">
+                                        <tr>
+                                            <td colspan="8" class="py-6 text-center text-slate-500 font-sans">
+                                                No variants generated yet. Select at least one color and size above and click Generate.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved.</div>
+                <div class="font-mono text-[11px] text-slate-600">Product Form v1.0</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { categoryService } from './assets/js/services/categoryService.js';
+        import { brandService } from './assets/js/services/brandService.js';
+        import { colorService } from './assets/js/services/colorService.js';
+        import { sizeService } from './assets/js/services/sizeService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PRODUCTS_CREATE });
+        if (!user) throw new Error('Auth required');
+
+        let availableColors = [];
+        let availableSizes = [];
+        let generatedVariants = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'products');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadMasterOptions();
+            attachBuilderEvents();
+        });
+
+        async function loadMasterOptions() {
+            const [categories, brands, colors, sizes] = await Promise.all([
+                categoryService.getCategories(),
+                brandService.getBrands(),
+                colorService.getColors(),
+                sizeService.getSizes()
+            ]);
+
+            availableColors = colors.filter(c => c.status === 'Active');
+            availableSizes = sizes.filter(s => s.status === 'Active');
+
+            // Categories
+            const catSelect = document.getElementById('prodCategory');
+            catSelect.innerHTML = '<option value="">-- Select Category --</option>' + 
+                categories.filter(c => c.status === 'Active').map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+            // Brands
+            const brandSelect = document.getElementById('prodBrand');
+            brandSelect.innerHTML = brands.filter(b => b.status === 'Active').map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+
+            // Color Selection Pills
+            const colorContainer = document.getElementById('colorPickerPills');
+            colorContainer.innerHTML = availableColors.map(c => `
+                <label class="cursor-pointer flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 hover:border-slate-500 transition text-xs select-none">
+                    <input type="checkbox" value="${c.name}" data-hex="${c.hexCode}" class="color-checkbox w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-0">
+                    <span class="w-3 h-3 rounded-full border border-slate-700 inline-block" style="background-color: ${c.hexCode};"></span>
+                    <span class="text-slate-300">${c.name}</span>
+                </label>
+            `).join('');
+
+            // Size Selection Pills
+            const sizeContainer = document.getElementById('sizePickerPills');
+            sizeContainer.innerHTML = availableSizes.map(s => `
+                <label class="cursor-pointer flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 hover:border-slate-500 transition text-xs select-none">
+                    <input type="checkbox" value="${s.name}" class="size-checkbox w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-0">
+                    <span class="font-mono font-bold text-slate-300">${s.name}</span>
+                </label>
+            `).join('');
+
+            attachPillChangeEvents();
+        }
+
+        function attachPillChangeEvents() {
+            const updateCount = () => {
+                const selectedColors = Array.from(document.querySelectorAll('.color-checkbox:checked'));
+                const selectedSizes = Array.from(document.querySelectorAll('.size-checkbox:checked'));
+                const comboCount = selectedColors.length * selectedSizes.length;
+                document.getElementById('combinationCountPreview').textContent = `${comboCount} combinations will be generated`;
+            };
+
+            document.querySelectorAll('.color-checkbox, .size-checkbox').forEach(cb => {
+                cb.addEventListener('change', updateCount);
+            });
+        }
+
+        function attachBuilderEvents() {
+            // Sample image buttons
+            document.querySelectorAll('.btn-sample-img').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const url = btn.getAttribute('data-url');
+                    document.getElementById('prodImageUrl').value = url;
+                    document.getElementById('imagePreview').src = url;
+                });
+            });
+
+            document.getElementById('prodImageUrl').addEventListener('input', (e) => {
+                const url = e.target.value.trim();
+                if (url) document.getElementById('imagePreview').src = url;
+            });
+
+            // Generate Variants Button
+            document.getElementById('btnGenerateVariants').addEventListener('click', generateVariantsMatrix);
+
+            // Save Product Button
+            document.getElementById('btnSubmitProduct').addEventListener('click', handleSaveProduct);
+        }
+
+        function generateVariantsMatrix() {
+            const selectedColors = Array.from(document.querySelectorAll('.color-checkbox:checked')).map(cb => ({
+                name: cb.value,
+                hex: cb.getAttribute('data-hex')
+            }));
+
+            const selectedSizes = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
+
+            if (selectedColors.length === 0 || selectedSizes.length === 0) {
+                showToast('Please select at least 1 color and 1 size to generate variants.', 'warning');
+                return;
+            }
+
+            const prodCode = document.getElementById('prodCode').value.trim() || document.getElementById('prodName').value.trim().slice(0, 4).toUpperCase() || 'PRD';
+            const baseCost = parseFloat(document.getElementById('prodCostPrice').value) || 0;
+            const baseSelling = parseFloat(document.getElementById('prodSellingPrice').value) || 0;
+
+            let addedCount = 0;
+            let duplicateCount = 0;
+
+            selectedColors.forEach(colorObj => {
+                selectedSizes.forEach(sizeName => {
+                    // Check duplicate
+                    const exists = generatedVariants.some(v => v.color === colorObj.name && v.size === sizeName);
+                    if (exists) {
+                        duplicateCount++;
+                    } else {
+                        const sku = productService.generateSku(prodCode, colorObj.name, sizeName);
+                        const barcode = productService.generateBarcode();
+
+                        generatedVariants.push({
+                            id: `var_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                            color: colorObj.name,
+                            colorHex: colorObj.hex,
+                            size: sizeName,
+                            sku: sku,
+                            barcode: barcode,
+                            costPrice: baseCost,
+                            sellingPrice: baseSelling,
+                            status: 'Active'
+                        });
+                        addedCount++;
+                    }
+                });
+            });
+
+            if (duplicateCount > 0 && addedCount === 0) {
+                showToast('All selected variant combinations are already in the table.', 'info');
+            } else if (duplicateCount > 0) {
+                showToast(`Generated ${addedCount} new variants (${duplicateCount} duplicates skipped).`, 'success');
+            } else {
+                showToast(`Successfully generated ${addedCount} variants.`, 'success');
+            }
+
+            renderVariantsTable();
+        }
+
+        function renderVariantsTable() {
+            const tbody = document.getElementById('variantTableBody');
+            document.getElementById('variantCountBadge').textContent = `${generatedVariants.length} Generated Variants`;
+
+            if (generatedVariants.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-6 text-center text-slate-500 font-sans">
+                            No variants generated yet. Select at least one color and size above and click Generate.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = generatedVariants.map((v, idx) => `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center space-x-2 font-sans font-medium text-slate-200">
+                            <span class="w-3.5 h-3.5 rounded-full border border-slate-700 inline-block" style="background-color: ${v.colorHex};"></span>
+                            <span>${v.color}</span>
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-200 border border-slate-700 font-bold">${v.size}</span>
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <input type="text" value="${v.sku}" data-idx="${idx}" class="var-sku-input px-2 py-1 bg-slate-900 border border-slate-700 rounded text-[11px] text-blue-300 font-mono w-28 uppercase focus:outline-none focus:border-blue-500">
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center space-x-1">
+                            <input type="text" value="${v.barcode}" data-idx="${idx}" class="var-barcode-input px-2 py-1 bg-slate-900 border border-slate-700 rounded text-[11px] text-slate-300 font-mono w-24 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        <input type="number" value="${v.costPrice}" data-idx="${idx}" class="var-cost-input px-2 py-1 bg-slate-900 border border-slate-700 rounded text-[11px] text-slate-200 font-mono text-right w-20 focus:outline-none focus:border-blue-500">
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        <input type="number" value="${v.sellingPrice}" data-idx="${idx}" class="var-selling-input px-2 py-1 bg-slate-900 border border-slate-700 rounded text-[11px] text-emerald-300 font-mono font-bold text-right w-20 focus:outline-none focus:border-blue-500">
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button type="button" class="btn-var-toggle px-2 py-0.5 rounded-full text-[10px] font-sans font-semibold border ${
+                            v.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                        }" data-idx="${idx}">
+                            ${v.status}
+                        </button>
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        <button type="button" class="btn-var-remove p-1 text-slate-500 hover:text-red-400 transition" data-idx="${idx}" title="Remove variant">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+
+            attachVariantRowEvents();
+        }
+
+        function attachVariantRowEvents() {
+            // SKU Change
+            document.querySelectorAll('.var-sku-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-idx');
+                    generatedVariants[idx].sku = e.target.value.trim().toUpperCase();
+                });
+            });
+
+            // Barcode Change
+            document.querySelectorAll('.var-barcode-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-idx');
+                    generatedVariants[idx].barcode = e.target.value.trim();
+                });
+            });
+
+            // Cost Change
+            document.querySelectorAll('.var-cost-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-idx');
+                    generatedVariants[idx].costPrice = parseFloat(e.target.value) || 0;
+                });
+            });
+
+            // Selling Change
+            document.querySelectorAll('.var-selling-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-idx');
+                    generatedVariants[idx].sellingPrice = parseFloat(e.target.value) || 0;
+                });
+            });
+
+            // Status Toggle
+            document.querySelectorAll('.btn-var-toggle').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = btn.getAttribute('data-idx');
+                    generatedVariants[idx].status = generatedVariants[idx].status === 'Active' ? 'Inactive' : 'Active';
+                    renderVariantsTable();
+                });
+            });
+
+            // Remove
+            document.querySelectorAll('.btn-var-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.getAttribute('data-idx'));
+                    generatedVariants.splice(idx, 1);
+                    renderVariantsTable();
+                });
+            });
+        }
+
+        async function handleSaveProduct() {
+            const name = document.getElementById('prodName').value.trim();
+            const code = document.getElementById('prodCode').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const brand = document.getElementById('prodBrand').value;
+            const gender = document.getElementById('prodGender').value;
+            const fabric = document.getElementById('prodFabric').value.trim();
+            const hsnCode = document.getElementById('prodHsn').value.trim();
+            const gstRate = document.getElementById('prodGst').value;
+            const status = document.getElementById('prodStatus').value;
+            const description = document.getElementById('prodDescription').value.trim();
+            const baseCostPrice = parseFloat(document.getElementById('prodCostPrice').value) || 0;
+            const baseSellingPrice = parseFloat(document.getElementById('prodSellingPrice').value) || 0;
+            const primaryImage = document.getElementById('prodImageUrl').value.trim();
+
+            let isValid = true;
+            const nameErr = document.getElementById('prodNameError');
+            const catErr = document.getElementById('prodCategoryError');
+            const priceErr = document.getElementById('prodPriceError');
+
+            nameErr.classList.add('hidden');
+            catErr.classList.add('hidden');
+            priceErr.classList.add('hidden');
+
+            if (!name) {
+                nameErr.textContent = 'Product name is required.';
+                nameErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!category) {
+                catErr.textContent = 'Please select a product category.';
+                catErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (baseSellingPrice <= 0) {
+                priceErr.textContent = 'Base selling price must be greater than zero.';
+                priceErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            const productData = {
+                name,
+                code,
+                category,
+                brand,
+                gender,
+                fabric,
+                hsnCode,
+                gstRate,
+                status,
+                description,
+                baseCostPrice,
+                baseSellingPrice,
+                primaryImage,
+                variants: generatedVariants
+            };
+
+            const res = await productService.createProduct(productData);
+            if (res.success) {
+                showToast('Product and variants created successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = `./product-details.html?id=${res.data.id}`;
+                }, 600);
+            } else {
+                showToast(res.message || 'Error saving product.', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting & Financial Hub — CLOTHERP</title>
+    <meta name="description" content="Chart of accounts, customer and supplier ledgers, double-entry journal vouchers, receivables aging, and financial statements in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Quick Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Financials</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Accounting</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="landmark" class="w-6 h-6 text-blue-400"></i>
+                            <span>Financial Management & Accounting Hub</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">General ledger, double-entry vouchers, customer/supplier ledgers, cash/bank accounts, and financial statements.</p>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="./journal-entries.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                            <span>New Journal Voucher</span>
+                        </a>
+
+                        <a href="./expenses.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                            <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                            <span>Record Expense</span>
+                        </a>
+
+                        <a href="./financial-reports.html" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                            <span>Financial Statements</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">Customer Receivables</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiReceivables">₹0</div>
+                        <span class="text-[10px] text-slate-500">Unsettled Sales Invoices</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Supplier Payables</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiPayables">₹0</div>
+                        <span class="text-[10px] text-slate-500">Fabric & Trim Bills</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Liquid Cash & Bank</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiLiquidFunds">₹0</div>
+                        <span class="text-[10px] text-slate-500">Drawers + Bank A/cs</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Net Operating Profit</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiNetProfit">₹0</div>
+                        <span class="text-[10px] text-slate-500">Sales - (COGS + Expenses)</span>
+                    </div>
+                </div>
+
+                <!-- 4 CORE MODULE SHORTCUT CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    
+                    <!-- Chart of Accounts Card -->
+                    <a href="./chart-of-accounts.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Chart of Accounts</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Hierarchical general ledger accounts, opening balances, and asset/liability classifications.</p>
+                        </div>
+                        <span class="text-xs text-blue-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Open Accounts Master</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Double-Entry Journals Card -->
+                    <a href="./journal-entries.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Journal Entries (Vouchers)</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Strict double-entry debit/credit vouchers, audit posting, and reversal history.</p>
+                        </div>
+                        <span class="text-xs text-purple-400 font-semibold inline-flex items-center space-x-1">
+                            <span>Manage Journals</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Receivables & Aging Card -->
+                    <a href="./receivables.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center">
+                            <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Receivables & Aging</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Customer dues tracking across 30/60/90+ day aging buckets and credit limit controls.</p>
+                        </div>
+                        <span class="text-xs text-teal-400 font-semibold inline-flex items-center space-x-1">
+                            <span>View Aging</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+
+                    <!-- Financial Statements Card -->
+                    <a href="./financial-reports.html" class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition space-y-3 block">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Financial Statements</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Real-time Trial Balance, Profit & Loss Statement, and Balance Sheet reports.</p>
+                        </div>
+                        <span class="text-xs text-emerald-400 font-semibold inline-flex items-center space-x-1">
+                            <span>View Statements</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- RECENT POSTED JOURNAL VOUCHERS -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden space-y-4 p-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="history" class="w-4 h-4 text-blue-400"></i>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Recent General Ledger Journals</h3>
+                        </div>
+                        <a href="./journal-entries.html" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">View All Vouchers →</a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-2.5 px-3">Voucher #</th>
+                                    <th class="py-2.5 px-3">Date</th>
+                                    <th class="py-2.5 px-3">Description</th>
+                                    <th class="py-2.5 px-3 text-right">Debit (₹)</th>
+                                    <th class="py-2.5 px-3 text-right">Credit (₹)</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="recentJournalsBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Financial Accounting System</div>
+                <div class="font-mono text-[11px] text-slate-600">Double-Entry Ledger Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { accountingService } from './assets/js/services/accountingService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.ACCOUNTING_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'accounting');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            const [recRes, payRes, cbList, pnlRes, jvRes] = await Promise.all([
+                accountingService.getReceivablesAging(),
+                accountingService.getPayablesAging(),
+                accountingService.getCashBankAccounts(),
+                accountingService.getProfitAndLoss(),
+                accountingService.getJournalEntries({ pageSize: 5 })
+            ]);
+
+            const liquidTotal = (cbList || []).reduce((acc, c) => acc + (c.balance || 0), 0);
+
+            document.getElementById('kpiReceivables').textContent = `₹${recRes.totalReceivables.toLocaleString('en-IN')}`;
+            document.getElementById('kpiPayables').textContent = `₹${payRes.totalPayables.toLocaleString('en-IN')}`;
+            document.getElementById('kpiLiquidFunds').textContent = `₹${liquidTotal.toLocaleString('en-IN')}`;
+            document.getElementById('kpiNetProfit').textContent = `₹${pnlRes.netProfit.toLocaleString('en-IN')}`;
+
+            const tbody = document.getElementById('recentJournalsBody');
+            tbody.innerHTML = (jvRes.items || []).map(j => `
+                <tr class="hover:bg-slate-850/40 transition">
+                    <td class="py-3 px-3 font-mono font-bold text-blue-400">${j.journalNumber}</td>
+                    <td class="py-3 px-3 font-mono text-slate-400">${j.date}</td>
+                    <td class="py-3 px-3 font-medium text-slate-200">${j.description}</td>
+                    <td class="py-3 px-3 text-right font-mono font-bold text-emerald-400">₹${j.totalDebit.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3 text-right font-mono font-bold text-emerald-400">₹${j.totalCredit.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            j.status === 'POSTED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }">${j.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

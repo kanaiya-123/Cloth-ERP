@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Exchanges — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Manage customer product variant exchanges, price difference adjustments, and dual stock movements in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Operations</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Product Replacements</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="refresh-cw" class="w-6 h-6 text-indigo-400"></i>
+                            <span>Product Exchanges</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Manage garment size & color variant exchanges, compute price differences, and record dual stock adjustments.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-2" id="exchangesActionButtons">
+                        <a href="./create-exchange.html" class="btn-primary px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-500/20 transition flex items-center space-x-1.5" id="btnCreateExchange">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>New Product Exchange</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3 KPI Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Exchanges</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalExchanges">0</div>
+                        <span class="text-[10px] text-slate-500">Lifetime Replacement Cases</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Pending Approval</span>
+                        <div class="text-2xl font-extrabold text-amber-300 font-mono" id="kpiPendingApproval">0</div>
+                        <span class="text-[10px] text-slate-500">In Exchange Queue</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Completed Exchanges</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiCompleted">0</div>
+                        <span class="text-[10px] text-slate-500">Dual Movements Adjusted</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="exchangesSearchInput" 
+                            placeholder="Search exchange no, sale no, customer or SKU..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="statusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Exchange Statuses</option>
+                            <option value="Requested">Requested</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+
+                        <select id="sortByFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="highest_amount">Highest Value</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Exchanges Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/70 text-slate-400 border-b border-slate-800 uppercase font-mono text-[11px]">
+                                    <th class="py-3 px-4">Exchange / Sale No.</th>
+                                    <th class="py-3 px-4">Customer</th>
+                                    <th class="py-3 px-4">Returned Item</th>
+                                    <th class="py-3 px-4">Replacement Item</th>
+                                    <th class="py-3 px-3 text-right">Difference</th>
+                                    <th class="py-3 px-3 text-center">Status</th>
+                                    <th class="py-3 px-3">Date</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exchangesTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400" id="paginationFooter">
+                        <span id="showingCount">Showing 0 of 0 exchanges</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Product Exchanges Module</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { exchangeService } from './assets/js/services/exchangeService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.EXCHANGES_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const canCreate = authService.hasPermission(PERMISSIONS.EXCHANGES_CREATE);
+
+        let currentPage = 1;
+        const pageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'exchanges');
+            initTopbar('topbarMount');
+
+            if (!canCreate) {
+                const btn = document.getElementById('btnCreateExchange');
+                if (btn) btn.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadExchanges();
+            attachFilterEvents();
+        });
+
+        async function loadExchanges() {
+            const search = document.getElementById('exchangesSearchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            const sortBy = document.getElementById('sortByFilter').value;
+
+            const res = await exchangeService.getExchanges({
+                page: currentPage,
+                pageSize,
+                search,
+                status,
+                sortBy
+            });
+
+            document.getElementById('kpiTotalExchanges').textContent = res.summary.totalExchanges;
+            document.getElementById('kpiPendingApproval').textContent = res.summary.pendingApproval;
+            document.getElementById('kpiCompleted').textContent = res.summary.completed;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(exchanges, pagination) {
+            const tbody = document.getElementById('exchangesTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${exchanges.length} of ${pagination.totalItems} exchanges`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (exchanges.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-12 text-center text-slate-500 font-sans">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                                <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-300 mb-1">No product exchanges found</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">Customer product exchange transactions will appear here.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = exchanges.map(e => `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-mono">
+                            <a href="./exchange-details.html?id=${e.id}" class="font-bold text-indigo-400 hover:underline">${e.exchangeNumber}</a>
+                            <div class="text-[10px] text-slate-500 font-sans">For: <strong class="text-slate-400 font-mono">${e.saleNumber}</strong></div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="font-bold text-slate-200">${e.customerName}</span>
+                            <div class="text-[10px] text-slate-500 font-mono">${e.customerMobile}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-300">${e.returnedItem ? e.returnedItem.productName : '—'}</div>
+                            <div class="text-[10px] text-amber-400 font-mono">${e.returnedItem ? e.returnedItem.variantName : ''} (1 pc)</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-300">${e.replacementItem ? e.replacementItem.productName : '—'}</div>
+                            <div class="text-[10px] text-emerald-400 font-mono">${e.replacementItem ? e.replacementItem.variantName : ''} (1 pc)</div>
+                        </td>
+                        <td class="py-3 px-3 text-right font-mono">
+                            <span class="font-bold ${e.priceDifferenceRaw > 0 ? 'text-amber-400' : e.priceDifferenceRaw < 0 ? 'text-emerald-400' : 'text-slate-400'}">
+                                ${e.priceDifferenceRaw > 0 ? `+₹${e.priceDifference}` : e.priceDifferenceRaw < 0 ? `-₹${e.priceDifference}` : '₹0.00'}
+                            </span>
+                            <span class="text-[10px] text-slate-500 block font-sans">${e.paymentAdjustmentType}</span>
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                e.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                e.status === 'Approved' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                                'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                            }">
+                                ${e.status}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3 text-slate-400 font-mono">${e.exchangeDate}</td>
+                        <td class="py-3 px-4 text-right">
+                            <a href="./exchange-details.html?id=${e.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition" title="View Exchange Details">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachFilterEvents() {
+            let debounceTimer;
+            document.getElementById('exchangesSearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadExchanges();
+                }, 300);
+            });
+
+            document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; loadExchanges(); });
+            document.getElementById('sortByFilter').addEventListener('change', () => { currentPage = 1; loadExchanges(); });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadExchanges();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadExchanges();
+            });
+        }
+    </script>
+</body>
+</html>

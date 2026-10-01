@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracking & LR Status — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Live shipment tracking timeline, transporter LR details, and checkpoint status in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Loading State -->
+                <div id="loadingPlaceholder" class="p-12 text-center text-slate-500">
+                    <div class="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin mx-auto mb-3"></div>
+                    Loading shipment tracking status...
+                </div>
+
+                <!-- Real Content -->
+                <div id="trackingContainer" class="hidden space-y-6">
+                    
+                    <!-- Page Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <a href="./purchase-shipments.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Shipments</a>
+                                <span class="text-slate-600">/</span>
+                                <span class="text-xs text-blue-400 font-bold font-mono" id="headerLrCode">LR-987456</span>
+                            </div>
+                            <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-3">
+                                <span>Freight Consignment Tracking</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border" id="headerStatusBadge">In Transit</span>
+                            </h1>
+                            <div class="flex items-center space-x-2.5 mt-1 text-xs text-slate-400">
+                                <span>Carrier: <strong class="text-slate-200" id="headerCarrier">—</strong></span>
+                                <span>•</span>
+                                <span>PO: <strong class="font-mono text-blue-300" id="headerPoNumber">—</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex items-center space-x-2">
+                            <a href="#" id="btnBackToPo" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                                <span>View Purchase Order</span>
+                            </a>
+                            
+                            <button id="btnOpenUpdateModal" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                <span>Update Status / LR</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Visual Milestone Progression Steps -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider">Consignment Lifecycle Progress</div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs" id="progressStepsGrid">
+                            <!-- Step 1: Created -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Created">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">1</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Draft</div>
+                            </div>
+                            <!-- Step 2: Confirmed -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Confirmed">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">2</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Confirmed</div>
+                            </div>
+                            <!-- Step 3: Packed -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Packed">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">3</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Packed</div>
+                            </div>
+                            <!-- Step 4: Dispatched -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Dispatched">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">4</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Dispatched</div>
+                            </div>
+                            <!-- Step 5: In Transit -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-In-Transit">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">5</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">In Transit</div>
+                            </div>
+                            <!-- Step 6: Delivered -->
+                            <div class="p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800" id="step-Delivered">
+                                <div class="w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400">6</div>
+                                <div class="font-semibold text-slate-300 text-[11px]">Delivered</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consignment Meta Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">TRANSPORTER & LR</span>
+                            <div class="font-bold text-white text-sm" id="metaTransport">—</div>
+                            <div class="font-mono text-blue-300 font-bold" id="metaLr">—</div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">VEHICLE & DRIVER</span>
+                            <div class="font-mono font-bold text-white text-sm" id="metaVehicle">—</div>
+                            <div class="text-slate-300" id="metaDriver">—</div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+                            <span class="text-[10px] text-slate-500 font-mono uppercase block">DELIVERY SCHEDULE</span>
+                            <div class="font-mono text-white text-sm" id="metaDeliveryDate">—</div>
+                            <div class="text-slate-400 text-[11px]" id="metaSupplierLocation">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Chronological Checkpoint Timeline -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-blue-400"></i>
+                            <span>Audit & Checkpoint Timeline History</span>
+                        </div>
+
+                        <div class="space-y-4 relative pl-4 border-l border-slate-800" id="trackingCheckpointsContainer">
+                            <!-- Dynamic Milestones -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Freight Tracking Screen</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- UPDATE STATUS & LR MODAL -->
+    <div id="updateShipmentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="relative w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="updateModalCard">
+            
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="truck" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white">Update Consignment Status</h3>
+                </div>
+                <button id="btnCloseUpdateModal" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form id="updateShipmentForm" class="space-y-3 text-xs" novalidate>
+                <div class="space-y-1">
+                    <label for="selectShipmentStatus" class="block text-slate-300 font-semibold">Shipment Status</label>
+                    <select id="selectShipmentStatus" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                        <option value="Packed">Packed by Supplier</option>
+                        <option value="Dispatched">Dispatched from Mill</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered at Warehouse</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1">
+                    <label for="inputModalTransport" class="block text-slate-300 font-semibold">Carrier / Transporter</label>
+                    <input type="text" id="inputModalTransport" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="inputModalLr" class="block text-slate-300 font-semibold">LR Number</label>
+                    <input type="text" id="inputModalLr" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="inputModalVehicle" class="block text-slate-300 font-semibold">Vehicle Number</label>
+                    <input type="text" id="inputModalVehicle" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="inputCheckpointNotes" class="block text-slate-300 font-semibold">Checkpoint / Transit Remarks</label>
+                    <input type="text" id="inputCheckpointNotes" placeholder="e.g. Cleared toll checkpoint, arrival at 4 PM" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelUpdateModal" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition">Save Status</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { purchaseService } from './assets/js/services/purchaseService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PURCHASE_SHIPMENTS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        let currentPurchase = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'purchase-shipments');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const purchaseId = urlParams.get('id');
+
+            if (!purchaseId) {
+                window.location.href = './purchase-shipments.html';
+                return;
+            }
+
+            await loadTracking(purchaseId);
+            attachModalEvents();
+        });
+
+        async function loadTracking(id) {
+            currentPurchase = await purchaseService.getPurchaseById(id);
+
+            if (!currentPurchase) {
+                document.getElementById('loadingPlaceholder').innerHTML = `
+                    <div class="text-red-400 font-bold mb-2">Purchase Consignment Not Found</div>
+                    <a href="./purchase-shipments.html" class="text-blue-400 text-xs hover:underline">Return to Shipments</a>
+                `;
+                return;
+            }
+
+            const sh = currentPurchase.shipment || {};
+
+            // Bind Header
+            document.getElementById('headerLrCode').textContent = sh.lrNumber || 'LR Pending';
+            document.getElementById('headerCarrier').textContent = sh.transportName || 'Direct Consignment';
+            document.getElementById('headerPoNumber').textContent = currentPurchase.purchaseNumber;
+            document.getElementById('btnBackToPo').href = `./purchase-details.html?id=${currentPurchase.id}`;
+
+            const badge = document.getElementById('headerStatusBadge');
+            badge.textContent = currentPurchase.shipmentStatus || 'Not Shipped';
+            badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                currentPurchase.shipmentStatus === 'Delivered' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                currentPurchase.shipmentStatus === 'In Transit' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                'bg-slate-800 text-slate-300 border-slate-700'
+            }`;
+
+            // Bind Meta Cards
+            document.getElementById('metaTransport').textContent = sh.transportName || 'Not Assigned';
+            document.getElementById('metaLr').textContent = sh.lrNumber ? `LR: ${sh.lrNumber}` : 'LR Document Pending';
+            document.getElementById('metaVehicle').textContent = sh.vehicleNumber || 'Vehicle TBA';
+            document.getElementById('metaDriver').textContent = sh.driverName ? `${sh.driverName} (${sh.driverMobile || ''})` : 'Driver info pending';
+            document.getElementById('metaDeliveryDate').textContent = currentPurchase.expectedDeliveryDate || 'TBD';
+            document.getElementById('metaSupplierLocation').textContent = `From: ${currentPurchase.supplierName} (${currentPurchase.supplierState})`;
+
+            // Highlight progress steps
+            highlightSteps(currentPurchase.shipmentStatus || currentPurchase.status);
+
+            // Render Timeline
+            renderTimeline(currentPurchase.trackingTimeline || []);
+
+            document.getElementById('loadingPlaceholder').classList.add('hidden');
+            document.getElementById('trackingContainer').classList.remove('hidden');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function highlightSteps(status) {
+            const stepsOrder = ['Draft', 'Confirmed', 'Packed', 'Dispatched', 'In-Transit', 'Delivered'];
+            let activeIdx = 0;
+
+            if (status === 'Confirmed') activeIdx = 1;
+            else if (status === 'Packed') activeIdx = 2;
+            else if (status === 'Dispatched') activeIdx = 3;
+            else if (status === 'In Transit') activeIdx = 4;
+            else if (status === 'Delivered' || status === 'Received' || status === 'Partially Received') activeIdx = 5;
+
+            stepsOrder.forEach((step, idx) => {
+                const el = document.getElementById(`step-${step}`);
+                if (!el) return;
+                const circle = el.querySelector('div:first-child');
+                const title = el.querySelector('div:last-child');
+
+                if (idx <= activeIdx) {
+                    el.className = 'p-3 rounded-xl border space-y-1 bg-blue-500/10 border-blue-500/30';
+                    circle.className = 'w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-blue-600 text-white';
+                    title.className = 'font-bold text-blue-300 text-[11px]';
+                } else {
+                    el.className = 'p-3 rounded-xl border space-y-1 bg-slate-950/80 border-slate-800';
+                    circle.className = 'w-6 h-6 rounded-full mx-auto flex items-center justify-center font-bold font-mono text-[11px] bg-slate-800 text-slate-400';
+                    title.className = 'font-semibold text-slate-500 text-[11px]';
+                }
+            });
+        }
+
+        function renderTimeline(timeline) {
+            const container = document.getElementById('trackingCheckpointsContainer');
+            if (timeline.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-xs py-4">No checkpoint records logged.</div>`;
+                return;
+            }
+
+            container.innerHTML = timeline.map((t, idx) => `
+                <div class="relative pl-6 pb-2">
+                    <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full ${idx === timeline.length - 1 ? 'bg-blue-500 ring-4 ring-blue-500/20' : 'bg-slate-700'}"></div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-200">${t.title || t.status}</span>
+                        <span class="text-[10px] text-slate-500 font-mono">${t.date} ${t.time || ''}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 mt-0.5">${t.notes || ''}</p>
+                    <span class="text-[10px] text-slate-500 block font-mono">Logged by: ${t.user}</span>
+                </div>
+            `).join('');
+        }
+
+        function attachModalEvents() {
+            const openModal = () => {
+                const sh = currentPurchase.shipment || {};
+                document.getElementById('selectShipmentStatus').value = currentPurchase.shipmentStatus === 'Delivered' ? 'Delivered' : currentPurchase.shipmentStatus || 'In Transit';
+                document.getElementById('inputModalTransport').value = sh.transportName || '';
+                document.getElementById('inputModalLr').value = sh.lrNumber || '';
+                document.getElementById('inputModalVehicle').value = sh.vehicleNumber || '';
+                document.getElementById('inputCheckpointNotes').value = '';
+
+                const modal = document.getElementById('updateShipmentModal');
+                const card = document.getElementById('updateModalCard');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+            };
+
+            const closeModal = () => {
+                const modal = document.getElementById('updateShipmentModal');
+                const card = document.getElementById('updateModalCard');
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            };
+
+            document.getElementById('btnOpenUpdateModal').addEventListener('click', openModal);
+            document.getElementById('btnCloseUpdateModal').addEventListener('click', closeModal);
+            document.getElementById('btnCancelUpdateModal').addEventListener('click', closeModal);
+
+            document.getElementById('updateShipmentForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const status = document.getElementById('selectShipmentStatus').value;
+                const transport = document.getElementById('inputModalTransport').value.trim();
+                const lr = document.getElementById('inputModalLr').value.trim();
+                const vehicle = document.getElementById('inputModalVehicle').value.trim();
+                const notes = document.getElementById('inputCheckpointNotes').value.trim();
+
+                const res = await purchaseService.updateShipment(currentPurchase.id, {
+                    shipmentStatus: status,
+                    transportName: transport,
+                    lrNumber: lr,
+                    vehicleNumber: vehicle,
+                    notes: notes
+                }, user.name);
+
+                if (res.success) {
+                    closeModal();
+                    showToast('Shipment status and LR updated!', 'success');
+                    await loadTracking(currentPurchase.id);
+                } else {
+                    showToast(res.message || 'Error updating shipment.', 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

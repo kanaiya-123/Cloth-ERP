@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Directory & Management — CLOTHERP</title>
+    <meta name="description" content="Capture prospective leads, duplicate detection, lead qualification, and customer conversion in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./crm.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">CRM</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Leads</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="contact" class="w-6 h-6 text-blue-400"></i>
+                            <span>Leads Management & Conversion</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Capture buyer inquiries, run duplicate phone/email detection, and convert qualified leads to active Customers.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <button id="btnOpenAddLeadModal" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Capture New Lead</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Prospects</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalLeads">0</div>
+                        <span class="text-[10px] text-slate-500">Pipeline Inquiries</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">New Leads</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiNewLeads">0</div>
+                        <span class="text-[10px] text-slate-500">Awaiting Contact</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Qualified Leads</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiQualifiedLeads">0</div>
+                        <span class="text-[10px] text-slate-500">Ready for Proposal</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-purple-400 font-medium">Total Est. Value</span>
+                        <div class="text-2xl font-extrabold text-purple-300 font-mono" id="kpiEstValue">₹0</div>
+                        <span class="text-[10px] text-slate-500">Gross Lead Potential</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="leadSearchInput" 
+                            placeholder="Search company, contact, phone, or lead #..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="leadStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="NEW">New</option>
+                            <option value="QUALIFIED">Qualified</option>
+                            <option value="PROPOSAL_SENT">Proposal Sent</option>
+                            <option value="WON">Won (Converted)</option>
+                            <option value="LOST">Lost</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Leads Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Lead #</th>
+                                    <th class="py-3 px-4">Company Name</th>
+                                    <th class="py-3 px-4">Contact Info</th>
+                                    <th class="py-3 px-4">Lead Source</th>
+                                    <th class="py-3 px-4">Product Interest</th>
+                                    <th class="py-3 px-4 text-right">Est. Value (₹)</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="leadsTableBody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Sales Automation</div>
+                <div class="font-mono text-[11px] text-slate-600">Lead Conversion Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- MODAL: ADD LEAD -->
+    <div id="addLeadModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl border border-slate-700/90 shadow-2xl p-6 space-y-4 bg-slate-900 my-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i data-lucide="contact" class="w-4 h-4 text-blue-400"></i>
+                    <span>Capture Prospective Lead</span>
+                </h3>
+                <button id="btnCloseLeadModal" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Duplicate Warning Alert Box -->
+            <div id="duplicateAlertBox" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center space-x-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                <span id="duplicateAlertMsg">Possible duplicate detected!</span>
+            </div>
+
+            <form id="addLeadForm" class="space-y-3" novalidate>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Store Name *</label>
+                    <input type="text" id="leadCompanyInput" required placeholder="e.g. Surat Silk Palace" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Person</label>
+                        <input type="text" id="leadContactInput" placeholder="e.g. Harshil Vora" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number *</label>
+                        <input type="tel" id="leadPhoneInput" required placeholder="+91 98250 88712" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                        <input type="email" id="leadEmailInput" placeholder="harshil@example.com" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Lead Source</label>
+                        <select id="leadSourceSelect" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                            <option value="Website Inquiry">Website Inquiry</option>
+                            <option value="WhatsApp Business">WhatsApp Business</option>
+                            <option value="Showroom Walk-in">Showroom Walk-in</option>
+                            <option value="Textile Trade Fair">Textile Trade Fair</option>
+                            <option value="Client Referral">Client Referral</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Product Interest</label>
+                        <input type="text" id="leadProductInput" placeholder="e.g. Cotton Oxford Shirts" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Estimated Value (₹)</label>
+                        <input type="number" id="leadValueInput" value="50000" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Notes / Requirements</label>
+                    <input type="text" id="leadNotesInput" placeholder="Specific size ratios, festive delivery required" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="btnCancelLead" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Lead</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { crmService } from './assets/js/services/crmService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.LEADS_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'leads');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadLeads();
+            attachEvents();
+        });
+
+        async function loadLeads() {
+            const search = document.getElementById('leadSearchInput').value;
+            const status = document.getElementById('leadStatusFilter').value;
+
+            const res = await crmService.getLeads({ search, status });
+
+            document.getElementById('kpiTotalLeads').textContent = res.summary.totalLeads;
+            document.getElementById('kpiNewLeads').textContent = res.summary.newCount;
+            document.getElementById('kpiQualifiedLeads').textContent = res.summary.qualifiedCount;
+            document.getElementById('kpiEstValue').textContent = `₹${res.summary.totalEstValue.toLocaleString('en-IN')}`;
+
+            renderTable(res.items);
+        }
+
+        function renderTable(leads) {
+            const tbody = document.getElementById('leadsTableBody');
+            tbody.innerHTML = leads.map(l => `
+                <tr class="hover:bg-slate-850/60 transition">
+                    <td class="py-3 px-4 font-mono font-bold text-blue-400">${l.leadNumber}</td>
+                    <td class="py-3 px-4 font-bold text-white">${l.companyName}</td>
+                    <td class="py-3 px-4 font-mono text-[11px] text-slate-300">
+                        <div>${l.contactPerson}</div>
+                        <div class="text-slate-400">${l.phone}</div>
+                    </td>
+                    <td class="py-3 px-4 text-slate-300">${l.leadSource}</td>
+                    <td class="py-3 px-4 text-slate-300">${l.productInterest}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-emerald-400">₹${l.estimatedValue.toLocaleString('en-IN')}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            l.status === 'QUALIFIED' || l.status === 'WON' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            l.status === 'PROPOSAL_SENT' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            'bg-slate-800 text-slate-300'
+                        }">${l.status}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right space-x-1.5">
+                        ${l.status !== 'WON' ? `
+                            <button class="btn-convert px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] shadow transition" data-id="${l.id}">Convert to Customer</button>
+                        ` : '<span class="text-[11px] font-bold text-emerald-400">Converted ✓</span>'}
+                    </td>
+                </tr>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+            attachRowEvents();
+        }
+
+        function attachRowEvents() {
+            document.querySelectorAll('.btn-convert').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const leadId = btn.dataset.id;
+                    if (confirm('Convert this qualified lead to an active Customer record in CLOTHERP?')) {
+                        const res = await crmService.convertLeadToCustomer(leadId, user.name);
+                        if (res.success) {
+                            showToast(`Lead converted! Created Customer: ${res.customer.name}`, 'success');
+                            await loadLeads();
+                        } else {
+                            showToast(res.message, 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        function attachEvents() {
+            document.getElementById('leadSearchInput').addEventListener('input', loadLeads);
+            document.getElementById('leadStatusFilter').addEventListener('change', loadLeads);
+
+            const phoneInput = document.getElementById('leadPhoneInput');
+            phoneInput.addEventListener('blur', async () => {
+                const phone = phoneInput.value;
+                const comp = document.getElementById('leadCompanyInput').value;
+                if (phone) {
+                    const dup = await crmService.checkDuplicateLead(phone, '', comp);
+                    const alertBox = document.getElementById('duplicateAlertBox');
+                    if (dup.isDuplicate) {
+                        document.getElementById('duplicateAlertMsg').textContent = `⚠️ Possible Duplicate: ${dup.message}`;
+                        alertBox.classList.remove('hidden');
+                    } else {
+                        alertBox.classList.add('hidden');
+                    }
+                }
+            });
+
+            document.getElementById('btnOpenAddLeadModal').addEventListener('click', () => {
+                document.getElementById('addLeadForm').reset();
+                document.getElementById('duplicateAlertBox').classList.add('hidden');
+                document.getElementById('addLeadModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseLeadModal').addEventListener('click', () => {
+                document.getElementById('addLeadModal').classList.add('hidden');
+            });
+            document.getElementById('btnCancelLead').addEventListener('click', () => {
+                document.getElementById('addLeadModal').classList.add('hidden');
+            });
+
+            document.getElementById('addLeadForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const leadData = {
+                    companyName: document.getElementById('leadCompanyInput').value,
+                    contactPerson: document.getElementById('leadContactInput').value,
+                    phone: document.getElementById('leadPhoneInput').value,
+                    email: document.getElementById('leadEmailInput').value,
+                    leadSource: document.getElementById('leadSourceSelect').value,
+                    productInterest: document.getElementById('leadProductInput').value,
+                    estimatedValue: document.getElementById('leadValueInput').value,
+                    notes: document.getElementById('leadNotesInput').value
+                };
+
+                const res = await crmService.createLead(leadData, user.name);
+                if (res.success) {
+                    showToast('Lead captured successfully and follow-up scheduled!', 'success');
+                    document.getElementById('addLeadModal').classList.add('hidden');
+                    await loadLeads();
+                } else {
+                    showToast(res.message, 'error');
+                }
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

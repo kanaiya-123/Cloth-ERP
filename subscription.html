@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Subscription & Usage Quotas — CLOTHERP</title>
+    <meta name="description" content="View active subscription plan, billing renewal, and user seat quotas in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Upgrade Action -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Account</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Subscription</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1 flex items-center space-x-2.5">
+                            <i data-lucide="credit-card" class="w-6 h-6 text-blue-400"></i>
+                            <span>My Plan & Usage Quotas</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Monitor active subscription tier, billing period renewal, and resource capacity limits.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3">
+                        <button onclick="alert('Upgrade Request submitted to CLOTHERP Sales Desk! An enterprise executive will contact you shortly.')" class="btn-primary px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Request Tier Upgrade</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Current Plan Hero Card -->
+                <div class="glass-card p-6 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-950/20 via-slate-900 to-blue-950/20 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">CURRENT SUBSCRIPTION</span>
+                            <h2 class="text-xl font-extrabold text-white" id="subPlanTitle">Enterprise Plan</h2>
+                            <p class="text-xs text-slate-400">Unlimited multi-branch hubs, double-entry general ledger, and dedicated priority support.</p>
+                        </div>
+
+                        <div class="text-left sm:text-right space-y-1">
+                            <span class="text-xs text-slate-400">Subscription Status:</span>
+                            <div class="text-base font-bold text-emerald-400 font-mono" id="subStatusDisplay">ACTIVE (Annual)</div>
+                            <div class="text-[11px] text-slate-500 font-mono">Renews on: <strong class="text-slate-300" id="subRenewalDate">2027-08-01</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 CAPACITY METERS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="users" class="w-4 h-4 text-blue-400"></i>
+                                <span class="text-xs font-bold text-white">Active User Seats</span>
+                            </div>
+                            <span class="font-mono font-bold text-blue-400 text-sm" id="userMeterText">7 / 100</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" id="userMeterBar" style="width: 7%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 block">Staff & managerial logins allowed</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="building-2" class="w-4 h-4 text-emerald-400"></i>
+                                <span class="text-xs font-bold text-white">Branch Nodes</span>
+                            </div>
+                            <span class="font-mono font-bold text-emerald-400 text-sm" id="branchMeterText">2 / 25</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full" id="branchMeterBar" style="width: 8%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 block">Retail depots & showroom branches</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="warehouse" class="w-4 h-4 text-purple-400"></i>
+                                <span class="text-xs font-bold text-white">Warehouses</span>
+                            </div>
+                            <span class="font-mono font-bold text-purple-400 text-sm" id="whMeterText">2 / 25</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500 rounded-full" id="whMeterBar" style="width: 8%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 block">Raw fabric & finished goods storage</span>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Tenant Account</div>
+                <div class="font-mono text-[11px] text-slate-600">Subscription Quota Engine</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { saasService } from './assets/js/services/saasService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.SUBSCRIPTION_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'subscription');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            await loadSubscriptionData();
+        });
+
+        async function loadSubscriptionData() {
+            const data = await saasService.getCurrentTenantSubscription('TEN-00001');
+
+            document.getElementById('subPlanTitle').textContent = data.plan.name;
+            document.getElementById('subStatusDisplay').textContent = `${data.tenant.subscriptionStatus} (${data.plan.billingCycle})`;
+            document.getElementById('subRenewalDate').textContent = data.tenant.renewalDate;
+
+            document.getElementById('userMeterText').textContent = `${data.usage.users.current} / ${data.usage.users.max}`;
+            document.getElementById('branchMeterText').textContent = `${data.usage.branches.current} / ${data.usage.branches.max}`;
+            document.getElementById('whMeterText').textContent = `${data.usage.warehouses.current} / ${data.usage.warehouses.max}`;
+        }
+    </script>
+</body>
+</html>

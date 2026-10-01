@@ -1,0 +1,152 @@
+/* CLOTHERP - Custom Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --brand-primary: #1E293B;
+    --brand-accent: #3B82F6;
+    --brand-emerald: #10B981;
+    --brand-amber: #F59E0B;
+    --brand-indigo: #6366F1;
+    --bg-dark: #090D16;
+    --bg-card-dark: #111827;
+    --border-dark: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Slim Custom Sidebar Scrollbar */
+.custom-sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+}
+.custom-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6;
+}
+
+/* Subtle Fabric Grid / Weave Background */
+.bg-grid-pattern {
+    background-size: 32px 32px;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.bg-dot-pattern {
+    background-size: 24px 24px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+/* Radial Glows */
+.radial-glow-top {
+    background: radial-gradient(600px circle at 50% -100px, rgba(59, 130, 246, 0.12), transparent 70%);
+}
+
+.radial-glow-center {
+    background: radial-gradient(500px circle at center, rgba(99, 102, 241, 0.08), transparent 70%);
+}
+
+/* Glassmorphism Classes */
+.glass-nav {
+    background: rgba(9, 13, 22, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-card {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Card Hover Lift & Border Shimmer */
+.hover-lift {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Subtle Active Badge Pulse */
+@keyframes pulse-subtle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.pulse-indicator {
+    animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+/* Step Flow Connectors */
+.step-connector {
+    position: relative;
+}
+
+@media (min-width: 1024px) {
+    .step-connector::after {
+        content: '';
+        position: absolute;
+        top: 28px;
+        right: -32px;
+        width: 32px;
+        height: 2px;
+        background: repeating-linear-gradient(90deg, #334155, #334155 4px, transparent 4px, transparent 8px);
+    }
+
+    .step-connector-last::after {
+        display: none;
+    }
+}
+
+/* Interactive Ripple for Buttons */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Purchase Order — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Structured multi-section apparel purchase order builder with variant selector and live GST calculations.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex items-center justify-between pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <a href="./purchases.html" class="text-xs text-slate-400 hover:text-white transition font-mono uppercase tracking-wider">Purchases</a>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">New Order</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Create Purchase Order</h1>
+                        <p class="text-xs text-slate-400">Order garment variants from fabric mills, calculate GST, and record transport LR details.</p>
+                    </div>
+
+                    <a href="./purchases.html" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-300 text-xs font-semibold transition flex items-center space-x-1.5">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+
+                <form id="createPurchaseForm" class="space-y-6" novalidate>
+                    
+                    <!-- SECTION 1: SUPPLIER & ORDER BASICS -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <span class="w-5 h-5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-mono text-[11px]">1</span>
+                            <span>Supplier & Order Specifications</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            
+                            <!-- Supplier Dropdown -->
+                            <div class="space-y-1 sm:col-span-2">
+                                <label for="selectSupplier" class="block text-xs font-semibold text-slate-300">Select Supplier / Mill <span class="text-red-400">*</span></label>
+                                <select id="selectSupplier" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="">-- Choose Supplier --</option>
+                                </select>
+                                <div id="supplierError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                            </div>
+
+                            <!-- Supplier GST & State Info Banner -->
+                            <div class="space-y-1">
+                                <label class="block text-xs font-semibold text-slate-300">GST Registration & Tax Type</label>
+                                <div class="p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs font-mono" id="supplierTaxBanner">
+                                    <span class="text-slate-500 block text-[10px]">SUPPLIER GSTIN</span>
+                                    <span class="text-blue-300 font-bold" id="infoGstinText">Select supplier</span>
+                                </div>
+                            </div>
+
+                            <!-- Purchase Date -->
+                            <div class="space-y-1">
+                                <label for="inputPurchaseDate" class="block text-xs font-semibold text-slate-300">Purchase Date <span class="text-red-400">*</span></label>
+                                <input type="date" id="inputPurchaseDate" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <!-- Expected Delivery -->
+                            <div class="space-y-1">
+                                <label for="inputDeliveryDate" class="block text-xs font-semibold text-slate-300">Expected Delivery Date</label>
+                                <input type="date" id="inputDeliveryDate" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <!-- Reference Number -->
+                            <div class="space-y-1">
+                                <label for="inputRefNumber" class="block text-xs font-semibold text-slate-300">Supplier Quotation / Reference</label>
+                                <input type="text" id="inputRefNumber" placeholder="e.g. PO/REF/2026/01" class="w-full px-3.5 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white uppercase font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: PURCHASE ITEMS (VARIANT MATRIX) -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white">
+                                <span class="w-5 h-5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-mono text-[11px]">2</span>
+                                <span>Purchase Items (Product Variants)</span>
+                            </div>
+                            
+                            <button type="button" id="btnOpenVariantPicker" class="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs font-bold transition flex items-center space-x-1.5">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Add Product Variant</span>
+                            </button>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                                        <th class="py-3 px-3">Garment Style & Variant</th>
+                                        <th class="py-3 px-3">SKU</th>
+                                        <th class="py-3 px-3 w-20 text-center">Qty</th>
+                                        <th class="py-3 px-3 w-28 text-right">Rate (₹)</th>
+                                        <th class="py-3 px-3 w-24 text-center">Disc (%)</th>
+                                        <th class="py-3 px-3 w-20 text-center">GST %</th>
+                                        <th class="py-3 px-3 text-right">Taxable (₹)</th>
+                                        <th class="py-3 px-3 text-right font-bold text-slate-200">Total (₹)</th>
+                                        <th class="py-3 px-2 text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseItemsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Dynamic Items -->
+                                    <tr id="emptyItemsRow">
+                                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                                            No product variants added yet. Click <strong>+ Add Product Variant</strong> to select items.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="itemsError" class="hidden text-[11px] text-red-400 font-medium pt-0.5"></div>
+                    </div>
+
+                    <!-- SECTION 3 & 4: OVERALL DISCOUNT & GST TAX SUMMARY -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Overall Discount & Payment -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-mono text-[11px]">3</span>
+                                <span>Overall Discount & Initial Disbursal</span>
+                            </div>
+
+                            <div class="space-y-4 text-xs">
+                                <!-- Overall Discount -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label for="selectOverallDiscType" class="block text-xs font-semibold text-slate-300">Discount Type</label>
+                                        <select id="selectOverallDiscType" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none">
+                                            <option value="percent">Percentage (%)</option>
+                                            <option value="amount">Fixed Amount (₹)</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label for="inputOverallDiscVal" class="block text-xs font-semibold text-slate-300">Discount Value</label>
+                                        <input type="number" id="inputOverallDiscVal" min="0" value="0" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    </div>
+                                </div>
+
+                                <!-- Initial Payment -->
+                                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+                                    <div class="text-[11px] font-bold text-slate-300 uppercase font-mono">Initial Payment / Advance</div>
+                                    
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="space-y-1">
+                                            <label for="selectPaymentMethod" class="block text-[11px] text-slate-400">Payment Mode</label>
+                                            <select id="selectPaymentMethod" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none">
+                                                <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
+                                                <option value="UPI">UPI</option>
+                                                <option value="Cash">Cash</option>
+                                                <option value="Cheque">Cheque</option>
+                                                <option value="Credit">Credit / Pay Later</option>
+                                            </select>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label for="inputPaidAmount" class="block text-[11px] text-slate-400">Paid Amount (₹)</label>
+                                            <input type="number" id="inputPaidAmount" min="0" value="0" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label for="inputPaymentRef" class="block text-[11px] text-slate-400">Transaction Reference / UTR</label>
+                                        <input type="text" id="inputPaymentRef" placeholder="TXN-XXXX" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white font-mono focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GST & Tax Summary Card -->
+                        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                                <span class="w-5 h-5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-mono text-[11px]">4</span>
+                                <span>Financial & GST Tax Summary</span>
+                            </div>
+
+                            <div class="space-y-2.5 text-xs">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Total Gross Amount</span>
+                                    <span class="font-mono text-slate-200" id="summaryGross">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Item-Level Discounts</span>
+                                    <span class="font-mono text-emerald-400" id="summaryItemDisc">-₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Overall PO Discount</span>
+                                    <span class="font-mono text-emerald-400" id="summaryOverallDisc">-₹0.00</span>
+                                </div>
+                                
+                                <div class="flex justify-between border-t border-slate-800 pt-2 font-semibold text-slate-300">
+                                    <span>Taxable Purchase Amount</span>
+                                    <span class="font-mono text-white" id="summaryTaxable">₹0.00</span>
+                                </div>
+
+                                <!-- Dynamic GST breakdown -->
+                                <div id="gstBreakdownContainer" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-[11px] font-mono">
+                                    <div class="flex justify-between text-slate-400" id="rowCGST">
+                                        <span>CGST</span>
+                                        <span id="summaryCGST">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400" id="rowSGST">
+                                        <span>SGST</span>
+                                        <span id="summarySGST">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400 hidden" id="rowIGST">
+                                        <span>IGST (Inter-State)</span>
+                                        <span id="summaryIGST">₹0.00</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between border-t border-slate-800 pt-2.5 font-bold text-base text-white">
+                                    <span>Grand Total</span>
+                                    <span class="font-mono text-blue-300" id="summaryGrandTotal">₹0.00</span>
+                                </div>
+
+                                <div class="flex justify-between text-[11px] text-slate-500 pt-1">
+                                    <span>Total Garment Units: <strong class="text-slate-300 font-mono" id="summaryTotalUnits">0</strong></span>
+                                    <span>Balance Due: <strong class="text-amber-400 font-mono" id="summaryBalanceDue">₹0.00</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- SECTION 5: SHIPMENT & FREIGHT DETAILS -->
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-white border-b border-slate-800 pb-3">
+                            <span class="w-5 h-5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-mono text-[11px]">5</span>
+                            <span>Freight Consignment & Transport Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="space-y-1">
+                                <label for="inputTransportName" class="block text-xs font-semibold text-slate-300">Transport / Freight Carrier</label>
+                                <input type="text" id="inputTransportName" placeholder="e.g. Navkar Roadlines Express" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputLrNumber" class="block text-xs font-semibold text-slate-300">LR (Lorry Receipt) Number</label>
+                                <input type="text" id="inputLrNumber" placeholder="e.g. LR-987456" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputVehicleNumber" class="block text-xs font-semibold text-slate-300">Vehicle / Truck Number</label>
+                                <input type="text" id="inputVehicleNumber" placeholder="e.g. GJ-05-BX-4321" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono uppercase placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputDriverName" class="block text-xs font-semibold text-slate-300">Driver Name</label>
+                                <input type="text" id="inputDriverName" placeholder="Driver name" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputDriverMobile" class="block text-xs font-semibold text-slate-300">Driver Mobile</label>
+                                <input type="text" id="inputDriverMobile" placeholder="+91 98790 00000" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="inputDispatchDate" class="block text-xs font-semibold text-slate-300">Dispatch Date</label>
+                                <input type="date" id="inputDispatchDate" class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="space-y-1 pt-2">
+                            <label for="inputPurchaseNotes" class="block text-xs font-semibold text-slate-300">Order Remarks / Delivery Instructions</label>
+                            <textarea id="inputPurchaseNotes" rows="2" placeholder="Quality inspection standards, packaging guidelines..." class="w-full px-3 py-2 bg-slate-950/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <a href="./purchases.html" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancel</a>
+                        <button type="button" id="btnSaveDraft" class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-850 text-slate-200 text-xs font-semibold transition">Save as Draft</button>
+                        <button type="submit" id="btnConfirmOrder" class="btn-primary px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Confirm & Issue Purchase Order</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">New Purchase Order Form</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- PRODUCT VARIANT PICKER MODAL -->
+    <div id="variantPickerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="variantPickerModalCard">
+            
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                        <i data-lucide="tag" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white">Select Product Variant to Add</h3>
+                </div>
+                <button id="btnClosePickerModal" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Modal Search Input -->
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="pickerSearchInput" 
+                    placeholder="Search product style, color, size, SKU or barcode..." 
+                    class="w-full pl-10 pr-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                >
+            </div>
+
+            <!-- Available Variants Table -->
+            <div class="overflow-x-auto max-h-80 overflow-y-auto border border-slate-800 rounded-xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="sticky top-0 bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+                        <tr>
+                            <th class="py-2.5 px-3">Product Style</th>
+                            <th class="py-2.5 px-3">Color × Size</th>
+                            <th class="py-2.5 px-3">SKU</th>
+                            <th class="py-2.5 px-3 text-right">Est. Cost</th>
+                            <th class="py-2.5 px-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pickerVariantsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                        <!-- Dynamic Variant Selector Rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button type="button" id="btnClosePickerBtn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Close</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { supplierService } from './assets/js/services/supplierService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { purchaseService } from './assets/js/services/purchaseService.js';
+        import { taxService } from './assets/js/services/taxService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PURCHASES_CREATE });
+        if (!user) throw new Error('Auth required');
+
+        let allSuppliers = [];
+        let allProducts = [];
+        let allVariantsFlat = [];
+        let purchaseItems = [];
+        let selectedSupplier = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'purchases');
+            initTopbar('topbarMount');
+
+            if (window.lucide) lucide.createIcons();
+
+            document.getElementById('inputPurchaseDate').value = new Date().toISOString().split('T')[0];
+
+            await loadPrerequisites();
+            attachFormEvents();
+            attachPickerEvents();
+        });
+
+        async function loadPrerequisites() {
+            const [supRes, prodRes] = await Promise.all([
+                supplierService.getSuppliers({ pageSize: 100 }),
+                productService.getProducts({ pageSize: 100 })
+            ]);
+
+            allSuppliers = supRes.items || [];
+            allProducts = prodRes.items || [];
+
+            // Flatten products & variants for easy lookup
+            allVariantsFlat = [];
+            allProducts.forEach(p => {
+                (p.variants || []).forEach(v => {
+                    allVariantsFlat.push({
+                        productId: p.id,
+                        productName: p.name,
+                        category: p.category,
+                        gstRate: p.gstRate ? parseInt(p.gstRate) : 5,
+                        productVariantId: v.id,
+                        color: v.color,
+                        colorHex: v.colorHex || '#111827',
+                        size: v.size,
+                        sku: v.sku,
+                        barcode: v.barcode,
+                        costPrice: v.costPrice || p.baseCostPrice || 500,
+                        sellingPrice: v.sellingPrice || p.baseSellingPrice
+                    });
+                });
+            });
+
+            // Populate Supplier Dropdown
+            const select = document.getElementById('selectSupplier');
+            select.innerHTML = '<option value="">-- Choose Supplier / Mill --</option>' +
+                allSuppliers.map(s => `<option value="${s.id}">${s.name} (${s.city}, ${s.state})</option>`).join('');
+
+            // If supplierId passed in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const passedSupId = urlParams.get('supplierId');
+            if (passedSupId) {
+                select.value = passedSupId;
+                handleSupplierChange(passedSupId);
+            }
+        }
+
+        function handleSupplierChange(supplierId) {
+            selectedSupplier = allSuppliers.find(s => s.id === supplierId);
+            if (selectedSupplier) {
+                const isSame = taxService.isSameState(selectedSupplier.state);
+                document.getElementById('infoGstinText').textContent = `${selectedSupplier.gstin || 'Unregistered'} • ${isSame ? 'CGST+SGST (Intra-State)' : 'IGST (Inter-State)'}`;
+            } else {
+                document.getElementById('infoGstinText').textContent = 'Select supplier';
+            }
+            recalculateSummary();
+        }
+
+        function renderItemsTable() {
+            const tbody = document.getElementById('purchaseItemsTableBody');
+
+            if (purchaseItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="emptyItemsRow">
+                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                            No product variants added yet. Click <strong>+ Add Product Variant</strong> to select items.
+                        </td>
+                    </tr>
+                `;
+                recalculateSummary();
+                return;
+            }
+
+            const isSame = selectedSupplier ? taxService.isSameState(selectedSupplier.state) : true;
+
+            tbody.innerHTML = purchaseItems.map((item, idx) => {
+                const line = taxService.calculateLineTax({
+                    quantity: item.quantity,
+                    rate: item.purchaseRate,
+                    discountType: item.discountType || 'percent',
+                    discountVal: item.discountVal || 0,
+                    gstRate: item.gstRate || 5,
+                    isSameState: isSame
+                });
+
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs" data-idx="${idx}">
+                        <td class="py-2.5 px-3">
+                            <div class="font-bold text-slate-200">${item.productName}</div>
+                            <div class="flex items-center space-x-1.5 text-[10px] text-slate-400">
+                                <span class="w-2.5 h-2.5 rounded-full inline-block border border-slate-700" style="background-color: ${item.colorHex || '#111827'};"></span>
+                                <span>${item.color}</span>
+                                <span>•</span>
+                                <span class="font-mono font-bold text-slate-300">${item.size}</span>
+                            </div>
+                        </td>
+                        <td class="py-2.5 px-3 font-mono text-blue-300">${item.sku}</td>
+                        <td class="py-2.5 px-3 text-center">
+                            <input type="number" min="1" value="${item.quantity}" class="item-qty w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono text-center focus:outline-none focus:border-blue-500" data-idx="${idx}">
+                        </td>
+                        <td class="py-2.5 px-3 text-right">
+                            <input type="number" min="0" value="${item.purchaseRate}" class="item-rate w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono text-right focus:outline-none focus:border-blue-500" data-idx="${idx}">
+                        </td>
+                        <td class="py-2.5 px-3 text-center">
+                            <input type="number" min="0" max="100" value="${item.discountVal || 0}" class="item-disc w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono text-center focus:outline-none focus:border-blue-500" data-idx="${idx}">
+                        </td>
+                        <td class="py-2.5 px-3 text-center font-mono text-slate-400">
+                            ${item.gstRate || 5}%
+                        </td>
+                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">
+                            ₹${line.taxableAmount.toFixed(2)}
+                        </td>
+                        <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-100">
+                            ₹${line.totalAmount.toFixed(2)}
+                        </td>
+                        <td class="py-2.5 px-2 text-center">
+                            <button type="button" class="btn-remove-item p-1 text-slate-500 hover:text-red-400 transition" data-idx="${idx}" title="Remove Item">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+            attachTableInputListeners();
+            recalculateSummary();
+        }
+
+        function attachTableInputListeners() {
+            document.querySelectorAll('.item-qty').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.getAttribute('data-idx'));
+                    purchaseItems[idx].quantity = Math.max(1, parseInt(e.target.value) || 1);
+                    renderItemsTable();
+                });
+            });
+
+            document.querySelectorAll('.item-rate').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.getAttribute('data-idx'));
+                    purchaseItems[idx].purchaseRate = Math.max(0, parseFloat(e.target.value) || 0);
+                    renderItemsTable();
+                });
+            });
+
+            document.querySelectorAll('.item-disc').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.getAttribute('data-idx'));
+                    purchaseItems[idx].discountVal = Math.max(0, parseFloat(e.target.value) || 0);
+                    renderItemsTable();
+                });
+            });
+
+            document.querySelectorAll('.btn-remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.getAttribute('data-idx'));
+                    purchaseItems.splice(idx, 1);
+                    renderItemsTable();
+                });
+            });
+        }
+
+        function recalculateSummary() {
+            const overallDiscType = document.getElementById('selectOverallDiscType').value;
+            const overallDiscVal = document.getElementById('inputOverallDiscVal').value;
+            const paidAmount = parseFloat(document.getElementById('inputPaidAmount').value) || 0;
+
+            const totals = taxService.calculatePurchaseTotals({
+                items: purchaseItems,
+                overallDiscountType: overallDiscType,
+                overallDiscountVal: overallDiscVal,
+                supplierState: selectedSupplier ? selectedSupplier.state : 'Maharashtra'
+            });
+
+            document.getElementById('summaryGross').textContent = `₹${totals.totalGross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryItemDisc').textContent = `-₹${totals.totalItemDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryOverallDisc').textContent = `-₹${totals.overallDiscountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryTaxable').textContent = `₹${totals.finalTaxableAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            
+            if (totals.isSameState) {
+                document.getElementById('rowCGST').classList.remove('hidden');
+                document.getElementById('rowSGST').classList.remove('hidden');
+                document.getElementById('rowIGST').classList.add('hidden');
+                document.getElementById('summaryCGST').textContent = `₹${totals.cgstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                document.getElementById('summarySGST').textContent = `₹${totals.sgstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            } else {
+                document.getElementById('rowCGST').classList.add('hidden');
+                document.getElementById('rowSGST').classList.add('hidden');
+                document.getElementById('rowIGST').classList.remove('hidden');
+                document.getElementById('summaryIGST').textContent = `₹${totals.igstTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            }
+
+            document.getElementById('summaryGrandTotal').textContent = `₹${totals.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('summaryTotalUnits').textContent = totals.totalQuantity;
+
+            const balance = Math.max(0, totals.grandTotal - paidAmount);
+            document.getElementById('summaryBalanceDue').textContent = `₹${balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        }
+
+        function attachFormEvents() {
+            document.getElementById('selectSupplier').addEventListener('change', (e) => {
+                handleSupplierChange(e.target.value);
+            });
+
+            document.getElementById('selectOverallDiscType').addEventListener('change', recalculateSummary);
+            document.getElementById('inputOverallDiscVal').addEventListener('input', recalculateSummary);
+            document.getElementById('inputPaidAmount').addEventListener('input', recalculateSummary);
+
+            document.getElementById('btnSaveDraft').addEventListener('click', () => submitPurchase(false));
+            document.getElementById('createPurchaseForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitPurchase(true);
+            });
+        }
+
+        async function submitPurchase(confirmNow) {
+            const supplierId = document.getElementById('selectSupplier').value;
+            const supErr = document.getElementById('supplierError');
+            const itemErr = document.getElementById('itemsError');
+
+            supErr.classList.add('hidden');
+            itemErr.classList.add('hidden');
+
+            let isValid = true;
+            if (!supplierId) {
+                supErr.textContent = 'Please select a supplier.';
+                supErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (purchaseItems.length === 0) {
+                itemErr.textContent = 'Please add at least one product variant item to the purchase order.';
+                itemErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const payload = {
+                supplierId,
+                confirmNow,
+                purchaseDate: document.getElementById('inputPurchaseDate').value,
+                expectedDeliveryDate: document.getElementById('inputDeliveryDate').value,
+                referenceNumber: document.getElementById('inputRefNumber').value.trim(),
+                items: purchaseItems,
+                overallDiscountType: document.getElementById('selectOverallDiscType').value,
+                overallDiscountVal: document.getElementById('inputOverallDiscVal').value,
+                initialPaymentMethod: document.getElementById('selectPaymentMethod').value,
+                initialPaymentAmount: document.getElementById('inputPaidAmount').value,
+                initialPaymentRef: document.getElementById('inputPaymentRef').value.trim(),
+                transportName: document.getElementById('inputTransportName').value.trim(),
+                lrNumber: document.getElementById('inputLrNumber').value.trim(),
+                vehicleNumber: document.getElementById('inputVehicleNumber').value.trim(),
+                driverName: document.getElementById('inputDriverName').value.trim(),
+                driverMobile: document.getElementById('inputDriverMobile').value.trim(),
+                dispatchDate: document.getElementById('inputDispatchDate').value,
+                notes: document.getElementById('inputPurchaseNotes').value.trim()
+            };
+
+            const res = await purchaseService.createPurchase(payload, user.name);
+
+            if (res.success) {
+                showToast(`Purchase Order ${res.purchase.purchaseNumber} created successfully!`, 'success');
+                setTimeout(() => {
+                    window.location.href = `./purchase-details.html?id=${res.purchase.id}`;
+                }, 500);
+            } else {
+                showToast(res.message || 'Error creating purchase order.', 'error');
+            }
+        }
+
+        // --- VARIANT PICKER MODAL LOGIC ---
+        function attachPickerEvents() {
+            document.getElementById('btnOpenVariantPicker').addEventListener('click', openPickerModal);
+            document.getElementById('btnClosePickerModal').addEventListener('click', closePickerModal);
+            document.getElementById('btnClosePickerBtn').addEventListener('click', closePickerModal);
+
+            document.getElementById('pickerSearchInput').addEventListener('input', (e) => {
+                renderPickerVariants(e.target.value);
+            });
+        }
+
+        function openPickerModal() {
+            renderPickerVariants('');
+            const modal = document.getElementById('variantPickerModal');
+            const card = document.getElementById('variantPickerModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closePickerModal() {
+            const modal = document.getElementById('variantPickerModal');
+            const card = document.getElementById('variantPickerModalCard');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function renderPickerVariants(query = '') {
+            const tbody = document.getElementById('pickerVariantsTableBody');
+            let filtered = allVariantsFlat;
+
+            if (query && query.trim()) {
+                const q = query.trim().toLowerCase();
+                filtered = filtered.filter(v => 
+                    v.productName.toLowerCase().includes(q) ||
+                    v.color.toLowerCase().includes(q) ||
+                    v.size.toLowerCase().includes(q) ||
+                    v.sku.toLowerCase().includes(q) ||
+                    v.barcode.includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-sans">No matching variants found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(v => {
+                const alreadyAdded = purchaseItems.some(i => i.productVariantId === v.productVariantId);
+
+                return `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-2.5 px-3">
+                            <span class="font-bold text-slate-200">${v.productName}</span>
+                            <span class="text-[10px] text-slate-500 font-mono block">${v.category}</span>
+                        </td>
+                        <td class="py-2.5 px-3">
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full inline-block border border-slate-700" style="background-color: ${v.colorHex};"></span>
+                                <span class="text-slate-300 font-medium">${v.color}</span>
+                                <span class="px-1.5 py-0.2 rounded bg-slate-900 border border-slate-700 text-slate-300 font-mono text-[10px] font-bold">${v.size}</span>
+                            </div>
+                        </td>
+                        <td class="py-2.5 px-3 font-mono text-blue-300">${v.sku}</td>
+                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">₹${v.costPrice}</td>
+                        <td class="py-2.5 px-3 text-right">
+                            ${alreadyAdded ? `
+                                <span class="text-emerald-400 font-bold text-[11px]">Added</span>
+                            ` : `
+                                <button type="button" class="btn-add-var px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold transition" data-id="${v.productVariantId}">
+                                    Add
+                                </button>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.btn-add-var').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const varId = btn.getAttribute('data-id');
+                    const targetVar = allVariantsFlat.find(v => v.productVariantId === varId);
+                    if (targetVar) {
+                        purchaseItems.push({
+                            productId: targetVar.productId,
+                            productName: targetVar.productName,
+                            productVariantId: targetVar.productVariantId,
+                            variantName: `${targetVar.color} / ${targetVar.size}`,
+                            color: targetVar.color,
+                            colorHex: targetVar.colorHex,
+                            size: targetVar.size,
+                            sku: targetVar.sku,
+                            barcode: targetVar.barcode,
+                            quantity: 10,
+                            purchaseRate: targetVar.costPrice,
+                            discountType: 'percent',
+                            discountVal: 0,
+                            gstRate: targetVar.gstRate || 5
+                        });
+                        renderItemsTable();
+                        renderPickerVariants(document.getElementById('pickerSearchInput').value);
+                    }
+                });
+            });
+        }
+
+        function showToast(msg, type = 'info') {
+            let toast = document.getElementById('clotherp-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'clotherp-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900 text-slate-100 border border-slate-700 px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-10 opacity-0';
+                toast.innerHTML = `<span id="toast-message" class="text-sm font-medium"></span>`;
+                document.body.appendChild(toast);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.textContent = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

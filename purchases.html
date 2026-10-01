@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchases — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Manage supplier purchase orders, GST invoices, and incoming stock in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Operations Hub</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Procurement</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Purchase Orders</h1>
+                        <p class="text-xs text-slate-400">Manage supplier purchase orders, GST tax invoicing, and incoming freight consignments.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-2" id="purchaseActionButtons">
+                        <a href="./create-purchase.html" class="btn-primary px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-1.5" id="btnCreatePurchase">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>New Purchase Order</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5 KPI Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Total Orders</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalPurchases">0</div>
+                        <span class="text-[10px] text-slate-500">All Purchase Orders</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-slate-400 font-medium">Draft POs</span>
+                        <div class="text-2xl font-extrabold text-slate-300 font-mono" id="kpiDraftCount">0</div>
+                        <span class="text-[10px] text-slate-500">Pending Confirmation</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-blue-400 font-medium">In Transit</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiInTransitCount">0</div>
+                        <span class="text-[10px] text-slate-500">Active LR Shipments</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-amber-400 font-medium">Pending Payables</span>
+                        <div class="text-xl font-extrabold text-amber-300 font-mono" id="kpiPendingPayables">₹0</div>
+                        <span class="text-[10px] text-slate-500">Due to Suppliers</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1">
+                        <span class="text-[11px] text-emerald-400 font-medium">Received Stock</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiReceivedCount">0</div>
+                        <span class="text-[10px] text-slate-500">Intake Completed</span>
+                    </div>
+                </div>
+
+                <!-- Table Search & Filter Controls -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+                    
+                    <!-- Search Input -->
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="purchaseSearchInput" 
+                            placeholder="Search purchases, supplier, LR number..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <!-- Dropdown Filters -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="supplierFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Suppliers</option>
+                        </select>
+
+                        <select id="statusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All PO Status</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="In Transit">In Transit</option>
+                            <option value="Partially Received">Partially Received</option>
+                            <option value="Received">Received</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+
+                        <select id="paymentStatusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="">All Payment Status</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Partial">Partial</option>
+                            <option value="Paid">Paid</option>
+                        </select>
+
+                        <select id="sortByFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="highest_amount">Highest Value</option>
+                            <option value="lowest_amount">Lowest Value</option>
+                        </select>
+
+                        <button id="btnClearFilters" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white border border-slate-700 text-xs transition" title="Clear filters">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Purchases Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/70 text-slate-400 border-b border-slate-800 uppercase font-mono text-[11px]">
+                                    <th class="py-3 px-4">Purchase No.</th>
+                                    <th class="py-3 px-4">Supplier / Mill</th>
+                                    <th class="py-3 px-3">Items / Qty</th>
+                                    <th class="py-3 px-4 text-right">Grand Total</th>
+                                    <th class="py-3 px-3 text-center">Payment</th>
+                                    <th class="py-3 px-4">Shipment & LR</th>
+                                    <th class="py-3 px-3 text-center">PO Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasesTableBody" class="divide-y divide-slate-800/60 font-sans">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400" id="paginationFooter">
+                        <span id="showingCount">Showing 0 of 0 purchases</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Procurement & Purchases Module</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { purchaseService } from './assets/js/services/purchaseService.js';
+        import { supplierService } from './assets/js/services/supplierService.js';
+        import { openEasyPrint } from './assets/js/components/easyPrintModal.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { initProfileMenu } from './assets/js/components/profileMenu.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth({ requiredPermission: PERMISSIONS.PURCHASES_VIEW });
+        if (!user) throw new Error('Auth required');
+
+        const canCreate = authService.hasPermission(PERMISSIONS.PURCHASES_CREATE);
+        const canReceive = authService.hasPermission(PERMISSIONS.PURCHASES_RECEIVE);
+
+        let currentPage = 1;
+        const pageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'purchases');
+            initTopbar('topbarMount');
+            initProfileMenu();
+
+            if (!canCreate) {
+                const btn = document.getElementById('btnCreatePurchase');
+                if (btn) btn.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            await populateSuppliersDropdown();
+            await loadPurchases();
+            attachFilterEvents();
+        });
+
+        async function populateSuppliersDropdown() {
+            const res = await supplierService.getSuppliers({ pageSize: 100 });
+            const select = document.getElementById('supplierFilter');
+            (res.items || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                select.appendChild(opt);
+            });
+        }
+
+        async function loadPurchases() {
+            const search = document.getElementById('purchaseSearchInput').value;
+            const supplierId = document.getElementById('supplierFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const paymentStatus = document.getElementById('paymentStatusFilter').value;
+            const sortBy = document.getElementById('sortByFilter').value;
+
+            const res = await purchaseService.getPurchases({
+                page: currentPage,
+                pageSize,
+                search,
+                supplierId,
+                status,
+                paymentStatus,
+                sortBy
+            });
+
+            // Update KPIs
+            document.getElementById('kpiTotalPurchases').textContent = res.summary.totalPurchases;
+            document.getElementById('kpiDraftCount').textContent = res.summary.draftCount;
+            document.getElementById('kpiInTransitCount').textContent = res.summary.inTransitCount;
+            document.getElementById('kpiPendingPayables').textContent = res.summary.pendingPaymentFormatted;
+            document.getElementById('kpiReceivedCount').textContent = res.summary.receivedCount;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(purchases, pagination) {
+            const tbody = document.getElementById('purchasesTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${purchases.length} of ${pagination.totalItems} orders`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (purchases.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-12 text-center text-slate-500 font-sans">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-300 mb-1">No purchase orders found</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">No procurement records match your active search filters.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = purchases.map(p => `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/40 transition text-xs">
+                        <td class="py-3 px-4 font-mono whitespace-nowrap">
+                            <a href="./purchase-details.html?id=${p.id}" class="font-bold text-blue-300 hover:underline">${p.purchaseNumber}</a>
+                            <div class="text-[10px] text-slate-500 whitespace-nowrap">${p.purchaseDate}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <a href="./supplier-details.html?id=${p.supplierId}" class="font-bold text-slate-200 hover:text-blue-400 transition">${p.supplierName}</a>
+                            <div class="text-[10px] text-slate-500 font-mono whitespace-nowrap">${p.supplierGstin || 'GST Unregistered'}</div>
+                        </td>
+                        <td class="py-3 px-3 whitespace-nowrap">
+                            <span class="font-bold text-slate-200">${p.items.length} Variants</span>
+                            <span class="text-[10px] text-slate-500 font-mono block">${p.totalReceivedQuantity || 0}/${p.totalQuantity} Units Rcvd</span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-slate-100 whitespace-nowrap">
+                            ₹${p.grandTotal.toLocaleString('en-IN')}
+                            <span class="text-[10px] font-normal text-slate-500 block">Bal: ₹${p.balanceAmount.toLocaleString('en-IN')}</span>
+                        </td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                p.paymentStatus === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                p.paymentStatus === 'Partial' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                'bg-red-500/10 text-red-400 border-red-500/20'
+                            }">
+                                ${p.paymentStatus}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            ${p.shipment && p.shipment.lrNumber ? `
+                                <a href="./purchase-shipment-tracking.html?id=${p.id}" class="font-mono font-bold text-blue-300 hover:underline flex items-center space-x-1">
+                                    <i data-lucide="truck" class="w-3 h-3 text-blue-400"></i>
+                                    <span>${p.shipment.lrNumber}</span>
+                                </a>
+                                <span class="text-[10px] text-slate-500 block truncate max-w-[120px]">${p.shipment.transportName || 'Transport'}</span>
+                            ` : `
+                                <span class="text-slate-500 text-[11px]">No LR assigned</span>
+                            `}
+                        </td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                p.status === 'Received' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                p.status === 'In Transit' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                p.status === 'Partially Received' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                p.status === 'Confirmed' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                                p.status === 'Cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                'bg-slate-800 text-slate-400 border-slate-700'
+                            }">
+                                ${p.status}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                            <div class="flex items-center justify-end space-x-1">
+                                <a href="./purchase-details.html?id=${p.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="View PO Details">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                </a>
+                                <button type="button" class="btn-easy-print-po p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition cursor-pointer" data-id="${p.id}" title="EasyPrint Purchase Order (Professional A4)">
+                                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <a href="./purchase-details.html?id=${p.id}&tab=tabProforma" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition" title="Supplier Proforma Document Archive">
+                                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                </a>
+                                ${canReceive && p.status !== 'Fully Received' && p.status !== 'Received' && p.status !== 'Cancelled' && p.status !== 'Draft' ? `
+                                    <a href="./receive-purchase.html?id=${p.id}" class="px-2 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold transition flex items-center space-x-1" title="Receive Goods & GRN">
+                                        <i data-lucide="package-check" class="w-3 h-3"></i>
+                                        <span>GRN</span>
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.querySelectorAll('.btn-easy-print-po').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        const p = await purchaseService.getPurchaseById(id);
+                        if (p) {
+                            openEasyPrint(p, 'PURCHASE_ORDER');
+                        }
+                    });
+                });
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function attachFilterEvents() {
+            let debounceTimer;
+            document.getElementById('purchaseSearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadPurchases();
+                }, 300);
+            });
+
+            document.getElementById('supplierFilter').addEventListener('change', () => { currentPage = 1; loadPurchases(); });
+            document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; loadPurchases(); });
+            document.getElementById('paymentStatusFilter').addEventListener('change', () => { currentPage = 1; loadPurchases(); });
+            document.getElementById('sortByFilter').addEventListener('change', () => { currentPage = 1; loadPurchases(); });
+
+            document.getElementById('btnClearFilters').addEventListener('click', () => {
+                document.getElementById('purchaseSearchInput').value = '';
+                document.getElementById('supplierFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('paymentStatusFilter').value = '';
+                document.getElementById('sortByFilter').value = 'newest';
+                currentPage = 1;
+                loadPurchases();
+            });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadPurchases();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadPurchases();
+            });
+        }
+    </script>
+</body>
+</html>

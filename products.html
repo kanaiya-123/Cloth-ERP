@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products — CLOTHERP Clothing Management Platform</title>
+    <meta name="description" content="Manage all clothing products and variants in CLOTHERP.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#0f172a',
+                            900: '#090d16',
+                            950: '#05070d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="bg-[#090D16] text-slate-100 antialiased selection:bg-blue-600 selection:text-white bg-grid-pattern overflow-x-hidden min-h-screen">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR MOUNT -->
+        <div id="sidebarMount"></div>
+
+        <!-- MAIN APPLICATION WORKSPACE -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- TOPBAR MOUNT -->
+            <div id="topbarMount"></div>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+                
+                <!-- Page Header & Action -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400 font-mono uppercase tracking-wider">Inventory Hub</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="text-xs text-blue-400 font-bold font-mono">Catalog</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">Products & Variants</h1>
+                        <p class="text-xs text-slate-400">Manage all apparel master styles, matrix variants (Size × Color), barcodes, and pricing.</p>
+                    </div>
+
+                    <div id="actionBtnArea">
+                        <a href="./add-product.html" id="btnAddProductLink" class="btn-primary px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Product</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1.5">
+                        <span class="text-xs text-slate-400 font-medium">Total Products</span>
+                        <div class="text-2xl font-extrabold text-white font-mono" id="kpiTotalProducts">0</div>
+                        <span class="text-[10px] text-slate-500">Clothing styles</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1.5">
+                        <span class="text-xs text-emerald-400 font-medium">Active Products</span>
+                        <div class="text-2xl font-extrabold text-emerald-300 font-mono" id="kpiActiveProducts">0</div>
+                        <span class="text-[10px] text-slate-500">In circulation</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1.5">
+                        <span class="text-xs text-slate-400 font-medium">Inactive Styles</span>
+                        <div class="text-2xl font-extrabold text-slate-300 font-mono" id="kpiInactiveProducts">0</div>
+                        <span class="text-[10px] text-slate-500">Archived / Deactivated</span>
+                    </div>
+
+                    <div class="glass-card hover-lift p-4 rounded-2xl border border-slate-800 space-y-1.5">
+                        <span class="text-xs text-blue-400 font-medium">Total SKUs (Variants)</span>
+                        <div class="text-2xl font-extrabold text-blue-300 font-mono" id="kpiTotalVariants">0</div>
+                        <span class="text-[10px] text-slate-500">Color × Size combinations</span>
+                    </div>
+                </div>
+
+                <!-- Table Filter & Search Controls -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+                    
+                    <!-- Search Input (Name, SKU, Barcode) -->
+                    <div class="relative flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="productSearchInput" 
+                            placeholder="Search by product name, SKU or barcode..." 
+                            class="w-full pl-10 pr-3.5 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        >
+                    </div>
+
+                    <!-- Dropdown Filters -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="categoryFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <option value="">All Categories</option>
+                        </select>
+
+                        <select id="brandFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <option value="">All Brands</option>
+                        </select>
+
+                        <select id="statusFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <option value="">All Statuses</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+
+                        <select id="sortByFilter" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="name_asc">Name (A-Z)</option>
+                            <option value="price_asc">Price (Low to High)</option>
+                            <option value="price_desc">Price (High to Low)</option>
+                        </select>
+
+                        <button id="btnClearFilters" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white border border-slate-700 text-xs transition" title="Clear all filters">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Products Table Card -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/70 text-slate-400 border-b border-slate-800 uppercase font-mono text-[11px]">
+                                    <th class="py-3 px-4">Product Style</th>
+                                    <th class="py-3 px-4">Category</th>
+                                    <th class="py-3 px-4">Brand</th>
+                                    <th class="py-3 px-3 text-center">Variants</th>
+                                    <th class="py-3 px-4 text-right">Base Price</th>
+                                    <th class="py-3 px-3 text-center">Status</th>
+                                    <th class="py-3 px-4 text-center">Created</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody" class="divide-y divide-slate-800/60">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400" id="paginationFooter">
+                        <span id="showingCount">Showing 0 of 0 products</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPrevPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Previous</button>
+                            <span id="pageInfo" class="font-mono text-slate-200">Page 1 of 1</span>
+                            <button id="btnNextPage" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="py-4 px-6 border-t border-slate-800/80 bg-slate-950/60 text-xs text-slate-500 flex justify-between items-center">
+                <div>© 2026 CLOTHERP. All rights reserved. • Enterprise Garment ERP</div>
+                <div class="font-mono text-[11px] text-slate-600">Product Management Module</div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- Script Handling -->
+    <script type="module">
+        import { requireAuth } from './assets/js/utils/authGuard.js';
+        import { authService } from './assets/js/services/authService.js';
+        import { productService } from './assets/js/services/productService.js';
+        import { categoryService } from './assets/js/services/categoryService.js';
+        import { brandService } from './assets/js/services/brandService.js';
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initTopbar } from './assets/js/components/topbar.js';
+        import { PERMISSIONS } from './assets/js/config/permissions.js';
+
+        const user = requireAuth();
+        if (!user) throw new Error('Auth required');
+
+        const canCreate = authService.hasPermission(PERMISSIONS.PRODUCTS_CREATE);
+        const canEdit = authService.hasPermission(PERMISSIONS.PRODUCTS_EDIT);
+
+        let currentPage = 1;
+        const pageSize = 8;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSidebar('sidebarMount', 'products');
+            initTopbar('topbarMount');
+
+            if (!canCreate) {
+                const addLink = document.getElementById('btnAddProductLink');
+                if (addLink) addLink.style.display = 'none';
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            await populateFilterDropdowns();
+            await loadProducts();
+            attachFilterEvents();
+        });
+
+        async function populateFilterDropdowns() {
+            const [categories, brands] = await Promise.all([
+                categoryService.getCategories(),
+                brandService.getBrands()
+            ]);
+
+            const catSelect = document.getElementById('categoryFilter');
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name;
+                catSelect.appendChild(opt);
+            });
+
+            const brandSelect = document.getElementById('brandFilter');
+            brands.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.name;
+                opt.textContent = b.name;
+                brandSelect.appendChild(opt);
+            });
+        }
+
+        async function loadProducts() {
+            const search = document.getElementById('productSearchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const brand = document.getElementById('brandFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const sortBy = document.getElementById('sortByFilter').value;
+
+            const res = await productService.getProducts({
+                page: currentPage,
+                pageSize,
+                search,
+                category,
+                brand,
+                status,
+                sortBy
+            });
+
+            // Update KPI Tiles
+            document.getElementById('kpiTotalProducts').textContent = res.summary.totalProducts;
+            document.getElementById('kpiActiveProducts').textContent = res.summary.activeProducts;
+            document.getElementById('kpiInactiveProducts').textContent = res.summary.inactiveProducts;
+            document.getElementById('kpiTotalVariants').textContent = res.summary.totalVariants;
+
+            renderTable(res.items, res.pagination);
+        }
+
+        function renderTable(products, pagination) {
+            const tbody = document.getElementById('productTableBody');
+            document.getElementById('showingCount').textContent = `Showing ${products.length} of ${pagination.totalItems} products`;
+            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+            document.getElementById('btnPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('btnNextPage').disabled = pagination.page >= pagination.totalPages;
+
+            if (products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-12 text-center text-slate-500">
+                            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                                <i data-lucide="tag" class="w-6 h-6"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-300 mb-1">No products found</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">No clothing items match your search or filter parameters.</p>
+                            ${canCreate ? `
+                                <a href="./add-product.html" class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>Add First Product</span>
+                                </a>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = products.map(p => `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-850/50 transition">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center space-x-3">
+                                <img src="${p.primaryImage || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=80&q=80'}" alt="${p.name}" class="w-9 h-9 rounded-lg object-cover border border-slate-700 flex-shrink-0 bg-slate-900">
+                                <div>
+                                    <a href="./product-details.html?id=${p.id}" class="font-bold text-slate-200 hover:text-blue-400 transition">${p.name}</a>
+                                    <div class="text-[10px] text-slate-500 font-mono">${p.code} • ${p.gender || 'Unisex'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-slate-300 font-medium">${p.category}</td>
+                        <td class="py-3 px-4 text-slate-400">${p.brand}</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-mono font-bold text-[11px] border border-blue-500/20">
+                                ${p.variants ? p.variants.length : 0} SKUs
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-slate-100">₹${p.baseSellingPrice.toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                p.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'
+                            }">
+                                ${p.status}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center font-mono text-slate-400">${p.createdOn}</td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end space-x-1.5">
+                                <a href="./product-details.html?id=${p.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="View Details">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                </a>
+                                ${canEdit ? `
+                                    <a href="./edit-product.html?id=${p.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" title="Edit Product">
+                                        <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                    <button class="btn-toggle-product p-1.5 rounded-lg ${
+                                        p.status === 'Active' ? 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10' : 'text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10'
+                                    } transition" data-id="${p.id}" title="${p.status === 'Active' ? 'Deactivate Product' : 'Activate Product'}">
+                                        <i data-lucide="${p.status === 'Active' ? 'slash' : 'check'}" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+            attachRowActions();
+        }
+
+        function attachRowActions() {
+            document.querySelectorAll('.btn-toggle-product').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    await productService.toggleStatus(id);
+                    await loadProducts();
+                });
+            });
+        }
+
+        function attachFilterEvents() {
+            let debounceTimer;
+            document.getElementById('productSearchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    loadProducts();
+                }, 300);
+            });
+
+            document.getElementById('categoryFilter').addEventListener('change', () => { currentPage = 1; loadProducts(); });
+            document.getElementById('brandFilter').addEventListener('change', () => { currentPage = 1; loadProducts(); });
+            document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; loadProducts(); });
+            document.getElementById('sortByFilter').addEventListener('change', () => { currentPage = 1; loadProducts(); });
+
+            document.getElementById('btnClearFilters').addEventListener('click', () => {
+                document.getElementById('productSearchInput').value = '';
+                document.getElementById('categoryFilter').value = '';
+                document.getElementById('brandFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('sortByFilter').value = 'newest';
+                currentPage = 1;
+                loadProducts();
+            });
+
+            document.getElementById('btnPrevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadProducts();
+                }
+            });
+
+            document.getElementById('btnNextPage').addEventListener('click', () => {
+                currentPage++;
+                loadProducts();
+            });
+        }
+    </script>
+</body>
+</html>
